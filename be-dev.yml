@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  check-in-be:
+    image: twendeesoft/project:detech-check-in-be-latest
+    container_name: twendee-erp-be
+    mem_limit: 1024M
+    ports:
+      - "${APP_PORT:-3000}:3000"  # Cho phép override port qua .env "HOST_PORT:CONTAINER_PORT"
+    pull_policy: always
+    volumes:
+      - ${PUBLIC_DIR:-~/root/public}:/app/public
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      TZ: Asia/Ho_Chi_Minh                     # ✅ Set timezone here
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-24h}
+      PORT: ${PORT:-3000}
+      NODE_ENV: ${NODE_ENV:-development}
+

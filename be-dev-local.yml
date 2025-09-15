@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  check-in-be:
+    build: .
+    ports:
+      - "${APP_PORT:-3002}:3000"  # Cho phép override port qua .env
+    pull_policy: always
+#    volumes:
+#      - ${PUBLIC_DIR:-~/root/public}:/app/public
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      TZ: Asia/Ho_Chi_Minh                     # ✅ Set timezone here
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-24h}
+      PORT: ${PORT:-3000}
+      NODE_ENV: ${NODE_ENV:-development}
+
+
