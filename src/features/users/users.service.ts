@@ -179,7 +179,10 @@ export class UsersService {
     }
 
     // Check if username is being updated and if it's already taken
-    if (updateUserDto.username && updateUserDto.username !== existingUser.username) {
+    if (
+      updateUserDto.username &&
+      updateUserDto.username !== existingUser.username
+    ) {
       const userWithUsername = await this.prisma.user.findUnique({
         where: { username: updateUserDto.username },
       });
@@ -191,11 +194,11 @@ export class UsersService {
 
     // Prepare update data
     const updateData: any = { ...updateUserDto };
-    
+
     // Hash password if provided
     if (updateUserDto.password) {
       updateData.password = await bcrypt.hash(updateUserDto.password, 10);
-      
+
       // Revoke all refresh tokens when password is changed
       await this.prisma.refreshToken.deleteMany({
         where: { userId: id },
@@ -259,7 +262,7 @@ export class UsersService {
 
     return updatedUser;
   }
-  
+
   async resetPassword(id: number, resetPasswordDto: ResetPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -300,7 +303,7 @@ export class UsersService {
     // Soft delete: set deleted to true and active to false
     const deletedUser = await this.prisma.user.update({
       where: { id },
-      data: { 
+      data: {
         deleted: true,
         active: false,
       },
@@ -342,7 +345,7 @@ export class UsersService {
 
     const restoredUser = await this.prisma.user.update({
       where: { id },
-      data: { 
+      data: {
         deleted: false,
         active: true,
       },
