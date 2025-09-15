@@ -33,6 +33,6 @@ import { PrismaService } from '../common/prisma.service';
     RefreshTokenCleanupTask,
     PrismaService,
   ],
-  exports: [AuthService],
+  exports: [AuthService, JwtStrategy],
 })
 export class AuthModule {}

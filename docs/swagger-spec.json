@@ -385,6 +385,425 @@
           "Authentication"
         ]
       }
+    },
+    "/api/users": {
+      "post": {
+        "operationId": "UsersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "409": {
+            "description": "Username already exists"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create a new user",
+        "tags": [
+          "Users"
+        ]
+      },
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by username or full name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "description": "Filter by role",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "MANAGEMENT",
+                "ADMIN",
+                "SUPER_ADMIN"
+              ]
+            }
+          },
+          {
+            "name": "active",
+            "required": false,
+            "in": "query",
+            "description": "Filter by active status",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "department",
+            "required": false,
+            "in": "query",
+            "description": "Filter by department",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeDeleted",
+            "required": false,
+            "in": "query",
+            "description": "Include deleted users",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sort by field",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Sort order (asc/desc)",
+            "schema": {
+              "default": "desc",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Users retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get all users with filtering and pagination",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/stats": {
+      "get": {
+        "operationId": "UsersController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Statistics retrieved successfully"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get user statistics",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User retrieved successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get user by ID",
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "409": {
+            "description": "Username already exists"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update user information",
+        "tags": [
+          "Users"
+        ]
+      },
+      "delete": {
+        "operationId": "UsersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Soft delete user (set deleted flag)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/status": {
+      "patch": {
+        "operationId": "UsersController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User status updated successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update user active/inactive status",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/reset-password": {
+      "patch": {
+        "operationId": "UsersController_resetPassword",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Reset user password (no current password required - admin only)",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/restore": {
+      "patch": {
+        "operationId": "UsersController_restore",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User restored successfully"
+          },
+          "400": {
+            "description": "User is not deleted"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Restore a deleted user",
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/hard": {
+      "delete": {
+        "operationId": "UsersController_hardDelete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User permanently deleted"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Permanently delete user",
+        "tags": [
+          "Users"
+        ]
+      }
     }
   },
   "info": {
@@ -466,6 +885,119 @@
         },
         "required": [
           "currentPassword",
+          "newPassword"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Full name of the user"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username for login",
+            "uniqueItems": true
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for the user",
+            "minLength": 6
+          },
+          "role": {
+            "type": "string",
+            "description": "Role of the user",
+            "enum": [
+              "MANAGEMENT",
+              "ADMIN",
+              "SUPER_ADMIN"
+            ],
+            "default": "MANAGEMENT"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address"
+          },
+          "department": {
+            "type": "string",
+            "description": "Department of the user"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the user is active",
+            "default": true
+          }
+        },
+        "required": [
+          "fullName",
+          "username",
+          "password",
+          "role",
+          "active"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Full name of the user"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username for login"
+          },
+          "password": {
+            "type": "string",
+            "description": "New password (will be hashed automatically)",
+            "minLength": 6
+          },
+          "role": {
+            "type": "string",
+            "description": "Role of the user",
+            "enum": [
+              "MANAGEMENT",
+              "ADMIN",
+              "SUPER_ADMIN"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address"
+          },
+          "department": {
+            "type": "string",
+            "description": "Department of the user"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the user is active"
+          }
+        }
+      },
+      "UpdateUserStatusDto": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Whether the user should be active or inactive"
+          }
+        },
+        "required": [
+          "active"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "description": "New password for the user",
+            "minLength": 6
+          }
+        },
+        "required": [
           "newPassword"
         ]
       }
