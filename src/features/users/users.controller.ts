@@ -24,20 +24,21 @@ import {
   CreateUserDto,
   UpdateUserDto,
   QueryUserDto,
-  ChangePasswordDto,
   UpdateUserStatusDto,
   ResetPasswordDto,
 } from './dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { Roles, Role, RolesGuard } from '../../auth/rbac';
 
 @ApiTags('Users')
 @ApiBearerAuth('JWT-auth')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 409, description: 'Username already exists' })
@@ -46,29 +47,55 @@ export class UsersController {
   }
 
   @Get()
+  @Roles(Role.MANAGEMENT, Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Get all users with filtering and pagination' })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
-  @ApiQuery({ name: 'search', required: false, description: 'Search by username or full name' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search by username or full name',
+  })
   @ApiQuery({ name: 'role', required: false, description: 'Filter by role' })
-  @ApiQuery({ name: 'active', required: false, description: 'Filter by active status' })
-  @ApiQuery({ name: 'department', required: false, description: 'Filter by department' })
-  @ApiQuery({ name: 'includeDeleted', required: false, description: 'Include deleted users' })
+  @ApiQuery({
+    name: 'active',
+    required: false,
+    description: 'Filter by active status',
+  })
+  @ApiQuery({
+    name: 'department',
+    required: false,
+    description: 'Filter by department',
+  })
+  @ApiQuery({
+    name: 'includeDeleted',
+    required: false,
+    description: 'Include deleted users',
+  })
   @ApiQuery({ name: 'page', required: false, description: 'Page number' })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page' })
   @ApiQuery({ name: 'sortBy', required: false, description: 'Sort by field' })
-  @ApiQuery({ name: 'sortOrder', required: false, description: 'Sort order (asc/desc)' })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    description: 'Sort order (asc/desc)',
+  })
   findAll(@Query() queryDto: QueryUserDto) {
     return this.usersService.findAll(queryDto);
   }
 
   @Get('stats')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Get user statistics' })
-  @ApiResponse({ status: 200, description: 'Statistics retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Statistics retrieved successfully',
+  })
   getStats() {
     return this.usersService.getStats();
   }
 
   @Get(':id')
+  @Roles(Role.MANAGEMENT, Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'User retrieved successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -77,6 +104,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Update user information' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -89,6 +117,7 @@ export class UsersController {
   }
 
   @Patch(':id/status')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Update user active/inactive status' })
   @ApiResponse({ status: 200, description: 'User status updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -99,9 +128,11 @@ export class UsersController {
     return this.usersService.updateStatus(id, updateStatusDto);
   }
 
-
   @Patch(':id/reset-password')
-  @ApiOperation({ summary: 'Reset user password (no current password required - admin only)' })
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
+  @ApiOperation({
+    summary: 'Reset user password (no current password required - admin only)',
+  })
   @ApiResponse({ status: 200, description: 'Password reset successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   resetPassword(
@@ -112,6 +143,7 @@ export class UsersController {
   }
 
   @Patch(':id/restore')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Restore a deleted user' })
   @ApiResponse({ status: 200, description: 'User restored successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -121,6 +153,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Soft delete user (set deleted flag)' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
@@ -129,6 +162,7 @@ export class UsersController {
   }
 
   @Delete(':id/hard')
+  @Roles(Role.SUPER_ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Permanently delete user' })
   @ApiResponse({ status: 204, description: 'User permanently deleted' })
