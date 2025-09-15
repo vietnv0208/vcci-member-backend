@@ -23,7 +23,68 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Check-in System Backend API built with [NestJS](https://github.com/nestjs/nest) framework.
+
+## Features
+
+- **Authentication System**: JWT-based authentication with login, logout, refresh token, and change password
+- **User Management**: Role-based access control (MANAGEMENT, ADMIN, SUPER_ADMIN)
+- **Database**: PostgreSQL with Prisma ORM
+- **API Documentation**: Swagger/OpenAPI documentation
+- **Default Admin**: Auto-creates super admin user on first startup
+
+## Authentication APIs
+
+### Login
+- **POST** `/api/auth/login`
+- Body: `{ "username": "string", "password": "string" }`
+- Returns: Access token, refresh token, and user info
+
+### Logout
+- **POST** `/api/auth/logout`
+- Headers: `Authorization: Bearer <token>`
+- Returns: Success message
+
+### Refresh Token
+- **POST** `/api/auth/refresh-token`
+- Body: `{ "refreshToken": "string" }`
+- Returns: New access token and refresh token
+
+### Change Password
+- **POST** `/api/auth/change-password`
+- Headers: `Authorization: Bearer <token>`
+- Body: `{ "currentPassword": "string", "newPassword": "string" }`
+- Returns: Success message
+
+### Get Profile
+- **GET** `/api/auth/profile`
+- Headers: `Authorization: Bearer <token>`
+- Returns: Current user profile
+
+## Default Super Admin
+
+When the application starts for the first time, it automatically creates a default super admin user:
+- **Username**: `superadmin`
+- **Password**: `123!@#`
+- **Role**: `SUPER_ADMIN`
+
+## Environment Variables
+
+Create a `.env` file with the following variables:
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/checkin_db"
+
+# JWT Configuration
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+JWT_EXPIRES_IN="15m"
+JWT_REFRESH_EXPIRES_IN="7d"
+
+# Application
+PORT=3000
+NODE_ENV=development
+```
 
 ## Project setup
 

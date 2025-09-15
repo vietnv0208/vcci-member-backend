@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { AuthService } from './auth/auth.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -69,6 +70,10 @@ async function bootstrap() {
       console.warn('⚠️ Could not write swagger spec file:', error.message);
     }
   }
+
+  // Create default super admin user if no users exist
+  const authService = app.get(AuthService);
+  await authService.createDefaultSuperAdmin();
 
   await app.listen(port);
 
