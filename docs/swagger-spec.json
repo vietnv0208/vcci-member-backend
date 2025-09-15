@@ -256,6 +256,135 @@
           "Authentication"
         ]
       }
+    },
+    "/api/auth/revoke-refresh-token": {
+      "post": {
+        "operationId": "AuthController_revokeRefreshToken",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Refresh token revoked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Revoke a specific refresh token",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/revoke-all-refresh-tokens": {
+      "post": {
+        "operationId": "AuthController_revokeAllRefreshTokens",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All refresh tokens revoked successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Revoke all refresh tokens for current user",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/auth/refresh-tokens": {
+      "get": {
+        "operationId": "AuthController_getUserRefreshTokens",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Refresh tokens retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number"
+                      },
+                      "token": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "expiresAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get all active refresh tokens for current user",
+        "tags": [
+          "Authentication"
+        ]
+      }
     }
   },
   "info": {

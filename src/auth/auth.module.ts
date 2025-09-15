@@ -1,16 +1,19 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { RefreshTokenCleanupTask } from './tasks/refresh-token-cleanup.task';
 import { PrismaService } from '../common/prisma.service';
 
 @Module({
   imports: [
     PassportModule,
+    ScheduleModule.forRoot(),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -23,7 +26,13 @@ import { PrismaService } from '../common/prisma.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, LocalStrategy, PrismaService],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    LocalStrategy,
+    RefreshTokenCleanupTask,
+    PrismaService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

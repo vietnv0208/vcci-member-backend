@@ -28,10 +28,13 @@ Check-in System Backend API built with [NestJS](https://github.com/nestjs/nest) 
 ## Features
 
 - **Authentication System**: JWT-based authentication with login, logout, refresh token, and change password
+- **Refresh Token Management**: Database-stored refresh tokens with revocation capabilities
 - **User Management**: Role-based access control (MANAGEMENT, ADMIN, SUPER_ADMIN)
+- **Security**: Password hashing, token validation, and automatic cleanup of expired tokens
 - **Database**: PostgreSQL with Prisma ORM
 - **API Documentation**: Swagger/OpenAPI documentation
 - **Default Admin**: Auto-creates super admin user on first startup
+- **Background Tasks**: Automatic cleanup of expired refresh tokens daily
 
 ## Authentication APIs
 
@@ -60,6 +63,22 @@ Check-in System Backend API built with [NestJS](https://github.com/nestjs/nest) 
 - **GET** `/api/auth/profile`
 - Headers: `Authorization: Bearer <token>`
 - Returns: Current user profile
+
+### Revoke Refresh Token
+- **POST** `/api/auth/revoke-refresh-token`
+- Headers: `Authorization: Bearer <token>`
+- Body: `{ "refreshToken": "string" }`
+- Returns: Success message
+
+### Revoke All Refresh Tokens
+- **POST** `/api/auth/revoke-all-refresh-tokens`
+- Headers: `Authorization: Bearer <token>`
+- Returns: Success message
+
+### Get User Refresh Tokens
+- **GET** `/api/auth/refresh-tokens`
+- Headers: `Authorization: Bearer <token>`
+- Returns: List of active refresh tokens for current user
 
 ## Default Super Admin
 

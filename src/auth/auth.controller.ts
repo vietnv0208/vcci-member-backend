@@ -76,8 +76,11 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async logout(): Promise<{ message: string }> {
-    return this.authService.logout();
+  async logout(
+    @Request() req,
+    @Body() body?: { refreshToken?: string },
+  ): Promise<{ message: string }> {
+    return this.authService.logout(req.user.id, body?.refreshToken);
   }
 
   @Post('refresh-token')
@@ -145,5 +148,72 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Post('revoke-refresh-token')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Revoke a specific refresh token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Refresh token revoked successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async revokeRefreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<{ message: string }> {
+    return this.authService.revokeRefreshToken(refreshTokenDto.refreshToken);
+  }
+
+  @Post('revoke-all-refresh-tokens')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Revoke all refresh tokens for current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'All refresh tokens revoked successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async revokeAllRefreshTokens(
+    @Request() req,
+  ): Promise<{ message: string }> {
+    return this.authService.revokeAllUserRefreshTokens(req.user.id);
+  }
+
+  @Get('refresh-tokens')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get all active refresh tokens for current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Refresh tokens retrieved successfully',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'number' },
+          token: { type: 'string' },
+          createdAt: { type: 'string', format: 'date-time' },
+          expiresAt: { type: 'string', format: 'date-time' },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getUserRefreshTokens(@Request() req) {
+    return this.authService.getUserRefreshTokens(req.user.id);
   }
 }
