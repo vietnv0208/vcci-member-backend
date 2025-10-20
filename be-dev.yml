@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   check-in-be:
-    image: twendeesoft/project:detech-check-in-be-latest
+    image: twendeesoft/project:vcci-member-be-latest
     container_name: twendee-erp-be
     mem_limit: 1024M
     ports:
