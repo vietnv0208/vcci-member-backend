@@ -43,10 +43,9 @@ export class AuthController {
           type: 'object',
           properties: {
             id: { type: 'number' },
-            username: { type: 'string' },
+            email: { type: 'string' },
             fullName: { type: 'string' },
             role: { type: 'string' },
-            email: { type: 'string' },
             department: { type: 'string' },
           },
         },
@@ -137,10 +136,9 @@ export class AuthController {
       type: 'object',
       properties: {
         id: { type: 'number' },
-        username: { type: 'string' },
+        email: { type: 'string' },
         fullName: { type: 'string' },
         role: { type: 'string' },
-        email: { type: 'string' },
         department: { type: 'string' },
       },
     },

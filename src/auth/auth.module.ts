@@ -21,7 +21,7 @@ import { PrismaService } from '../common/prisma.service';
         signOptions: {
           expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '15m',
         },
-      }),
+      } as any),
       inject: [ConfigService],
     }),
   ],

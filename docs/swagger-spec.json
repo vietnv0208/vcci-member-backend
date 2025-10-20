@@ -49,16 +49,13 @@
                         "id": {
                           "type": "number"
                         },
-                        "username": {
+                        "email": {
                           "type": "string"
                         },
                         "fullName": {
                           "type": "string"
                         },
                         "role": {
-                          "type": "string"
-                        },
-                        "email": {
                           "type": "string"
                         },
                         "department": {
@@ -222,16 +219,13 @@
                     "id": {
                       "type": "number"
                     },
-                    "username": {
+                    "email": {
                       "type": "string"
                     },
                     "fullName": {
                       "type": "string"
                     },
                     "role": {
-                      "type": "string"
-                    },
-                    "email": {
                       "type": "string"
                     },
                     "department": {
@@ -405,7 +399,7 @@
             "description": "User created successfully"
           },
           "409": {
-            "description": "Username already exists"
+            "description": "Email already exists"
           }
         },
         "security": [
@@ -425,7 +419,7 @@
             "name": "search",
             "required": false,
             "in": "query",
-            "description": "Search by username or full name",
+            "description": "Search by email or full name",
             "schema": {
               "type": "string"
             }
@@ -610,7 +604,7 @@
             "description": "User not found"
           },
           "409": {
-            "description": "Username already exists"
+            "description": "Email already exists"
           }
         },
         "security": [
@@ -839,10 +833,10 @@
       "LoginDto": {
         "type": "object",
         "properties": {
-          "username": {
+          "email": {
             "type": "string",
-            "description": "Username for login",
-            "example": "admin"
+            "description": "Email for login",
+            "example": "admin@example.com"
           },
           "password": {
             "type": "string",
@@ -851,7 +845,7 @@
           }
         },
         "required": [
-          "username",
+          "email",
           "password"
         ]
       },
@@ -895,9 +889,9 @@
             "type": "string",
             "description": "Full name of the user"
           },
-          "username": {
+          "email": {
             "type": "string",
-            "description": "Username for login",
+            "description": "Email address for login",
             "uniqueItems": true
           },
           "password": {
@@ -915,10 +909,6 @@
             ],
             "default": "MANAGEMENT"
           },
-          "email": {
-            "type": "string",
-            "description": "Email address"
-          },
           "department": {
             "type": "string",
             "description": "Department of the user"
@@ -931,7 +921,7 @@
         },
         "required": [
           "fullName",
-          "username",
+          "email",
           "password",
           "role",
           "active"
@@ -944,9 +934,9 @@
             "type": "string",
             "description": "Full name of the user"
           },
-          "username": {
+          "email": {
             "type": "string",
-            "description": "Username for login"
+            "description": "Email address for login"
           },
           "password": {
             "type": "string",
@@ -961,10 +951,6 @@
               "ADMIN",
               "SUPER_ADMIN"
             ]
-          },
-          "email": {
-            "type": "string",
-            "description": "Email address"
           },
           "department": {
             "type": "string",

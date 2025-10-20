@@ -31,7 +31,7 @@ export class RolesGuard implements CanActivate {
     }
     
     const hasRole = requiredRoles.some((role) => user.role === role);
-    this.logger.debug(`Access ${hasRole ? 'granted' : 'denied'} for user ${user.username}`);
+    this.logger.debug(`Access ${hasRole ? 'granted' : 'denied'} for user ${user.email}`);
     
     return hasRole;
   }

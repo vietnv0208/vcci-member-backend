@@ -23,11 +23,10 @@ enum UserRole {
 model User {
   id         Int       @id @default(autoincrement())
   fullName   String
-  username   String    @unique
+  email      String    @unique
   password   String
   role       UserRole  @default(MANAGEMENT)
   active     Boolean   @default(true)
-  email      String?
   department String?
   lastLogin  DateTime?
 

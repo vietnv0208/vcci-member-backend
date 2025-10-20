@@ -41,7 +41,7 @@ export class UsersController {
   @Roles(Role.ADMIN, Role.SUPER_ADMIN)
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User created successfully' })
-  @ApiResponse({ status: 409, description: 'Username already exists' })
+  @ApiResponse({ status: 409, description: 'Email already exists' })
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
@@ -53,7 +53,7 @@ export class UsersController {
   @ApiQuery({
     name: 'search',
     required: false,
-    description: 'Search by username or full name',
+    description: 'Search by email or full name',
   })
   @ApiQuery({ name: 'role', required: false, description: 'Filter by role' })
   @ApiQuery({
@@ -108,7 +108,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Update user information' })
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 409, description: 'Username already exists' })
+  @ApiResponse({ status: 409, description: 'Email already exists' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,

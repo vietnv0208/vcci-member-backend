@@ -23,12 +23,11 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.user.findUnique({
-      where: { username },
+      where: { email },
       select: {
         id: true,
-        username: true,
         password: true,
         fullName: true,
         role: true,
@@ -50,7 +49,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponse> {
-    const user = await this.validateUser(loginDto.username, loginDto.password);
+    const user = await this.validateUser(loginDto.email, loginDto.password);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -58,20 +57,20 @@ export class AuthService {
     // Clean up existing refresh tokens for this user (optional: limit concurrent sessions)
     await this.cleanupExpiredRefreshTokens(user.id);
 
-    const payload: JwtPayload = {
+    const payload = {
       sub: user.id,
-      username: user.username,
+      email: user.email,
       role: user.role,
-    };
+    } as any;
 
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.configService.get<string>('JWT_EXPIRES_IN') || '15m',
-    });
+    } as any);
 
     const refreshTokenValue = this.jwtService.sign(payload, {
       expiresIn:
         this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d',
-    });
+    } as any);
 
     // Calculate expiration date for refresh token
     const refreshTokenExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d';
@@ -115,10 +114,9 @@ export class AuthService {
       refreshToken: refreshTokenValue,
       user: {
         id: user.id,
-        username: user.username,
+        email: user.email,
         fullName: user.fullName,
         role: user.role,
-        email: user.email,
         department: user.department,
       },
     };
@@ -139,7 +137,7 @@ export class AuthService {
           user: {
             select: {
               id: true,
-              username: true,
+              email: true,
               role: true,
               active: true,
               deleted: true,
@@ -157,20 +155,20 @@ export class AuthService {
         throw new UnauthorizedException('User not found or inactive');
       }
 
-      const newPayload: JwtPayload = {
+      const newPayload = {
         sub: user.id,
-        username: user.username,
+        email: user.email,
         role: user.role,
-      };
+      } as any;
 
       const newAccessToken = this.jwtService.sign(newPayload, {
         expiresIn: this.configService.get<string>('JWT_EXPIRES_IN') || '15m',
-      });
+      } as any);
 
       const newRefreshTokenValue = this.jwtService.sign(newPayload, {
         expiresIn:
           this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d',
-      });
+      } as any);
 
       // Calculate new expiration date
       const refreshTokenExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') || '7d';
@@ -329,18 +327,17 @@ export class AuthService {
 
       await this.prisma.user.create({
         data: {
-          username: 'superadmin',
           password: hashedPassword,
           fullName: 'Super Administrator',
           role: 'SUPER_ADMIN',
-          email: 'admin@detech.com',
+          email: 'admin@vcci.com.vn',
           department: 'IT',
           active: true,
         },
       });
 
       console.log('✅ Default super admin user created successfully');
-      console.log('📧 Username: superadmin');
+      console.log('📧 Email: admin@detech.com');
       console.log('🔑 Password: 123!@#');
     }
   }

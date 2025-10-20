@@ -8,10 +8,10 @@ export class UpdateUserDto {
   @IsOptional()
   fullName?: string;
 
-  @ApiProperty({ description: 'Username for login', required: false })
-  @IsString()
+  @ApiProperty({ description: 'Email address for login', required: false })
+  @IsEmail()
   @IsOptional()
-  username?: string;
+  email?: string;
 
   @ApiProperty({ description: 'New password (will be hashed automatically)', required: false, minLength: 6 })
   @IsString()
@@ -28,10 +28,6 @@ export class UpdateUserDto {
   @IsOptional()
   role?: UserRole;
 
-  @ApiProperty({ description: 'Email address', required: false })
-  @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @ApiProperty({ description: 'Department of the user', required: false })
   @IsString()

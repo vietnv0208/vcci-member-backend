@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 
 export class QueryUserDto {
-  @ApiProperty({ description: 'Search by username or full name', required: false })
+  @ApiProperty({ description: 'Search by email or full name', required: false })
   @IsString()
   @IsOptional()
   search?: string;

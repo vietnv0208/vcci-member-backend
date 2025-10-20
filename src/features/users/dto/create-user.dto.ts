@@ -7,9 +7,9 @@ export class CreateUserDto {
   @IsString()
   fullName: string;
 
-  @ApiProperty({ description: 'Username for login', uniqueItems: true })
-  @IsString()
-  username: string;
+  @ApiProperty({ description: 'Email address for login', uniqueItems: true })
+  @IsEmail()
+  email: string;
 
   @ApiProperty({ description: 'Password for the user', minLength: 6 })
   @IsString()
@@ -25,10 +25,6 @@ export class CreateUserDto {
   @IsOptional()
   role?: UserRole;
 
-  @ApiProperty({ description: 'Email address', required: false })
-  @IsEmail()
-  @IsOptional()
-  email?: string;
 
   @ApiProperty({ description: 'Department of the user', required: false })
   @IsString()
