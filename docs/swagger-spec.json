@@ -1162,6 +1162,47 @@
           "Files"
         ]
       }
+    },
+    "/api/files/attach": {
+      "post": {
+        "description": "Attach files uploaded with tempKey to a specific entity",
+        "operationId": "FilesController_attachTempFiles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachFilesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Files attached successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachFilesResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No files found with the given tempKey"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Attach temporary files to entity",
+        "tags": [
+          "Files"
+        ]
+      }
     }
   },
   "info": {
@@ -1486,6 +1527,48 @@
         "required": [
           "parentPath",
           "name"
+        ]
+      },
+      "AttachFilesDto": {
+        "type": "object",
+        "properties": {
+          "tempKey": {
+            "type": "string",
+            "description": "Temporary key to identify files to attach",
+            "example": "temp_abc123"
+          },
+          "entityType": {
+            "type": "string",
+            "description": "Type of entity to attach files to",
+            "example": "MEMBER"
+          },
+          "entityId": {
+            "type": "string",
+            "description": "ID of the entity to attach files to",
+            "example": "uuid-member-id"
+          }
+        },
+        "required": [
+          "tempKey",
+          "entityType",
+          "entityId"
+        ]
+      },
+      "AttachFilesResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          },
+          "updatedCount": {
+            "type": "number",
+            "description": "Number of files updated"
+          }
+        },
+        "required": [
+          "message",
+          "updatedCount"
         ]
       }
     }

@@ -27,7 +27,7 @@ import type { Response } from 'express';
 import { StreamableFile } from '@nestjs/common';
 
 import { FilesService } from './files.service';
-import { FileResponseDto, UploadFileDto, CreateFolderDto } from './dto';
+import { FileResponseDto, UploadFileDto, CreateFolderDto, AttachFilesDto, AttachFilesResponseDto } from './dto';
 import { JwtAuthGuard } from '../../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../../auth/guards/roles.guard';
 import { FileCategory } from '@prisma/client';
@@ -258,6 +258,30 @@ export class FilesController {
       body.parentPath,
       body.name,
       req.user.userId,
+    );
+  }
+
+  @Post('attach')
+  @ApiOperation({
+    summary: 'Attach temporary files to entity',
+    description: 'Attach files uploaded with tempKey to a specific entity',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Files attached successfully',
+    type: AttachFilesResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No files found with the given tempKey',
+  })
+  async attachTempFiles(
+    @Body() attachFilesDto: AttachFilesDto,
+  ): Promise<AttachFilesResponseDto> {
+    return this.filesService.attachTempFiles(
+      attachFilesDto.tempKey,
+      attachFilesDto.entityType,
+      attachFilesDto.entityId,
     );
   }
 }

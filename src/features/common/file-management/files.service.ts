@@ -46,8 +46,12 @@ export class FilesService {
     const fileExtension = extname(file.originalname);
     const uniqueFileName = `${randomBytes(16).toString('hex')}${fileExtension}`;
 
+    // Generate tempKey if no entityId provided
+    const tempKey = body.entityId ? null : `temp_${randomBytes(8).toString('hex')}`;
+
     // Create relative storage path based on entityType/category/entityId or folderPath
     const relativePath = this.createRelativePath(body);
+    // const relativePath = this.createRelativePath(body, tempKey || undefined);
     const fullStoragePath = join(this.uploadPath, relativePath, uniqueFileName);
     const relativeStoragePath = join(relativePath, uniqueFileName);
 
@@ -77,6 +81,7 @@ export class FilesService {
         checksum,
         entityType: body.entityType,
         entityId: body.entityId,
+        tempKey,
         category: body.category,
         description: body.description,
         uploadedById: userId,
@@ -238,13 +243,37 @@ export class FilesService {
     };
   }
 
-  private createRelativePath(body: UploadFileDto): string {
+  async attachTempFiles(
+    tempKey: string,
+    entityType: string,
+    entityId: string,
+  ): Promise<{ message: string; updatedCount: number }> {
+    // Update all files with the given tempKey to the new entityId
+    const result = await this.prisma.file.updateMany({
+      where: { 
+        tempKey,
+        entityType,
+        deleted: false,
+      },
+      data: { 
+        entityId,
+        tempKey: null, // Clear tempKey after attaching
+      },
+    });
+
+    return {
+      message: `Successfully attached ${result.count} files to ${entityType}:${entityId}`,
+      updatedCount: result.count,
+    };
+  }
+
+  private createRelativePath(body: UploadFileDto, tempKey?: string): string {
     // If folderPath is provided, use it
     if (body.folderPath) {
       return body.folderPath.startsWith('/') ? body.folderPath.slice(1) : body.folderPath;
     }
 
-    // Otherwise, create path based on entityType/category/entityId
+    // Otherwise, create path based on entityType/category/entityId or tempKey
     const pathParts: string[] = [];
     
     if (body.entityType) {
@@ -257,6 +286,9 @@ export class FilesService {
     
     if (body.entityId) {
       pathParts.push(body.entityId);
+    } else if (tempKey) {
+      // If no entityId but has tempKey, use temp folder
+      pathParts.push('temp', tempKey);
     }
 
     return pathParts.length > 0 ? pathParts.join('/') : 'general';
