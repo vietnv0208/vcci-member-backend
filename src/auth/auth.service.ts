@@ -214,7 +214,7 @@ export class AuthService {
   }
 
   async changePassword(
-    userId: number,
+    userId: string,
     changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
     const user = await this.prisma.user.findUnique({
@@ -247,7 +247,7 @@ export class AuthService {
     return { message: 'Password changed successfully' };
   }
 
-  async logout(userId: number, refreshToken?: string): Promise<{ message: string }> {
+  async logout(userId: string, refreshToken?: string): Promise<{ message: string }> {
     if (refreshToken) {
       // Revoke specific refresh token
       await this.prisma.refreshToken.deleteMany({
@@ -279,14 +279,14 @@ export class AuthService {
     }
   }
 
-  async revokeAllUserRefreshTokens(userId: number): Promise<{ message: string }> {
+  async revokeAllUserRefreshTokens(userId: string): Promise<{ message: string }> {
     await this.prisma.refreshToken.deleteMany({
       where: { userId: userId },
     });
     return { message: 'All refresh tokens revoked successfully' };
   }
 
-  async cleanupExpiredRefreshTokens(userId?: number): Promise<void> {
+  async cleanupExpiredRefreshTokens(userId?: string): Promise<void> {
     const whereCondition: any = {
       expiresAt: {
         lt: new Date(),
@@ -302,7 +302,7 @@ export class AuthService {
     });
   }
 
-  async getUserRefreshTokens(userId: number): Promise<any[]> {
+  async getUserRefreshTokens(userId: string): Promise<any[]> {
     return this.prisma.refreshToken.findMany({
       where: { userId: userId },
       select: {

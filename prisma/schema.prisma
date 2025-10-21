@@ -21,7 +21,7 @@ enum UserRole {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
+  id         String    @id @default(cuid())
   fullName   String
   email      String    @unique
   password   String
@@ -35,13 +35,93 @@ model User {
   updatedAt DateTime @updatedAt
 
   refreshTokens RefreshToken[]
+  File          File[]
 }
 
 model RefreshToken {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   token     String   @unique
-  userId    Int
+  userId    String
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+//File management
+
+model File {
+  id        String      @id @default(cuid())
+  fileName  String
+  fileType  FileType    @default(OTHER)
+  storeType StorageType @default(LOCAL)
+
+  mimeType    String?
+  fileSize    Int?
+  storagePath String //local path or S3 key
+  publicUrl   String?
+  checksum    String?
+
+  entityType String? // e.g., "MEMBER", "ARTICLE"
+  entityId   String? // Có thể null khi upload tạm
+  tempKey    String? // 🔑 Khóa tạm để gom nhóm file trước khi gán entityId
+
+  category    String? // e.g., "MEMBERSHIP_APPLICATION", "BUSINESS_LICENSE"
+  description String?
+
+  folderId String?
+  folder   Folder? @relation(fields: [folderId], references: [id])
+
+  uploadedById String?
+  uploadedBy   User?   @relation(fields: [uploadedById], references: [id])
+
+  visibility FileVisibility @default(PRIVATE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted Boolean @default(false)
+}
+
+model Folder {
+  id         String   @id @default(cuid())
+  name       String   @db.VarChar(255)
+  parentId   String?
+  parent     Folder?  @relation("FolderToSubFolder", fields: [parentId], references: [id])
+  subFolders Folder[] @relation("FolderToSubFolder")
+  files      File[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum FileType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  PDF
+  EXCEL
+  OTHER
+}
+
+enum EntityType {
+  MEMBER
+}
+
+enum FileCategory {
+  MEMBERSHIP_APPLICATION // Đơn đăng ký hội viên
+  BUSINESS_LICENSE // Giấy phép kinh doanh
+  FINANCIAL_REPORT // Báo cáo tài chính
+  PAYMENT_PROOF // Ủy nhiệm chi, biên lai
+  OTHER_DOCUMENT // Tài liệu khác
+}
+
+enum FileVisibility {
+  PUBLIC
+  PRIVATE
+  INTERNAL
+}
+
+enum StorageType {
+  LOCAL
+  S3
 }

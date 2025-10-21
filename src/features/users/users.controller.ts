@@ -10,7 +10,6 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -99,7 +98,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'User retrieved successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
@@ -110,7 +109,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateUserDto);
@@ -122,7 +121,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User status updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   updateStatus(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateStatusDto: UpdateUserStatusDto,
   ) {
     return this.usersService.updateStatus(id, updateStatusDto);
@@ -136,7 +135,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Password reset successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   resetPassword(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() resetPasswordDto: ResetPasswordDto,
   ) {
     return this.usersService.resetPassword(id, resetPasswordDto);
@@ -148,7 +147,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User restored successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 400, description: 'User is not deleted' })
-  restore(@Param('id', ParseIntPipe) id: number) {
+  restore(@Param('id') id: string) {
     return this.usersService.restore(id);
   }
 
@@ -157,7 +156,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Soft delete user (set deleted flag)' })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
 
@@ -167,7 +166,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Permanently delete user' })
   @ApiResponse({ status: 204, description: 'User permanently deleted' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  hardDelete(@Param('id', ParseIntPipe) id: number) {
+  hardDelete(@Param('id') id: string) {
     return this.usersService.hardDelete(id);
   }
 }

@@ -140,7 +140,7 @@ export class UsersService {
     };
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -164,7 +164,7 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     // Check if user exists
     const existingUser = await this.prisma.user.findUnique({
       where: { id },
@@ -221,7 +221,7 @@ export class UsersService {
     return updatedUser;
   }
 
-  async updateStatus(id: number, updateStatusDto: UpdateUserStatusDto) {
+  async updateStatus(id: string, updateStatusDto: UpdateUserStatusDto) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -257,7 +257,7 @@ export class UsersService {
     return updatedUser;
   }
 
-  async resetPassword(id: number, resetPasswordDto: ResetPasswordDto) {
+  async resetPassword(id: string, resetPasswordDto: ResetPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -285,7 +285,7 @@ export class UsersService {
     return { message: 'Password reset successfully' };
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -323,7 +323,7 @@ export class UsersService {
     return deletedUser;
   }
 
-  async restore(id: number) {
+  async restore(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -359,7 +359,7 @@ export class UsersService {
     return restoredUser;
   }
 
-  async hardDelete(id: number) {
+  async hardDelete(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });

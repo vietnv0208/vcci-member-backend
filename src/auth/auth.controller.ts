@@ -42,7 +42,7 @@ export class AuthController {
         user: {
           type: 'object',
           properties: {
-            id: { type: 'number' },
+            id: { type: 'string' },
             email: { type: 'string' },
             fullName: { type: 'string' },
             role: { type: 'string' },
@@ -135,7 +135,7 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        id: { type: 'number' },
+        id: { type: 'string' },
         email: { type: 'string' },
         fullName: { type: 'string' },
         role: { type: 'string' },
@@ -202,7 +202,7 @@ export class AuthController {
       items: {
         type: 'object',
         properties: {
-          id: { type: 'number' },
+          id: { type: 'string' },
           token: { type: 'string' },
           createdAt: { type: 'string', format: 'date-time' },
           expiresAt: { type: 'string', format: 'date-time' },
