@@ -816,6 +816,10 @@
     {
       "url": "http://localhost:3000",
       "description": "Development Server"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Deploy Server"
     }
   ],
   "components": {

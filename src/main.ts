@@ -27,6 +27,7 @@ async function bootstrap() {
     credentials: true,
   });
   const port = process.env.PORT || 3000;
+  const API_SERVER = process.env.API_SERVER || 'http://103.61.123.139:3000';
 
   // Swagger documentation
   const config = new DocumentBuilder()
@@ -34,6 +35,7 @@ async function bootstrap() {
     .setDescription('API documentation for the Check-in System')
     .setVersion('1.0')
     .addServer(`http://localhost:${port}`, 'Development Server')
+    .addServer(`${API_SERVER}`, 'Deploy Server')
     // .addServer('https://check-in-detech.twendeesoft.com', 'Production Server')
     .addBearerAuth(
       {
