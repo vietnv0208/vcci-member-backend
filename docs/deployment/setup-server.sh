@@ -4,7 +4,7 @@ systemctl status nginx
 
 # ssl
 sudo apt install certbot python3-certbot-nginx -y
-sudo certbot --nginx -d staging-erp.twendeesoft.com
+sudo certbot --nginx -d vcci.twendeesoft.com
 sudo systemctl enable certbot.timer
 
 
