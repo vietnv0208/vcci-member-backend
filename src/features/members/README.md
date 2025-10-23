@@ -7,6 +7,7 @@ Module quản lý hội viên VCCI với đầy đủ tính năng CRUD, xét duy
 ### ✅ Đã hoàn thành
 
 - ✅ **CRUD Operations**: Tạo, đọc, cập nhật, xóa hội viên
+- ✅ **Public Member Registration**: API công khai cho đăng ký hội viên (không cần authentication)
 - ✅ **Member Registration**: Đăng ký hội viên mới (Doanh nghiệp & Hiệp hội)
 - ✅ **Status Management**: Quản lý trạng thái hội viên với workflow
 - ✅ **Search & Filter**: Tìm kiếm và lọc hội viên theo nhiều tiêu chí
@@ -22,24 +23,52 @@ Module quản lý hội viên VCCI với đầy đủ tính năng CRUD, xét duy
 
 ```
 src/features/members/
-├── dto/                              # Data Transfer Objects
-│   ├── create-member.dto.ts         # DTO tạo hội viên mới
-│   ├── update-member.dto.ts         # DTO cập nhật hội viên
-│   ├── query-member.dto.ts          # DTO query/filter
-│   ├── member-response.dto.ts       # DTO response
-│   ├── change-member-status.dto.ts  # DTO thay đổi trạng thái
+├── dto/                                  # Data Transfer Objects
+│   ├── create-member.dto.ts             # DTO tạo hội viên mới
+│   ├── update-member.dto.ts             # DTO cập nhật hội viên
+│   ├── query-member.dto.ts              # DTO query/filter
+│   ├── member-response.dto.ts           # DTO response
+│   ├── change-member-status.dto.ts      # DTO thay đổi trạng thái
 │   └── index.ts
-├── members.controller.ts             # REST API endpoints
-├── members.service.ts                # Business logic
-├── members.repository.ts             # Data access layer
-├── members.module.ts                 # NestJS module
-├── index.ts                          # Exports
-└── README.md                         # Documentation
+├── members.controller.ts                 # REST API endpoints (Protected)
+├── members-public.controller.ts          # Public API endpoints (No Auth)
+├── members.service.ts                    # Business logic
+├── members.repository.ts                 # Data access layer
+├── members.module.ts                     # NestJS module
+├── index.ts                              # Exports
+└── README.md                             # Documentation
 ```
 
 ## 🔌 API Endpoints
 
-### 1. Tạo đơn đăng ký hội viên mới
+### 🌐 Public API (Không cần Authentication)
+
+#### 1. Đăng ký hội viên (Public)
+```http
+POST /api/public/members/register
+Content-Type: application/json
+```
+
+**Mô tả:** API công khai cho phép doanh nghiệp/hiệp hội tự đăng ký làm hội viên VCCI mà không cần đăng nhập. Đơn đăng ký sẽ tự động có trạng thái `PENDING` và chờ admin xét duyệt.
+
+**Request Body:** (Giống như endpoint tạo member bên dưới)
+
+**Response:**
+```json
+{
+  "id": "cm...",
+  "code": "VCCI20250001",
+  "status": "PENDING",
+  "vietnameseName": "Công ty TNHH ABC",
+  ...
+}
+```
+
+---
+
+### 🔒 Protected API (Yêu cầu Authentication)
+
+#### 1. Tạo đơn đăng ký hội viên mới (Admin)
 ```http
 POST /api/members
 Authorization: Bearer {token}
@@ -89,7 +118,7 @@ Roles: SUPER_ADMIN, ADMIN, MANAGEMENT
 }
 ```
 
-### 2. Lấy danh sách hội viên
+#### 2. Lấy danh sách hội viên
 ```http
 GET /api/members?search=ABC&status=PENDING&page=1&limit=10
 Authorization: Bearer {token}
@@ -110,35 +139,35 @@ Roles: SUPER_ADMIN, ADMIN, MANAGEMENT
 - `sortBy`: Sắp xếp theo trường (default: createdAt)
 - `sortOrder`: asc | desc (default: desc)
 
-### 3. Lấy thống kê hội viên
+#### 3. Lấy thống kê hội viên
 ```http
 GET /api/members/statistics
 Authorization: Bearer {token}
 Roles: SUPER_ADMIN, ADMIN, MANAGEMENT
 ```
 
-### 4. Lấy thông tin chi tiết hội viên
+#### 4. Lấy thông tin chi tiết hội viên
 ```http
 GET /api/members/:id
 Authorization: Bearer {token}
 Roles: SUPER_ADMIN, ADMIN, MANAGEMENT
 ```
 
-### 5. Lấy thông tin hội viên theo mã
+#### 5. Lấy thông tin hội viên theo mã
 ```http
 GET /api/members/code/:code
 Authorization: Bearer {token}
 Roles: SUPER_ADMIN, ADMIN, MANAGEMENT
 ```
 
-### 6. Cập nhật thông tin hội viên
+#### 6. Cập nhật thông tin hội viên
 ```http
 PATCH /api/members/:id
 Authorization: Bearer {token}
 Roles: SUPER_ADMIN, ADMIN, MANAGEMENT
 ```
 
-### 7. Thay đổi trạng thái hội viên
+#### 7. Thay đổi trạng thái hội viên
 ```http
 PATCH /api/members/:id/status
 Authorization: Bearer {token}
@@ -153,7 +182,7 @@ Roles: SUPER_ADMIN, ADMIN
 }
 ```
 
-### 8. Xóa hội viên
+#### 8. Xóa hội viên
 ```http
 DELETE /api/members/:id
 Authorization: Bearer {token}

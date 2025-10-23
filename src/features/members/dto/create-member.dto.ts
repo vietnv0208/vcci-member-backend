@@ -1,7 +1,23 @@
-import { IsEnum, IsString, IsOptional, IsEmail, IsDateString, IsArray, ValidateNested, IsInt, IsNumber } from 'class-validator';
+import {
+  IsEnum,
+  IsString,
+  IsOptional,
+  IsEmail,
+  IsDateString,
+  IsArray,
+  ValidateNested,
+  IsInt,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ApplicationType, MemberType, ContactRole, Gender, OrganizationType } from '@prisma/client';
+import {
+  ApplicationType,
+  MemberType,
+  ContactRole,
+  Gender,
+  OrganizationType,
+} from '@prisma/client';
 
 export class CreateMemberContactDto {
   @ApiProperty({ enum: ContactRole, description: 'Vai trò liên hệ' })
@@ -113,7 +129,11 @@ export class CreateMemberDto {
   @IsEnum(ApplicationType)
   applicationType: ApplicationType;
 
-  @ApiPropertyOptional({ enum: MemberType, description: 'Loại hội viên', default: 'LINKED' })
+  @ApiPropertyOptional({
+    enum: MemberType,
+    description: 'Loại hội viên',
+    default: 'LINKED',
+  })
   @IsOptional()
   @IsEnum(MemberType)
   memberType?: MemberType;
@@ -181,7 +201,10 @@ export class CreateMemberDto {
   @Type(() => CreateMemberAssociationDetailDto)
   associationDetail?: CreateMemberAssociationDetailDto;
 
-  @ApiProperty({ description: 'Danh sách người liên hệ', type: [CreateMemberContactDto] })
+  @ApiProperty({
+    description: 'Danh sách người liên hệ',
+    type: [CreateMemberContactDto],
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateMemberContactDto)
@@ -193,7 +216,10 @@ export class CreateMemberDto {
   @IsString({ each: true })
   businessCategoryIds?: string[];
 
-  @ApiPropertyOptional({ description: 'Danh sách file đính kèm', type: [String] })
+  @ApiPropertyOptional({
+    description: 'Danh sách file đính kèm',
+    type: [String],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

@@ -1751,6 +1751,45 @@
         ]
       }
     },
+    "/api/public/members/register": {
+      "post": {
+        "description": "API công khai cho phép doanh nghiệp/hiệp hội tự đăng ký làm hội viên VCCI. Đơn đăng ký sẽ có trạng thái PENDING và chờ xét duyệt.",
+        "operationId": "MembersPublicController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đơn đăng ký đã được tạo thành công và đang chờ xét duyệt",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ"
+          },
+          "409": {
+            "description": "Email đã tồn tại trong hệ thống"
+          }
+        },
+        "summary": "Đăng ký hội viên mới (Public - không cần authentication)",
+        "tags": [
+          "Members (Public)"
+        ]
+      }
+    },
     "/api/business-categories": {
       "post": {
         "operationId": "BusinessCategoriesController_create",

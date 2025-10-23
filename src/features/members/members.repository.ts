@@ -97,7 +97,9 @@ export class MembersRepository {
     });
   }
 
-  async findMany(query: QueryMemberDto): Promise<{ data: Member[]; total: number }> {
+  async findMany(
+    query: QueryMemberDto,
+  ): Promise<{ data: Member[]; total: number }> {
     const {
       search,
       applicationType,
@@ -295,9 +297,9 @@ export class MembersRepository {
   }
 
   async generateMemberCode(): Promise<string> {
-    const year = new Date().getFullYear();
-    const prefix = `VCCI${year}`;
-    
+    // const year = new Date().getFullYear();
+    const prefix = `VCCI-`;
+
     // Find the last member code for this year
     const lastMember = await this.prisma.member.findFirst({
       where: {
