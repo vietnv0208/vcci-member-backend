@@ -2055,6 +2055,421 @@
           "Business Categories"
         ]
       }
+    },
+    "/api/common/categories": {
+      "get": {
+        "description": "Supports filtering by type, searching by code/name, and pagination",
+        "operationId": "CategoryController_findAll",
+        "parameters": [
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "description": "Filter by category type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ORGANIZATION_TYPE"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search text for code and name fields",
+            "schema": {
+              "example": "TNHH",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-based)",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get all categories with filtering, searching, and pagination",
+        "tags": [
+          "Categories"
+        ]
+      },
+      "post": {
+        "operationId": "CategoryController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "409": {
+            "description": "Category name or code already exists"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create new category",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/api/common/categories/active/{type}": {
+      "get": {
+        "description": "Returns only id, code, and name of active categories sorted by orderIndex and name",
+        "operationId": "CategoryController_findActiveByType",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "description": "Category type to filter by",
+            "schema": {
+              "enum": [
+                "ORGANIZATION_TYPE"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategorySummaryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get active categories by type",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/api/common/categories/type/{type}": {
+      "get": {
+        "operationId": "CategoryController_findByType",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "description": "Category type to filter by",
+            "schema": {
+              "enum": [
+                "ORGANIZATION_TYPE"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get categories by type",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/api/common/categories/types": {
+      "get": {
+        "operationId": "CategoryController_getCategoryTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of all category types with their display labels and parent rules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "enum": [
+                          "ORGANIZATION_TYPE"
+                        ]
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "parentType": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get all category types with labels & parent rules",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/api/common/categories/{id}": {
+      "get": {
+        "operationId": "CategoryController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Category ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get category by ID",
+        "tags": [
+          "Categories"
+        ]
+      },
+      "put": {
+        "operationId": "CategoryController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Category ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "404": {
+            "description": "Category not found"
+          },
+          "409": {
+            "description": "Category name or code already exists"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Update category",
+        "tags": [
+          "Categories"
+        ]
+      },
+      "delete": {
+        "operationId": "CategoryController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Category ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category deleted successfully"
+          },
+          "400": {
+            "description": "Cannot delete category with children"
+          },
+          "404": {
+            "description": "Category not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete category",
+        "tags": [
+          "Categories"
+        ]
+      }
+    },
+    "/api/common/categories/{id}/toggle-active": {
+      "put": {
+        "operationId": "CategoryController_toggleActive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Category ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category status toggled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Toggle category active status",
+        "tags": [
+          "Categories"
+        ]
+      }
     }
   },
   "info": {
@@ -3122,6 +3537,217 @@
             "description": "ID của danh mục cha (null để xóa parent)",
             "example": "clxxxxxxxxxxxxx",
             "nullable": true
+          }
+        }
+      },
+      "CategoryListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "List of categories"
+          },
+          "pagination": {
+            "type": "object",
+            "description": "Pagination metadata"
+          }
+        },
+        "required": [
+          "data",
+          "pagination"
+        ]
+      },
+      "CategorySummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Category ID",
+            "example": "clr123456789"
+          },
+          "code": {
+            "type": "object",
+            "description": "Category code",
+            "example": "TNHH",
+            "nullable": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Category name",
+            "example": "Công ty TNHH"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name"
+        ]
+      },
+      "CategoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Category ID",
+            "example": "clr123456789"
+          },
+          "name": {
+            "type": "string",
+            "description": "Category name",
+            "example": "Công ty TNHH"
+          },
+          "code": {
+            "type": "object",
+            "description": "Category code",
+            "example": "TNHH",
+            "nullable": true
+          },
+          "parentId": {
+            "type": "object",
+            "description": "Parent category ID",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "description": "Category type",
+            "enum": [
+              "ORGANIZATION_TYPE"
+            ],
+            "example": "ORGANIZATION_TYPE"
+          },
+          "description": {
+            "type": "object",
+            "description": "Category description",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether category is active",
+            "example": true
+          },
+          "orderIndex": {
+            "type": "object",
+            "description": "Display order index",
+            "nullable": true
+          },
+          "deleted": {
+            "type": "boolean",
+            "description": "Whether category is deleted",
+            "example": false
+          },
+          "createdBy": {
+            "type": "object",
+            "description": "User ID who created the category",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update timestamp",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "parentId",
+          "type",
+          "description",
+          "isActive",
+          "orderIndex",
+          "deleted",
+          "createdBy",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Category name",
+            "example": "Công ty TNHH"
+          },
+          "code": {
+            "type": "string",
+            "description": "Category code",
+            "example": "TNHH"
+          },
+          "parentId": {
+            "type": "string",
+            "description": "Parent category ID for hierarchical categories"
+          },
+          "type": {
+            "type": "string",
+            "description": "Category type",
+            "enum": [
+              "ORGANIZATION_TYPE"
+            ],
+            "example": "ORGANIZATION_TYPE"
+          },
+          "description": {
+            "type": "string",
+            "description": "Category description"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether category is active",
+            "default": true
+          },
+          "orderIndex": {
+            "type": "number",
+            "description": "Display order index"
+          }
+        },
+        "required": [
+          "name",
+          "type"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Category name",
+            "example": "Công ty TNHH"
+          },
+          "code": {
+            "type": "string",
+            "description": "Category code",
+            "example": "TNHH"
+          },
+          "parentId": {
+            "type": "string",
+            "description": "Parent category ID for hierarchical categories"
+          },
+          "type": {
+            "type": "string",
+            "description": "Category type",
+            "enum": [
+              "ORGANIZATION_TYPE"
+            ],
+            "example": "ORGANIZATION_TYPE"
+          },
+          "description": {
+            "type": "string",
+            "description": "Category description"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether category is active"
+          },
+          "orderIndex": {
+            "type": "number",
+            "description": "Display order index"
           }
         }
       }

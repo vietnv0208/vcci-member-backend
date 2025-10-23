@@ -7,6 +7,7 @@ import { UsersModule } from './features/users/users.module';
 import { FilesModule } from './features/common/file-management/files.module';
 import { MembersModule } from './features/members/members.module';
 import { BusinessCategoriesModule } from './features/business-categories/business-categories.module';
+import { CategoryModule } from './features/common/category/category.module';
 import { PrismaService } from './common/prisma.service';
 
 @Module({
@@ -19,6 +20,7 @@ import { PrismaService } from './common/prisma.service';
     FilesModule,
     MembersModule,
     BusinessCategoriesModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [
