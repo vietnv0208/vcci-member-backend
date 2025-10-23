@@ -432,9 +432,10 @@
             "schema": {
               "type": "string",
               "enum": [
-                "MANAGEMENT",
+                "SUPER_ADMIN",
                 "ADMIN",
-                "SUPER_ADMIN"
+                "MANAGEMENT",
+                "MEMBER"
               ]
             }
           },
@@ -1203,6 +1204,271 @@
           "Files"
         ]
       }
+    },
+    "/api/public/files/upload": {
+      "post": {
+        "description": "Uploads a file directly to the backend, which handles S3 upload internally",
+        "operationId": "FilesPublicController_uploadFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "MEMBERSHIP_APPLICATION",
+                      "BUSINESS_LICENSE",
+                      "FINANCIAL_REPORT",
+                      "PAYMENT_PROOF",
+                      "OTHER_DOCUMENT"
+                    ],
+                    "description": "File category"
+                  },
+                  "entityId": {
+                    "type": "string",
+                    "description": "ID of the entity this file belongs to"
+                  },
+                  "entityType": {
+                    "type": "string",
+                    "description": "Type of entity this file belongs to"
+                  },
+                  "folderPath": {
+                    "type": "string",
+                    "description": "Target folder path for upload (e.g., /Documents/Projects)"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponseDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error or file type not allowed"
+          }
+        },
+        "summary": "Upload file directly to backend",
+        "tags": [
+          "Public Files"
+        ]
+      }
+    },
+    "/api/public/files/{id}": {
+      "get": {
+        "description": "Retrieves file metadata by ID",
+        "operationId": "FilesPublicController_getFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "File ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File information retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "summary": "Get file information",
+        "tags": [
+          "Public Files"
+        ]
+      }
+    },
+    "/api/public/files/{id}/download": {
+      "get": {
+        "description": "Streams the file content directly from the server",
+        "operationId": "FilesPublicController_downloadFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "File ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File content streamed",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "summary": "Download file",
+        "tags": [
+          "Public Files"
+        ]
+      }
+    },
+    "/api/public/files/{id}/download-url": {
+      "get": {
+        "description": "Get download URL for the file",
+        "operationId": "FilesPublicController_downloadFileUrl",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "File ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download URL retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "downloadUrl": {
+                      "type": "string",
+                      "description": "Download URL for the file"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "summary": "Download file url",
+        "tags": [
+          "Public Files"
+        ]
+      }
+    },
+    "/api/public/files": {
+      "get": {
+        "description": "Retrieves all files associated with a specific entity",
+        "operationId": "FilesPublicController_getFilesByEntity",
+        "parameters": [
+          {
+            "name": "entityType",
+            "required": true,
+            "in": "query",
+            "description": "Type of entity (e.g., User, LeaveRequest)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": true,
+            "in": "query",
+            "description": "ID of the entity",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Files retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get files by entity",
+        "tags": [
+          "Public Files"
+        ]
+      }
+    },
+    "/api/public/files/attach": {
+      "post": {
+        "description": "Attach files uploaded with tempKey to a specific entity",
+        "operationId": "FilesPublicController_attachTempFiles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachFilesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Files attached successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachFilesResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No files found with the given tempKey"
+          }
+        },
+        "summary": "Attach temporary files to entity",
+        "tags": [
+          "Public Files"
+        ]
+      }
     }
   },
   "info": {
@@ -1312,9 +1578,10 @@
             "type": "string",
             "description": "Role of the user",
             "enum": [
-              "MANAGEMENT",
+              "SUPER_ADMIN",
               "ADMIN",
-              "SUPER_ADMIN"
+              "MANAGEMENT",
+              "MEMBER"
             ],
             "default": "MANAGEMENT"
           },
@@ -1356,9 +1623,10 @@
             "type": "string",
             "description": "Role of the user",
             "enum": [
-              "MANAGEMENT",
+              "SUPER_ADMIN",
               "ADMIN",
-              "SUPER_ADMIN"
+              "MANAGEMENT",
+              "MEMBER"
             ]
           },
           "department": {
