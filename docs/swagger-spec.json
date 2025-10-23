@@ -2056,6 +2056,32 @@
         ]
       }
     },
+    "/api/public/business-categories/tree": {
+      "get": {
+        "operationId": "BusinessCategoriesPublicController_getPublicTree",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Tìm kiếm theo tên hoặc mã",
+            "schema": {
+              "example": "Nông nghiệp",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cây phân cấp business categories đang hoạt động"
+          }
+        },
+        "summary": "Lấy cây phân cấp business categories (Public, chỉ isActive)",
+        "tags": [
+          "Business Categories (Public)"
+        ]
+      }
+    },
     "/api/common/categories": {
       "get": {
         "description": "Supports filtering by type, searching by code/name, and pagination",

@@ -175,5 +175,65 @@ export class BusinessCategoriesRepository {
     });
     return count > 0;
   }
+
+  /**
+   * Lấy tree structure với filter isActive và search (cho public API)
+   */
+  async findActiveTreeWithSearch(search?: string): Promise<BusinessCategory[]> {
+    // Build where clause cho search
+    const searchWhere = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            { code: { contains: search, mode: 'insensitive' as const } },
+          ],
+        }
+      : {};
+
+    // Nếu có search, lấy tất cả categories phù hợp (không phân cấp)
+    if (search) {
+      return this.prisma.businessCategory.findMany({
+        where: {
+          isActive: true,
+          ...searchWhere,
+        },
+        include: {
+          parent: true,
+        },
+        orderBy: [{ level: 'asc' }, { code: 'asc' }],
+      });
+    }
+
+    // Không có search, lấy full tree từ level 1
+    return this.prisma.businessCategory.findMany({
+      where: {
+        level: 1,
+        isActive: true,
+      },
+      include: {
+        children: {
+          where: { isActive: true },
+          include: {
+            children: {
+              where: { isActive: true },
+              include: {
+                children: {
+                  where: { isActive: true },
+                  include: {
+                    children: {
+                      where: { isActive: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        code: 'asc',
+      },
+    });
+  }
 }
 

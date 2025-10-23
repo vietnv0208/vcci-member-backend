@@ -320,6 +320,7 @@ model BusinessCategory {
   parentId String?
   parent   BusinessCategory?  @relation("BusinessCategoryHierarchy", fields: [parentId], references: [id])
   children BusinessCategory[] @relation("BusinessCategoryHierarchy")
+  isActive Boolean            @default(true) // Trạng thái hoạt động
 
   // Liên kết với doanh nghiệp hoặc hiệp hội
   memberBusinessCategories MemberEnterpriseBusinessCategory[]

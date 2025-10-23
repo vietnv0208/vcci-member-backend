@@ -267,6 +267,13 @@ export class BusinessCategoriesService {
   }
 
   /**
+   * Lấy tree structure cho public API (chỉ isActive)
+   */
+  async getPublicTree(search?: string): Promise<BusinessCategory[]> {
+    return this.repository.findActiveTreeWithSearch(search);
+  }
+
+  /**
    * Kiểm tra xem categoryId có phải là descendant của ancestorId không
    */
   private async isDescendant(
