@@ -432,9 +432,10 @@
             "schema": {
               "type": "string",
               "enum": [
-                "MANAGEMENT",
+                "SUPER_ADMIN",
                 "ADMIN",
-                "SUPER_ADMIN"
+                "MANAGEMENT",
+                "MEMBER"
               ]
             }
           },
@@ -1312,9 +1313,10 @@
             "type": "string",
             "description": "Role of the user",
             "enum": [
-              "MANAGEMENT",
+              "SUPER_ADMIN",
               "ADMIN",
-              "SUPER_ADMIN"
+              "MANAGEMENT",
+              "MEMBER"
             ],
             "default": "MANAGEMENT"
           },
@@ -1356,9 +1358,10 @@
             "type": "string",
             "description": "Role of the user",
             "enum": [
-              "MANAGEMENT",
+              "SUPER_ADMIN",
               "ADMIN",
-              "SUPER_ADMIN"
+              "MANAGEMENT",
+              "MEMBER"
             ]
           },
           "department": {
