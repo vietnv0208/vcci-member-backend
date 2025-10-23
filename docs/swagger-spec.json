@@ -1411,6 +1411,16 @@
             }
           },
           {
+            "name": "businessCategoryId",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo ngành nghề kinh doanh (sẽ tìm cả category con)",
+            "schema": {
+              "example": "clxxxxxxxxxxxxxx",
+              "type": "string"
+            }
+          },
+          {
             "name": "submittedDateFrom",
             "required": false,
             "in": "query",
@@ -3351,6 +3361,44 @@
           "fullName"
         ]
       },
+      "BusinessCategoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID của business category"
+          },
+          "code": {
+            "type": "string",
+            "description": "Mã danh mục",
+            "example": "A"
+          },
+          "name": {
+            "type": "string",
+            "description": "Tên danh mục",
+            "example": "Nông nghiệp, lâm nghiệp và thuỷ sản"
+          },
+          "level": {
+            "type": "number",
+            "description": "Cấp độ",
+            "example": 1
+          },
+          "parentId": {
+            "type": "string",
+            "description": "ID danh mục cha"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Trạng thái hoạt động"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "level",
+          "isActive"
+        ]
+      },
       "MemberResponseDto": {
         "type": "object",
         "properties": {
@@ -3446,6 +3494,13 @@
               "$ref": "#/components/schemas/MemberContactResponseDto"
             }
           },
+          "businessCategories": {
+            "description": "Danh sách ngành nghề kinh doanh",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BusinessCategoryResponseDto"
+            }
+          },
           "attachmentIds": {
             "type": "array",
             "items": {
@@ -3471,6 +3526,7 @@
           "telephone",
           "email",
           "contacts",
+          "businessCategories",
           "attachmentIds",
           "createdAt",
           "updatedAt"

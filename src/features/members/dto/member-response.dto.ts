@@ -1,6 +1,26 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ApplicationType, MemberType, MemberStatus, ContactRole, Gender } from '@prisma/client';
 
+export class BusinessCategoryResponseDto {
+  @ApiProperty({ description: 'ID của business category' })
+  id: string;
+
+  @ApiPropertyOptional({ description: 'Mã danh mục', example: 'A' })
+  code?: string;
+
+  @ApiProperty({ description: 'Tên danh mục', example: 'Nông nghiệp, lâm nghiệp và thuỷ sản' })
+  name: string;
+
+  @ApiProperty({ description: 'Cấp độ', example: 1 })
+  level: number;
+
+  @ApiPropertyOptional({ description: 'ID danh mục cha' })
+  parentId?: string;
+
+  @ApiProperty({ description: 'Trạng thái hoạt động' })
+  isActive: boolean;
+}
+
 export class MemberContactResponseDto {
   @ApiProperty()
   id: string;
@@ -142,6 +162,12 @@ export class MemberResponseDto {
 
   @ApiProperty({ type: [MemberContactResponseDto] })
   contacts: MemberContactResponseDto[];
+
+  @ApiProperty({ 
+    type: [BusinessCategoryResponseDto],
+    description: 'Danh sách ngành nghề kinh doanh'
+  })
+  businessCategories: BusinessCategoryResponseDto[];
 
   @ApiProperty({ type: [String] })
   attachmentIds: string[];

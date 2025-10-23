@@ -96,6 +96,12 @@ export class MembersController {
     ],
   })
   @ApiQuery({
+    name: 'businessCategoryId',
+    required: false,
+    type: String,
+    description: 'Lọc theo ngành nghề kinh doanh (sẽ tìm cả category con)',
+  })
+  @ApiQuery({
     name: 'page',
     required: false,
     type: Number,

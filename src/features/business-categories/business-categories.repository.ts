@@ -116,6 +116,28 @@ export class BusinessCategoriesRepository {
   }
 
   /**
+   * Lấy tất cả descendant IDs của một category (đệ quy lấy tất cả con cháu)
+   */
+  async getAllDescendantIds(categoryId: string): Promise<string[]> {
+    const descendantIds: string[] = [categoryId]; // Bao gồm cả chính nó
+    
+    const getChildrenRecursive = async (parentId: string) => {
+      const children = await this.prisma.businessCategory.findMany({
+        where: { parentId },
+        select: { id: true },
+      });
+
+      for (const child of children) {
+        descendantIds.push(child.id);
+        await getChildrenRecursive(child.id); // Đệ quy
+      }
+    };
+
+    await getChildrenRecursive(categoryId);
+    return descendantIds;
+  }
+
+  /**
    * Lấy tree structure từ root
    */
   async findTree(rootLevel: number = 1): Promise<BusinessCategory[]> {

@@ -272,6 +272,16 @@ export class MembersService {
   }
 
   private mapToResponseDto(member: any): MemberResponseDto {
+    // Map business categories từ memberBusinessCategories relation
+    const businessCategories = (member.memberBusinessCategories || []).map((mbc: any) => ({
+      id: mbc.businessCategory.id,
+      code: mbc.businessCategory.code,
+      name: mbc.businessCategory.name,
+      level: mbc.businessCategory.level,
+      parentId: mbc.businessCategory.parentId,
+      isActive: mbc.businessCategory.isActive,
+    }));
+
     return {
       id: member.id,
       code: member.code,
@@ -295,6 +305,7 @@ export class MembersService {
       enterpriseDetail: member.enterpriseDetail,
       associationDetail: member.associationDetail,
       contacts: member.contacts || [],
+      businessCategories,
       attachmentIds: member.attachmentIds || [],
       createdAt: member.createdAt,
       updatedAt: member.updatedAt,

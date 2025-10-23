@@ -15,7 +15,9 @@ Module quản lý hội viên VCCI với đầy đủ tính năng CRUD, xét duy
 - ✅ **Statistics**: Thống kê tổng quan về hội viên
 - ✅ **Member Code Generation**: Tự động sinh mã hội viên (VCCI{YEAR}{NUMBER})
 - ✅ **Status History**: Lưu lịch sử thay đổi trạng thái
-- ✅ **Business Categories**: Quản lý ngành nghề kinh doanh
+- ✅ **Business Categories Management**: Quản lý ngành nghề kinh doanh với cấu trúc phân cấp
+- ✅ **Business Categories in Response**: Trả về thông tin đầy đủ của business categories trong member response
+- ✅ **Hierarchical Category Search**: Tìm kiếm theo category cha sẽ tự động bao gồm tất cả category con
 - ✅ **Contact Management**: Quản lý người liên hệ/lãnh đạo
 - ✅ **Role-based Access Control**: Phân quyền theo vai trò
 
@@ -60,7 +62,31 @@ Content-Type: application/json
   "code": "VCCI20250001",
   "status": "PENDING",
   "vietnameseName": "Công ty TNHH ABC",
-  ...
+  "email": "contact@abc.com",
+  "telephone": "024-1234567",
+  "officeAddress": "123 Đường ABC",
+  "enterpriseDetail": { ... },
+  "contacts": [ ... ],
+  "businessCategories": [
+    {
+      "id": "cat_001",
+      "code": "A",
+      "name": "Nông nghiệp, lâm nghiệp và thuỷ sản",
+      "level": 1,
+      "parentId": null,
+      "isActive": true
+    },
+    {
+      "id": "cat_002",
+      "code": "01",
+      "name": "Trồng trọt và chăn nuôi",
+      "level": 2,
+      "parentId": "cat_001",
+      "isActive": true
+    }
+  ],
+  "createdAt": "2025-01-15T...",
+  "updatedAt": "2025-01-15T..."
 }
 ```
 
@@ -130,6 +156,7 @@ Roles: SUPER_ADMIN, ADMIN, MANAGEMENT
 - `applicationType`: ENTERPRISE | ASSOCIATION
 - `memberType`: LINKED | OFFICIAL | HONORARY
 - `status`: PENDING | APPROVED | REJECTED | CANCELLED | ACTIVE | INACTIVE | SUSPENDED | TERMINATED
+- `businessCategoryId`: **Lọc theo ngành nghề kinh doanh** (sẽ tìm cả category con) - VD: nếu chọn "Nông nghiệp" (level 1) sẽ tìm tất cả members có ngành nghề thuộc "Nông nghiệp" và các ngành con như "Trồng trọt", "Chăn nuôi"...
 - `submittedDateFrom`: Ngày đăng ký từ (ISO 8601)
 - `submittedDateTo`: Ngày đăng ký đến (ISO 8601)
 - `approvedDateFrom`: Ngày duyệt từ (ISO 8601)
@@ -254,6 +281,25 @@ PENDING (Chờ xét duyệt)
 ### MemberEnterpriseBusinessCategory
 - Liên kết với danh mục ngành nghề
 
+### BusinessCategory (Returned in Response)
+Mỗi member sẽ trả về danh sách `businessCategories` với thông tin đầy đủ:
+```json
+{
+  "id": "category_id",
+  "code": "A",                    // Mã danh mục theo QĐ 27/2018/QĐ-TTg
+  "name": "Nông nghiệp, lâm nghiệp và thuỷ sản",
+  "level": 1,                     // Cấp độ: 1 (Section), 2 (Division), 3 (Group), 4 (Class)
+  "parentId": null,               // ID danh mục cha (null nếu là root)
+  "isActive": true                // Trạng thái hoạt động
+}
+```
+
+**Cấu trúc phân cấp:**
+- **Level 1 (Section)**: A, B, C... (21 sections) - VD: "A - Nông nghiệp, lâm nghiệp và thuỷ sản"
+- **Level 2 (Division)**: 01, 02, 03... (88 divisions) - VD: "01 - Trồng trọt và chăn nuôi"
+- **Level 3 (Group)**: 011, 012, 013... - VD: "011 - Trồng cây hàng năm"
+- **Level 4 (Class)**: 0111, 0112... - VD: "0111 - Trồng lúa"
+
 ## 🔐 Phân quyền
 
 | Endpoint | SUPER_ADMIN | ADMIN | MANAGEMENT | MEMBER |
@@ -313,6 +359,23 @@ const result = await membersService.findAll({
   page: 1,
   limit: 10
 });
+```
+
+### Tìm kiếm theo ngành nghề kinh doanh (với category con)
+```typescript
+// Tìm tất cả members có ngành nghề là "Nông nghiệp" 
+// hoặc các ngành con (Trồng trọt, Chăn nuôi, Lâm nghiệp...)
+const result = await membersService.findAll({
+  businessCategoryId: 'agriculture_category_id', // ID của category "Nông nghiệp"
+  page: 1,
+  limit: 20
+});
+
+// Kết quả sẽ bao gồm:
+// - Members có category chính xác là "Nông nghiệp"
+// - Members có category là "Trồng trọt" (con của Nông nghiệp)
+// - Members có category là "Trồng lúa" (con của Trồng trọt)
+// - ... tất cả descendants
 ```
 
 ### Thay đổi trạng thái

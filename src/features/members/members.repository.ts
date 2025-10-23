@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
 import { Prisma, Member, MemberStatus } from '@prisma/client';
 import { QueryMemberDto } from './dto';
+import { BusinessCategoriesService } from '../business-categories/business-categories.service';
 
 @Injectable()
 export class MembersRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly businessCategoriesService: BusinessCategoriesService,
+  ) {}
 
   async create(data: Prisma.MemberCreateInput): Promise<Member> {
     return this.prisma.member.create({
@@ -105,6 +109,7 @@ export class MembersRepository {
       applicationType,
       memberType,
       status,
+      businessCategoryId,
       submittedDateFrom,
       submittedDateTo,
       approvedDateFrom,
@@ -140,6 +145,23 @@ export class MembersRepository {
 
     if (status) {
       where.status = status;
+    }
+
+    // Filter by business category (including descendants)
+    if (businessCategoryId) {
+      // Lấy tất cả descendant IDs (bao gồm cả chính nó)
+      const categoryIds = await this.businessCategoriesService.getAllDescendantIds(
+        businessCategoryId,
+      );
+
+      // Filter members có ít nhất 1 category trong danh sách
+      where.memberBusinessCategories = {
+        some: {
+          businessCategoryId: {
+            in: categoryIds,
+          },
+        },
+      };
     }
 
     if (submittedDateFrom || submittedDateTo) {

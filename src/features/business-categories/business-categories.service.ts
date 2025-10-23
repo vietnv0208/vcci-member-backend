@@ -267,6 +267,13 @@ export class BusinessCategoriesService {
   }
 
   /**
+   * Lấy tất cả descendant IDs của một category (bao gồm cả chính nó)
+   */
+  async getAllDescendantIds(categoryId: string): Promise<string[]> {
+    return this.repository.getAllDescendantIds(categoryId);
+  }
+
+  /**
    * Lấy tree structure cho public API (chỉ isActive)
    */
   async getPublicTree(search?: string): Promise<BusinessCategory[]> {
