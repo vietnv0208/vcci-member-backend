@@ -1204,6 +1204,447 @@
           "Files"
         ]
       }
+    },
+    "/api/members": {
+      "post": {
+        "operationId": "MembersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Đơn đăng ký đã được tạo thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ"
+          },
+          "409": {
+            "description": "Email đã tồn tại"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Tạo đơn đăng ký hội viên mới",
+        "tags": [
+          "Members"
+        ]
+      },
+      "get": {
+        "operationId": "MembersController_findAll",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Tìm kiếm theo tên, email, mã số thuế",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "applicationType",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo loại đơn đăng ký",
+            "schema": {
+              "enum": [
+                "ENTERPRISE",
+                "ASSOCIATION"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberType",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo loại hội viên",
+            "schema": {
+              "enum": [
+                "LINKED",
+                "OFFICIAL",
+                "HONORARY"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo trạng thái",
+            "schema": {
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "REJECTED",
+                "CANCELLED",
+                "ACTIVE",
+                "INACTIVE",
+                "SUSPENDED",
+                "TERMINATED"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "submittedDateFrom",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo ngày đăng ký từ",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "submittedDateTo",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo ngày đăng ký đến",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "approvedDateFrom",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo ngày duyệt từ",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "approvedDateTo",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo ngày duyệt đến",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Số trang",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Số lượng mỗi trang",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sắp xếp theo trường",
+            "schema": {
+              "default": "createdAt",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Thứ tự sắp xếp",
+            "schema": {
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách hội viên",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy danh sách hội viên",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/api/members/statistics": {
+      "get": {
+        "operationId": "MembersController_getStatistics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Thống kê hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy thống kê hội viên",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/api/members/{id}": {
+      "get": {
+        "operationId": "MembersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin chi tiết hội viên",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy thông tin chi tiết hội viên",
+        "tags": [
+          "Members"
+        ]
+      },
+      "patch": {
+        "operationId": "MembersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Thông tin hội viên đã được cập nhật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ"
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Cập nhật thông tin hội viên",
+        "tags": [
+          "Members"
+        ]
+      },
+      "delete": {
+        "operationId": "MembersController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Hội viên đã được xóa"
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Xóa hội viên",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/api/members/code/{code}": {
+      "get": {
+        "operationId": "MembersController_findByCode",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "description": "Mã hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin chi tiết hội viên",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy thông tin hội viên theo mã",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/api/members/{id}/status": {
+      "patch": {
+        "operationId": "MembersController_changeStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeMemberStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Trạng thái hội viên đã được thay đổi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Chuyển trạng thái không hợp lệ"
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Thay đổi trạng thái hội viên",
+        "tags": [
+          "Members"
+        ]
+      }
     }
   },
   "info": {
@@ -1572,6 +2013,645 @@
         "required": [
           "message",
           "updatedCount"
+        ]
+      },
+      "CreateMemberEnterpriseDetailDto": {
+        "type": "object",
+        "properties": {
+          "businessRegistrationNo": {
+            "type": "string",
+            "description": "Số đăng ký kinh doanh"
+          },
+          "businessRegistrationDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày đăng ký kinh doanh"
+          },
+          "issuedBy": {
+            "type": "string",
+            "description": "Nơi cấp"
+          },
+          "registeredCapital": {
+            "type": "number",
+            "description": "Vốn điều lệ"
+          },
+          "totalAsset": {
+            "type": "number",
+            "description": "Tổng tài sản"
+          },
+          "previousYearRevenue": {
+            "type": "number",
+            "description": "Doanh thu năm trước"
+          },
+          "totalEmployees": {
+            "type": "number",
+            "description": "Tổng số nhân viên"
+          },
+          "branchInfo": {
+            "type": "string",
+            "description": "Thông tin chi nhánh"
+          },
+          "organizationTypes": {
+            "description": "Loại hình tổ chức",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "businessRegistrationNo",
+          "organizationTypes"
+        ]
+      },
+      "CreateMemberAssociationDetailDto": {
+        "type": "object",
+        "properties": {
+          "establishmentLicenseNo": {
+            "type": "string",
+            "description": "Số quyết định thành lập"
+          },
+          "establishmentDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày thành lập"
+          },
+          "issuedBy": {
+            "type": "string",
+            "description": "Nơi cấp"
+          },
+          "totalMembers": {
+            "type": "number",
+            "description": "Tổng số hội viên"
+          }
+        },
+        "required": [
+          "establishmentLicenseNo"
+        ]
+      },
+      "CreateMemberContactDto": {
+        "type": "object",
+        "properties": {
+          "contactRole": {
+            "type": "string",
+            "enum": [
+              "CHAIR_PERSON",
+              "CEO",
+              "CHIEF_OFFICE",
+              "SECRETARY_GENERAL",
+              "CONTACT_1",
+              "CONTACT_2"
+            ],
+            "description": "Vai trò liên hệ"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Họ và tên"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ],
+            "description": "Giới tính"
+          },
+          "telephone": {
+            "type": "string",
+            "description": "Số điện thoại cố định"
+          },
+          "mobile": {
+            "type": "string",
+            "description": "Số điện thoại di động"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "note": {
+            "type": "string",
+            "description": "Ghi chú"
+          }
+        },
+        "required": [
+          "contactRole",
+          "fullName"
+        ]
+      },
+      "CreateMemberDto": {
+        "type": "object",
+        "properties": {
+          "applicationType": {
+            "type": "string",
+            "enum": [
+              "ENTERPRISE",
+              "ASSOCIATION"
+            ],
+            "description": "Loại đơn đăng ký"
+          },
+          "memberType": {
+            "type": "string",
+            "enum": [
+              "LINKED",
+              "OFFICIAL",
+              "HONORARY"
+            ],
+            "description": "Loại hội viên",
+            "default": "LINKED"
+          },
+          "vietnameseName": {
+            "type": "string",
+            "description": "Tên tiếng Việt"
+          },
+          "englishName": {
+            "type": "string",
+            "description": "Tên tiếng Anh"
+          },
+          "abbreviation": {
+            "type": "string",
+            "description": "Tên viết tắt"
+          },
+          "officeAddress": {
+            "type": "string",
+            "description": "Địa chỉ trụ sở chính"
+          },
+          "businessAddress": {
+            "type": "string",
+            "description": "Địa chỉ kinh doanh"
+          },
+          "telephone": {
+            "type": "string",
+            "description": "Số điện thoại"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "website": {
+            "type": "string",
+            "description": "Website"
+          },
+          "taxCode": {
+            "type": "string",
+            "description": "Mã số thuế"
+          },
+          "expireDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày hết hạn"
+          },
+          "remarks": {
+            "type": "string",
+            "description": "Ghi chú"
+          },
+          "enterpriseDetail": {
+            "description": "Chi tiết doanh nghiệp",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateMemberEnterpriseDetailDto"
+              }
+            ]
+          },
+          "associationDetail": {
+            "description": "Chi tiết hiệp hội",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateMemberAssociationDetailDto"
+              }
+            ]
+          },
+          "contacts": {
+            "description": "Danh sách người liên hệ",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateMemberContactDto"
+            }
+          },
+          "businessCategoryIds": {
+            "description": "Danh mục ngành nghề",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachmentIds": {
+            "description": "Danh sách file đính kèm",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "applicationType",
+          "vietnameseName",
+          "officeAddress",
+          "telephone",
+          "email",
+          "contacts"
+        ]
+      },
+      "MemberEnterpriseDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "businessRegistrationNo": {
+            "type": "string"
+          },
+          "businessRegistrationDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "issuedBy": {
+            "type": "string"
+          },
+          "registeredCapital": {
+            "type": "number"
+          },
+          "totalAsset": {
+            "type": "number"
+          },
+          "previousYearRevenue": {
+            "type": "number"
+          },
+          "totalEmployees": {
+            "type": "number"
+          },
+          "branchInfo": {
+            "type": "string"
+          },
+          "organizationTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "businessRegistrationNo",
+          "organizationTypes"
+        ]
+      },
+      "MemberAssociationDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "establishmentLicenseNo": {
+            "type": "string"
+          },
+          "establishmentDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "issuedBy": {
+            "type": "string"
+          },
+          "totalMembers": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "establishmentLicenseNo"
+        ]
+      },
+      "MemberContactResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "contactRole": {
+            "type": "string",
+            "enum": [
+              "CHAIR_PERSON",
+              "CEO",
+              "CHIEF_OFFICE",
+              "SECRETARY_GENERAL",
+              "CONTACT_1",
+              "CONTACT_2"
+            ]
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ]
+          },
+          "telephone": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "contactRole",
+          "fullName"
+        ]
+      },
+      "MemberResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "applicationType": {
+            "type": "string",
+            "enum": [
+              "ENTERPRISE",
+              "ASSOCIATION"
+            ]
+          },
+          "memberType": {
+            "type": "string",
+            "enum": [
+              "LINKED",
+              "OFFICIAL",
+              "HONORARY"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "CANCELLED",
+              "ACTIVE",
+              "INACTIVE",
+              "SUSPENDED",
+              "TERMINATED"
+            ]
+          },
+          "vietnameseName": {
+            "type": "string"
+          },
+          "englishName": {
+            "type": "string"
+          },
+          "abbreviation": {
+            "type": "string"
+          },
+          "officeAddress": {
+            "type": "string"
+          },
+          "businessAddress": {
+            "type": "string"
+          },
+          "telephone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          },
+          "taxCode": {
+            "type": "string"
+          },
+          "submittedDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "approvedDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "joinDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expireDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "remarks": {
+            "type": "string"
+          },
+          "enterpriseDetail": {
+            "$ref": "#/components/schemas/MemberEnterpriseDetailResponseDto"
+          },
+          "associationDetail": {
+            "$ref": "#/components/schemas/MemberAssociationDetailResponseDto"
+          },
+          "contacts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberContactResponseDto"
+            }
+          },
+          "attachmentIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "applicationType",
+          "memberType",
+          "status",
+          "vietnameseName",
+          "officeAddress",
+          "telephone",
+          "email",
+          "contacts",
+          "attachmentIds",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "MemberListResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "page",
+          "limit",
+          "totalPages"
+        ]
+      },
+      "UpdateMemberDto": {
+        "type": "object",
+        "properties": {
+          "applicationType": {
+            "type": "string",
+            "enum": [
+              "ENTERPRISE",
+              "ASSOCIATION"
+            ],
+            "description": "Loại đơn đăng ký"
+          },
+          "memberType": {
+            "type": "string",
+            "enum": [
+              "LINKED",
+              "OFFICIAL",
+              "HONORARY"
+            ],
+            "description": "Loại hội viên",
+            "default": "LINKED"
+          },
+          "vietnameseName": {
+            "type": "string",
+            "description": "Tên tiếng Việt"
+          },
+          "englishName": {
+            "type": "string",
+            "description": "Tên tiếng Anh"
+          },
+          "abbreviation": {
+            "type": "string",
+            "description": "Tên viết tắt"
+          },
+          "officeAddress": {
+            "type": "string",
+            "description": "Địa chỉ trụ sở chính"
+          },
+          "businessAddress": {
+            "type": "string",
+            "description": "Địa chỉ kinh doanh"
+          },
+          "telephone": {
+            "type": "string",
+            "description": "Số điện thoại"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "website": {
+            "type": "string",
+            "description": "Website"
+          },
+          "taxCode": {
+            "type": "string",
+            "description": "Mã số thuế"
+          },
+          "expireDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày hết hạn"
+          },
+          "remarks": {
+            "type": "string",
+            "description": "Ghi chú"
+          },
+          "enterpriseDetail": {
+            "description": "Chi tiết doanh nghiệp",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateMemberEnterpriseDetailDto"
+              }
+            ]
+          },
+          "associationDetail": {
+            "description": "Chi tiết hiệp hội",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateMemberAssociationDetailDto"
+              }
+            ]
+          },
+          "contacts": {
+            "description": "Danh sách người liên hệ",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateMemberContactDto"
+            }
+          },
+          "businessCategoryIds": {
+            "description": "Danh mục ngành nghề",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachmentIds": {
+            "description": "Danh sách file đính kèm",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ChangeMemberStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "CANCELLED",
+              "ACTIVE",
+              "INACTIVE",
+              "SUSPENDED",
+              "TERMINATED"
+            ],
+            "description": "Trạng thái mới"
+          },
+          "remark": {
+            "type": "string",
+            "description": "Ghi chú thay đổi trạng thái"
+          }
+        },
+        "required": [
+          "status"
         ]
       }
     }

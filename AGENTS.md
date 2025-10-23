@@ -321,6 +321,27 @@ export class UsersRepository {
 - Phân quyền với `@Roles(Role.ADMIN, Role.SUPER_ADMIN)`
 - Validate input với DTOs
 
+### **Documentation Guidelines:**
+
+**Nguyên tắc tạo documentation:**
+- **Không tạo file .md riêng** cho mỗi tính năng thông thường
+- **Chỉ tạo documentation** khi tính năng quá phức tạp hoặc đặc biệt
+- **Ưu tiên Swagger/OpenAPI** documentation trong code
+- **Sử dụng AGENTS.md** làm tài liệu tổng quan duy nhất
+- **Comment trong code** thay vì tạo file riêng
+
+**Khi nào cần tạo file .md riêng:**
+- Tính năng có **workflow phức tạp** (ví dụ: approval process)
+- **Integration** với hệ thống bên ngoài
+- **API documentation** cho external partners
+- **Deployment guides** hoặc **setup instructions**
+
+**Best practices:**
+- Giữ documentation **ngắn gọn** và **focused**
+- Cập nhật **AGENTS.md** thay vì tạo file mới
+- Sử dụng **code comments** cho implementation details
+- **Swagger annotations** cho API documentation
+
 ---
 
 ## 🔮 **Roadmap**
