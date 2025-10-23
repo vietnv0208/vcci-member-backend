@@ -31,8 +31,8 @@ async function bootstrap() {
 
   // Swagger documentation
   const config = new DocumentBuilder()
-    .setTitle('Check-in System API')
-    .setDescription('API documentation for the Check-in System')
+    .setTitle('VCCI-Member System API')
+    .setDescription('API documentation for the VCCI-Member System')
     .setVersion('1.0')
     .addServer(`http://localhost:${port}`, 'Development Server')
     .addServer(`${API_SERVER}`, 'Deploy Server')

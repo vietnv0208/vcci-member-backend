@@ -66,7 +66,8 @@ src/
     ├── schema.prisma
     ├── migrations/
     └── seeds/              # 🌱 Seed Files
-        └── 20250115_organization_types.sql
+        ├── 20250115_organization_types.sql
+        └── 20250115_business_categories.sql
 ```
 
 ---
@@ -208,6 +209,7 @@ src/
 
 **Current Seeds:**
 - Organization Types (7 loại hình tổ chức) ✅
+- Business Categories (123 ngành kinh tế theo QĐ 27/2018/QĐ-TTg) ✅
 
 **Features:**
 - Idempotent seeds (có thể chạy nhiều lần an toàn)

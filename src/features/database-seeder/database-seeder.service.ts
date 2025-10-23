@@ -152,17 +152,27 @@ export class DatabaseSeederService {
    */
   async checkSeedStatus(): Promise<{
     organizationTypesCount: number;
+    businessCategoriesCount: number;
   }> {
     try {
-      const organizationTypesCount = await this.prisma.category.count({
-        where: {
-          type: 'ORGANIZATION_TYPE',
-          deleted: false,
-        },
-      });
+      const [organizationTypesCount, businessCategoriesCount] =
+        await Promise.all([
+          this.prisma.category.count({
+            where: {
+              type: 'ORGANIZATION_TYPE',
+              deleted: false,
+            },
+          }),
+          this.prisma.businessCategory.count({
+            where: {
+              isActive: true,
+            },
+          }),
+        ]);
 
       return {
         organizationTypesCount,
+        businessCategoriesCount,
       };
     } catch (error) {
       this.logger.error(`Lỗi khi kiểm tra seed status: ${error.message}`);
@@ -190,7 +200,8 @@ export class DatabaseSeederService {
 
     // Thêm thông tin về số lượng records
     result.message += `\n📊 Trạng thái sau seeding:
-- Organization types: ${afterStatus.organizationTypesCount}`;
+- Organization types: ${afterStatus.organizationTypesCount}
+- Business categories: ${afterStatus.businessCategoriesCount}`;
 
     return result;
   }

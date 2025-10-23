@@ -2538,7 +2538,7 @@
     },
     "/api/database-seeder/seeds": {
       "post": {
-        "description": "\n    Chạy tất cả các seed files SQL một cách an toàn khi triển khai.\n    \n    Tính năng:\n    - Sử dụng ON CONFLICT DO NOTHING để tránh lỗi duplicate\n    - Có thể chạy nhiều lần mà không gây lỗi\n    - Chạy theo thứ tự đúng dựa trên tên file\n    - Thích hợp cho CI/CD deployment\n    \n    Seeds bao gồm:\n    - Organization types (loại hình tổ chức)\n    ",
+        "description": "\n    Chạy tất cả các seed files SQL một cách an toàn khi triển khai.\n    \n    Tính năng:\n    - Sử dụng ON CONFLICT DO NOTHING để tránh lỗi duplicate\n    - Có thể chạy nhiều lần mà không gây lỗi\n    - Chạy theo thứ tự đúng dựa trên tên file\n    - Thích hợp cho CI/CD deployment\n    \n    Seeds bao gồm:\n    - Organization types (loại hình tổ chức)\n    - Business categories (phân loại ngành kinh tế theo QĐ 27/2018/QĐ-TTg)\n    ",
         "operationId": "DatabaseSeederController_runDatabaseSeeds",
         "parameters": [],
         "responses": {
@@ -2608,6 +2608,9 @@
                   "properties": {
                     "organizationTypesCount": {
                       "type": "number"
+                    },
+                    "businessCategoriesCount": {
+                      "type": "number"
                     }
                   }
                 }
@@ -2628,8 +2631,8 @@
     }
   },
   "info": {
-    "title": "Check-in System API",
-    "description": "API documentation for the Check-in System",
+    "title": "VCCI-Member System API",
+    "description": "API documentation for the VCCI-Member System",
     "version": "1.0",
     "contact": {}
   },

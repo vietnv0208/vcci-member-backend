@@ -17,6 +17,9 @@ describe('DatabaseSeederService', () => {
             category: {
               count: jest.fn(),
             },
+            businessCategory: {
+              count: jest.fn(),
+            },
           },
         },
       ],
@@ -31,18 +34,27 @@ describe('DatabaseSeederService', () => {
   });
 
   it('should check seed status', async () => {
-    const mockCount = 7;
-    jest.spyOn(prismaService.category, 'count').mockResolvedValue(mockCount);
+    const mockOrgTypesCount = 7;
+    const mockBusinessCategoriesCount = 123;
+    
+    jest.spyOn(prismaService.category, 'count').mockResolvedValue(mockOrgTypesCount);
+    jest.spyOn(prismaService.businessCategory, 'count').mockResolvedValue(mockBusinessCategoriesCount);
 
     const status = await service.checkSeedStatus();
 
     expect(status).toEqual({
-      organizationTypesCount: mockCount,
+      organizationTypesCount: mockOrgTypesCount,
+      businessCategoriesCount: mockBusinessCategoriesCount,
     });
     expect(prismaService.category.count).toHaveBeenCalledWith({
       where: {
         type: 'ORGANIZATION_TYPE',
         deleted: false,
+      },
+    });
+    expect(prismaService.businessCategory.count).toHaveBeenCalledWith({
+      where: {
+        isActive: true,
       },
     });
   });
@@ -69,6 +81,7 @@ describe('DatabaseSeederService', () => {
     it('should run deployment seed and check status', async () => {
       jest.spyOn(service, 'checkSeedStatus').mockResolvedValue({
         organizationTypesCount: 7,
+        businessCategoriesCount: 123,
       });
       jest.spyOn(service, 'runAllSeeds').mockResolvedValue({
         success: true,
@@ -82,6 +95,7 @@ describe('DatabaseSeederService', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('Organization types: 7');
+      expect(result.message).toContain('Business categories: 123');
     });
   });
 });

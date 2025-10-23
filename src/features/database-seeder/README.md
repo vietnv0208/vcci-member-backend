@@ -55,7 +55,8 @@ Kiểm tra số lượng records đã được seed.
 **Response:**
 ```json
 {
-  "organizationTypesCount": 7
+  "organizationTypesCount": 7,
+  "businessCategoriesCount": 123
 }
 ```
 

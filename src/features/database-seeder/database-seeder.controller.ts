@@ -37,6 +37,7 @@ export class DatabaseSeederController {
     
     Seeds bao gồm:
     - Organization types (loại hình tổ chức)
+    - Business categories (phân loại ngành kinh tế theo QĐ 27/2018/QĐ-TTg)
     `,
   })
   @ApiResponse({
@@ -86,6 +87,7 @@ export class DatabaseSeederController {
       type: 'object',
       properties: {
         organizationTypesCount: { type: 'number' },
+        businessCategoriesCount: { type: 'number' },
       },
     },
   })

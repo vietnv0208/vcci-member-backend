@@ -23,7 +23,7 @@
 
 ## Description
 
-Check-in System Backend API built with [NestJS](https://github.com/nestjs/nest) framework.
+VCCI-Member System Backend API built with [NestJS](https://github.com/nestjs/nest) framework.
 
 ## Features
 
