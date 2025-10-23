@@ -103,13 +103,15 @@ export class BusinessCategoriesController {
   ) {
     return this.businessCategoriesService.findOne(
       id,
-      includeChildren === true || includeChildren === 'true' as any,
+      includeChildren === true || includeChildren === ('true' as any),
     );
   }
 
   @Get(':id/children')
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGEMENT, Role.MEMBER)
-  @ApiOperation({ summary: 'Lấy tất cả danh mục con của một business category' })
+  @ApiOperation({
+    summary: 'Lấy tất cả danh mục con của một business category',
+  })
   @ApiParam({ name: 'id', description: 'ID của business category cha' })
   @ApiResponse({
     status: 200,
@@ -149,11 +151,11 @@ export class BusinessCategoriesController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Không thể xóa danh mục có danh mục con hoặc đang được sử dụng',
+    description:
+      'Không thể xóa danh mục có danh mục con hoặc đang được sử dụng',
   })
   @ApiResponse({ status: 404, description: 'Không tìm thấy business category' })
   remove(@Param('id') id: string) {
     return this.businessCategoriesService.remove(id);
   }
 }
-

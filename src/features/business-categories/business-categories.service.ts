@@ -14,9 +14,7 @@ import {
 
 @Injectable()
 export class BusinessCategoriesService {
-  constructor(
-    private readonly repository: BusinessCategoriesRepository,
-  ) {}
+  constructor(private readonly repository: BusinessCategoriesRepository) {}
 
   /**
    * Tạo mới business category
@@ -125,7 +123,10 @@ export class BusinessCategoriesService {
   /**
    * Lấy chi tiết một business category
    */
-  async findOne(id: string, includeChildren: boolean = false): Promise<BusinessCategory> {
+  async findOne(
+    id: string,
+    includeChildren: boolean = false,
+  ): Promise<BusinessCategory> {
     const category = await this.repository.findById(id, includeChildren, true);
 
     if (!category) {
@@ -202,7 +203,7 @@ export class BusinessCategoriesService {
     if (code !== undefined) updateData.code = code;
     if (name !== undefined) updateData.name = name;
     if (level !== undefined) updateData.level = level;
-    
+
     if (parentId !== undefined) {
       if (parentId === null) {
         updateData.parent = { disconnect: true };
@@ -284,4 +285,3 @@ export class BusinessCategoriesService {
     return false;
   }
 }
-
