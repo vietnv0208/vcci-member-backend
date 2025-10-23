@@ -82,7 +82,7 @@ export class FilesPublicController {
   })
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
-    @Request() req: any,
+    // @Request() req: any,
     @UploadedFile() file: Express.Multer.File,
     @Body()
     body: {
@@ -92,7 +92,7 @@ export class FilesPublicController {
       folderPath?: string;
     },
   ): Promise<FileResponseDto> {
-    return this.filesService.uploadFile(file, body, req.user.userId);
+    return this.filesService.uploadFile(file, body,undefined);
   }
 
   @Post('attach')

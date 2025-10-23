@@ -33,7 +33,7 @@ export class FilesService {
   async uploadFile(
     file: Express.Multer.File,
     body: UploadFileDto,
-    userId: string,
+    userId?: string,
   ): Promise<FileResponseDto> {
     if (!file) {
       throw new BadRequestException('No file provided');
