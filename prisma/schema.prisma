@@ -15,9 +15,10 @@ datasource db {
 }
 
 enum UserRole {
-  MANAGEMENT
-  ADMIN
   SUPER_ADMIN
+  ADMIN
+  MANAGEMENT
+  MEMBER
 }
 
 model User {
@@ -34,8 +35,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  refreshTokens RefreshToken[]
-  File          File[]
+  refreshTokens       RefreshToken[]
+  File                File[]
+  MemberStatusHistory MemberStatusHistory[]
 }
 
 model RefreshToken {
@@ -124,4 +126,203 @@ enum FileVisibility {
 enum StorageType {
   LOCAL
   S3
+}
+
+// ===== CATEGORIES =====
+enum CategoryType {
+  ORGANIZATION_TYPE // Loại hình tổ chức
+}
+
+model Category {
+  id     String  @id @default(cuid())
+  name   String // name vi
+  nameEn String? // name en
+
+  code        String
+  parentId    String? // Parent category ID for hierarchical categories
+  type        CategoryType // Loại danh mục
+  description String? // Mô tả
+  isActive    Boolean      @default(true) // Trạng thái hoạt động
+  orderIndex  Int? // Thứ tự hiển thị
+
+  deleted   Boolean  @default(false)
+  createdBy String? // Người tạo
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, code])
+  @@map("categories")
+}
+
+/// ======================================================
+/// MEMBERSHIP MANAGEMENT (VCCI)
+/// ======================================================
+
+enum ApplicationType {
+  ENTERPRISE
+  ASSOCIATION
+}
+
+enum MemberStatus {
+  PENDING // Chờ xét duyệt
+  APPROVED // Được duyệt, trở thành hội viên
+  REJECTED // Bị từ chối
+  CANCELLED // Đã hủy đơn
+  ACTIVE // Đang hoạt động
+  INACTIVE // Không hoạt động
+  SUSPENDED // Tạm ngưng
+  TERMINATED // Chấm dứt tư cách hội viên
+}
+
+enum MemberType {
+  LINKED // Hội viên liên kết
+  OFFICIAL // Hội viên chính thức
+  HONORARY // Hội viên danh dự
+}
+
+/// Loại vai trò của người liên hệ
+enum ContactRole {
+  CHAIR_PERSON
+  CEO
+  CHIEF_OFFICE
+  SECRETARY_GENERAL
+  CONTACT_1
+  CONTACT_2
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+/// Danh mục loại hình tổ chức (ví dụ: Tư nhân, Cổ phần, TNHH,...)
+enum OrganizationType {
+  PRIVATE
+  JOINT_STOCK
+  LIMITED
+  STATE_OWNED
+  OTHER
+}
+
+/// Hội viên (đã gộp đơn đăng ký & hội viên chính thức)
+model Member {
+  id              String          @id @default(cuid())
+  code            String?         @unique
+  applicationType ApplicationType
+  memberType      MemberType      @default(LINKED)
+  status          MemberStatus    @default(PENDING)
+
+  // --- Thông tin cơ bản ---
+  vietnameseName  String
+  englishName     String?
+  abbreviation    String?
+  officeAddress   String
+  businessAddress String?
+  telephone       String
+  email           String
+  website         String?
+  taxCode         String?
+
+  // --- Ngày tháng ---
+  submittedDate DateTime? @default(now())
+  approvedDate  DateTime?
+  joinDate      DateTime?
+  expireDate    DateTime?
+  remarks       String?
+
+  // --- Liên kết quan hệ ---
+  enterpriseDetail         MemberEnterpriseDetail?
+  associationDetail        MemberAssociationDetail?
+  memberBusinessCategories MemberEnterpriseBusinessCategory[] // productsServices Sản phẩm, dịch vụ chính va activityArea
+
+  contacts        MemberContact[]
+  statusHistories MemberStatusHistory[]
+  attachmentIds   String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Chi tiết riêng cho loại Doanh nghiệp
+model MemberEnterpriseDetail {
+  id                       String    @id @default(cuid())
+  memberId                 String    @unique
+  businessRegistrationNo   String
+  businessRegistrationDate DateTime?
+  issuedBy                 String?
+  registeredCapital        Decimal?
+  totalAsset               Decimal?
+  previousYearRevenue      Decimal?
+  totalEmployees           Int?
+  branchInfo               String?
+  organizationTypes        String[] // Category codes of organization types
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+/// Chi tiết riêng cho loại Hội/Hiệp hội
+model MemberAssociationDetail {
+  id                     String    @id @default(cuid())
+  memberId               String    @unique
+  establishmentLicenseNo String
+  establishmentDate      DateTime?
+  issuedBy               String?
+  totalMembers           Int?
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+/// Người liên hệ hoặc lãnh đạo (dùng chung)
+model MemberContact {
+  id          String      @id @default(cuid())
+  memberId    String
+  contactRole ContactRole
+  fullName    String
+  gender      Gender?
+  telephone   String?
+  mobile      String?
+  email       String?
+  note        String?
+
+  member Member @relation(fields: [memberId], references: [id])
+}
+
+/// Lịch sử thay đổi trạng thái
+model MemberStatusHistory {
+  id          String       @id @default(cuid())
+  memberId    String
+  status      MemberStatus
+  remark      String?
+  changedById String?
+  changedBy   User?        @relation(fields: [changedById], references: [id])
+  changedAt   DateTime     @default(now())
+
+  member Member @relation(fields: [memberId], references: [id])
+}
+
+model MemberEnterpriseBusinessCategory {
+  memberId           String
+  businessCategoryId String
+
+  member           Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  businessCategory BusinessCategory @relation(fields: [businessCategoryId], references: [id], onDelete: Cascade)
+
+  @@id([memberId, businessCategoryId])
+  @@map("member_business_categories")
+}
+
+model BusinessCategory {
+  id       String             @id @default(cuid())
+  code     String? // ví dụ: "A", "11", "1200" ...
+  name     String
+  level    Int
+  parentId String?
+  parent   BusinessCategory?  @relation("BusinessCategoryHierarchy", fields: [parentId], references: [id])
+  children BusinessCategory[] @relation("BusinessCategoryHierarchy")
+
+  // Liên kết với doanh nghiệp hoặc hiệp hội
+  memberBusinessCategories MemberEnterpriseBusinessCategory[]
+
+  @@map("business_categories")
 }
