@@ -48,6 +48,12 @@ src/
 │   │   ├── users.repository.ts
 │   │   └── users.module.ts
 │   │
+│   ├── database-seeder/    # 🌱 Database Seeder
+│   │   ├── database-seeder.controller.ts
+│   │   ├── database-seeder.service.ts
+│   │   ├── database-seeder.module.ts
+│   │   └── database-seeder.spec.ts
+│   │
 │   └── common/
 │       └── file-management/ # 📁 File Management
 │           ├── dto/
@@ -58,7 +64,9 @@ src/
 │
 └── prisma/                  # 🗄️ Database Schema
     ├── schema.prisma
-    └── migrations/
+    ├── migrations/
+    └── seeds/              # 🌱 Seed Files
+        └── 20250115_organization_types.sql
 ```
 
 ---
@@ -175,6 +183,38 @@ src/
 - `Member` - Hội viên VCCI (sẽ implement)
 - `Category` - Danh mục
 - `BusinessCategory` - Danh mục ngành nghề
+
+---
+
+### 🌱 **6. Database Seeder Agent**
+
+**Thư mục:** `src/features/database-seeder/`
+
+**Vai trò:**
+- Quản lý database seeds cho deployment
+- Seed dữ liệu mặc định (categories, organization types, etc.)
+- Hỗ trợ idempotent seeding (có thể chạy nhiều lần)
+
+**Nhiệm vụ:**
+- `/api/database-seeder/seeds` - Chạy tất cả seeds
+- `/api/database-seeder/seeds/status` - Kiểm tra trạng thái seeds
+- Safe deployment seeding với ON CONFLICT DO NOTHING
+- Seed SQL files từ `prisma/seeds/`
+
+**Key Components:**
+- `DatabaseSeederService` - Business logic và file execution
+- `DatabaseSeederController` - API endpoints
+- SQL seed files - Dữ liệu seed trong `prisma/seeds/`
+
+**Current Seeds:**
+- Organization Types (7 loại hình tổ chức) ✅
+
+**Features:**
+- Idempotent seeds (có thể chạy nhiều lần an toàn)
+- Transaction support
+- Error handling và logging
+- Role-based access (SUPER_ADMIN only)
+- Deployment-ready
 
 ---
 

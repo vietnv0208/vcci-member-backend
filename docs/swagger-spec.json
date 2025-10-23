@@ -2535,6 +2535,96 @@
           "Categories"
         ]
       }
+    },
+    "/api/database-seeder/seeds": {
+      "post": {
+        "description": "\n    Chạy tất cả các seed files SQL một cách an toàn khi triển khai.\n    \n    Tính năng:\n    - Sử dụng ON CONFLICT DO NOTHING để tránh lỗi duplicate\n    - Có thể chạy nhiều lần mà không gây lỗi\n    - Chạy theo thứ tự đúng dựa trên tên file\n    - Thích hợp cho CI/CD deployment\n    \n    Seeds bao gồm:\n    - Organization types (loại hình tổ chức)\n    ",
+        "operationId": "DatabaseSeederController_runDatabaseSeeds",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Database seeds đã được chạy thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "seedsExecuted": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "executionTime": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chỉ SUPER_ADMIN được phép chạy seeds"
+          },
+          "500": {
+            "description": "Lỗi khi chạy database seeds"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Chạy database seeds an toàn cho deployment",
+        "tags": [
+          "Database Seeder"
+        ]
+      }
+    },
+    "/api/database-seeder/seeds/status": {
+      "get": {
+        "description": "Trả về số lượng records hiện tại trong các bảng seeds để kiểm tra tình trạng",
+        "operationId": "DatabaseSeederController_getDatabaseSeedsStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Trạng thái seeds được trả về thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "organizationTypesCount": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Kiểm tra trạng thái database seeds",
+        "tags": [
+          "Database Seeder"
+        ]
+      }
     }
   },
   "info": {

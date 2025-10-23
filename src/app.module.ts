@@ -8,6 +8,7 @@ import { FilesModule } from './features/common/file-management/files.module';
 import { MembersModule } from './features/members/members.module';
 import { BusinessCategoriesModule } from './features/business-categories/business-categories.module';
 import { CategoryModule } from './features/common/category/category.module';
+import { DatabaseSeederModule } from './features/database-seeder/database-seeder.module';
 import { PrismaService } from './common/prisma.service';
 
 @Module({
@@ -21,6 +22,7 @@ import { PrismaService } from './common/prisma.service';
     MembersModule,
     BusinessCategoriesModule,
     CategoryModule,
+    DatabaseSeederModule,
   ],
   controllers: [AppController],
   providers: [
