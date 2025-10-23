@@ -321,6 +321,12 @@ export class UsersRepository {
 - Phân quyền với `@Roles(Role.ADMIN, Role.SUPER_ADMIN)`
 - Validate input với DTOs
 
+### **Swagger Documentation:**
+- **Luôn sử dụng** `@ApiBearerAuth('JWT-auth')` với parameter
+- **Không được** sử dụng `@ApiBearerAuth()` không có parameter
+- **Public controllers** (như FilesPublicController) không cần `@ApiBearerAuth`
+- **Health check endpoints** (như AppController) không cần authentication
+
 ### **Documentation Guidelines:**
 
 **Nguyên tắc tạo documentation:**

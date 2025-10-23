@@ -1205,6 +1205,111 @@
         ]
       }
     },
+    "/api/public/files/upload": {
+      "post": {
+        "description": "Uploads a file directly to the backend, which handles S3 upload internally",
+        "operationId": "FilesPublicController_uploadFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "MEMBERSHIP_APPLICATION",
+                      "BUSINESS_LICENSE",
+                      "FINANCIAL_REPORT",
+                      "PAYMENT_PROOF",
+                      "OTHER_DOCUMENT"
+                    ],
+                    "description": "File category"
+                  },
+                  "entityId": {
+                    "type": "string",
+                    "description": "ID of the entity this file belongs to"
+                  },
+                  "entityType": {
+                    "type": "string",
+                    "description": "Type of entity this file belongs to"
+                  },
+                  "folderPath": {
+                    "type": "string",
+                    "description": "Target folder path for upload (e.g., /Documents/Projects)"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponseDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error or file type not allowed"
+          }
+        },
+        "summary": "Upload file directly to backend",
+        "tags": [
+          "Public Files"
+        ]
+      }
+    },
+    "/api/public/files/attach": {
+      "post": {
+        "description": "Attach files uploaded with tempKey to a specific entity",
+        "operationId": "FilesPublicController_attachTempFiles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachFilesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Files attached successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachFilesResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No files found with the given tempKey"
+          }
+        },
+        "summary": "Attach temporary files to entity",
+        "tags": [
+          "Public Files"
+        ]
+      }
+    },
     "/api/members": {
       "post": {
         "operationId": "MembersController_create",
@@ -1643,6 +1748,311 @@
         "summary": "Thay đổi trạng thái hội viên",
         "tags": [
           "Members"
+        ]
+      }
+    },
+    "/api/business-categories": {
+      "post": {
+        "operationId": "BusinessCategoriesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBusinessCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Business category đã được tạo thành công"
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ"
+          },
+          "409": {
+            "description": "Code đã tồn tại"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Tạo mới business category",
+        "tags": [
+          "Business Categories"
+        ]
+      },
+      "get": {
+        "operationId": "BusinessCategoriesController_findAll",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Tìm kiếm theo tên hoặc mã",
+            "schema": {
+              "example": "Nông nghiệp",
+              "type": "string"
+            }
+          },
+          {
+            "name": "level",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo cấp độ",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "parentId",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo parent ID (null để lấy root categories)",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "includeChildren",
+            "required": false,
+            "in": "query",
+            "description": "Lấy kèm children (hierarchical)",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Số trang",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Số lượng mỗi trang",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách business categories"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy danh sách business categories với phân trang",
+        "tags": [
+          "Business Categories"
+        ]
+      }
+    },
+    "/api/business-categories/tree": {
+      "get": {
+        "operationId": "BusinessCategoriesController_getTree",
+        "parameters": [
+          {
+            "name": "rootLevel",
+            "required": false,
+            "in": "query",
+            "description": "Level gốc của cây (mặc định: 1)",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cây phân cấp business categories"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy cây phân cấp business categories",
+        "tags": [
+          "Business Categories"
+        ]
+      }
+    },
+    "/api/business-categories/{id}": {
+      "get": {
+        "operationId": "BusinessCategoriesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của business category",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeChildren",
+            "required": false,
+            "in": "query",
+            "description": "Bao gồm danh mục con",
+            "schema": {
+              "example": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chi tiết business category"
+          },
+          "404": {
+            "description": "Không tìm thấy business category"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy chi tiết một business category",
+        "tags": [
+          "Business Categories"
+        ]
+      },
+      "patch": {
+        "operationId": "BusinessCategoriesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của business category",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBusinessCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Business category đã được cập nhật"
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ"
+          },
+          "404": {
+            "description": "Không tìm thấy business category"
+          },
+          "409": {
+            "description": "Code đã tồn tại"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Cập nhật business category",
+        "tags": [
+          "Business Categories"
+        ]
+      },
+      "delete": {
+        "operationId": "BusinessCategoriesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của business category",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Business category đã được xóa"
+          },
+          "400": {
+            "description": "Không thể xóa danh mục có danh mục con hoặc đang được sử dụng"
+          },
+          "404": {
+            "description": "Không tìm thấy business category"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Xóa business category",
+        "tags": [
+          "Business Categories"
+        ]
+      }
+    },
+    "/api/business-categories/{id}/children": {
+      "get": {
+        "operationId": "BusinessCategoriesController_getChildren",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của business category cha",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách danh mục con"
+          },
+          "404": {
+            "description": "Không tìm thấy business category"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy tất cả danh mục con của một business category",
+        "tags": [
+          "Business Categories"
         ]
       }
     }
@@ -2653,6 +3063,67 @@
         "required": [
           "status"
         ]
+      },
+      "CreateBusinessCategoryDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Mã danh mục (ví dụ: \"A\", \"11\", \"1200\")",
+            "example": "A"
+          },
+          "name": {
+            "type": "string",
+            "description": "Tên danh mục ngành nghề",
+            "example": "Nông nghiệp, lâm nghiệp và thủy sản"
+          },
+          "level": {
+            "type": "number",
+            "description": "Cấp độ của danh mục (1, 2, 3...)",
+            "example": 1,
+            "minimum": 1
+          },
+          "parentId": {
+            "type": "string",
+            "description": "ID của danh mục cha (nếu có)",
+            "example": "clxxxxxxxxxxxxx"
+          }
+        },
+        "required": [
+          "name",
+          "level"
+        ]
+      },
+      "Object": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateBusinessCategoryDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Mã danh mục",
+            "example": "A"
+          },
+          "name": {
+            "type": "string",
+            "description": "Tên danh mục ngành nghề",
+            "example": "Nông nghiệp, lâm nghiệp và thủy sản"
+          },
+          "level": {
+            "type": "number",
+            "description": "Cấp độ của danh mục",
+            "example": 1,
+            "minimum": 1
+          },
+          "parentId": {
+            "type": "object",
+            "description": "ID của danh mục cha (null để xóa parent)",
+            "example": "clxxxxxxxxxxxxx",
+            "nullable": true
+          }
+        }
       }
     }
   }
