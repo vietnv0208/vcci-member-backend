@@ -49,6 +49,18 @@ model RefreshToken {
   expiresAt DateTime
 }
 
+// === deleted history
+model DeletedHistory {
+  id        String   @id @default(cuid())
+  table     String
+  objectId  String
+  data      Json
+  deletedBy String? // ID của user xóa
+  deletedAt DateTime @default(now())
+
+  @@map("deleted_history")
+}
+
 //File management
 
 model File {
