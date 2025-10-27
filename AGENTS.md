@@ -363,6 +363,32 @@ export class UsersRepository {
 - Phân quyền với `@Roles(Role.ADMIN, Role.SUPER_ADMIN)`
 - Validate input với DTOs
 
+### **Error Messages:**
+- **Tất cả error messages phải bằng tiếng Việt**
+- **Exception types:**
+  - `NotFoundException` - Không tìm thấy resource
+  - `BadRequestException` - Dữ liệu không hợp lệ
+  - `ConflictException` - Xung đột dữ liệu (duplicate, etc.)
+  - `UnauthorizedException` - Chưa xác thực
+  - `ForbiddenException` - Không có quyền truy cập
+
+**Ví dụ Error Messages:**
+```typescript
+// ❌ BAD - Tiếng Anh
+throw new NotFoundException(`Member with ID ${id} not found`);
+throw new BadRequestException('Email already exists');
+
+// ✅ GOOD - Tiếng Việt
+throw new NotFoundException(`Không tìm thấy hội viên với ID ${id}`);
+throw new ConflictException('Email đã tồn tại trong hệ thống');
+```
+
+**Nguyên tắc viết error messages:**
+- Rõ ràng, dễ hiểu cho người dùng cuối
+- Bao gồm thông tin cụ thể (ID, tên field, giá trị)
+- Gợi ý giải pháp nếu có thể
+- Nhất quán về cách diễn đạt trong toàn dự án
+
 ### **Swagger Documentation:**
 - **Luôn sử dụng** `@ApiBearerAuth('JWT-auth')` với parameter
 - **Không được** sử dụng `@ApiBearerAuth()` không có parameter

@@ -35,7 +35,7 @@ export class MembersService {
     // Validate application type matches detail type
     if (createMemberDto.applicationType === 'ENTERPRISE' && !enterpriseDetail) {
       throw new BadRequestException(
-        'Enterprise detail is required for ENTERPRISE application type',
+        'Thông tin doanh nghiệp là bắt buộc cho loại đơn đăng ký DOANH NGHIỆP',
       );
     }
 
@@ -44,7 +44,7 @@ export class MembersService {
       !associationDetail
     ) {
       throw new BadRequestException(
-        'Association detail is required for ASSOCIATION application type',
+        'Thông tin hiệp hội là bắt buộc cho loại đơn đăng ký HIỆP HỘI',
       );
     }
 
@@ -56,7 +56,7 @@ export class MembersService {
     });
 
     if (existingMember.total > 0) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('Email đã tồn tại trong hệ thống');
     }
 
     // Generate member code
@@ -130,7 +130,7 @@ export class MembersService {
     const member = await this.membersRepository.findById(id);
 
     if (!member) {
-      throw new NotFoundException(`Member with ID ${id} not found`);
+      throw new NotFoundException(`Không tìm thấy hội viên với ID ${id}`);
     }
 
     return this.mapToResponseDto(member);
@@ -140,7 +140,7 @@ export class MembersService {
     const member = await this.membersRepository.findByCode(code);
 
     if (!member) {
-      throw new NotFoundException(`Member with code ${code} not found`);
+      throw new NotFoundException(`Không tìm thấy hội viên với mã ${code}`);
     }
 
     return this.mapToResponseDto(member);
@@ -153,7 +153,7 @@ export class MembersService {
     const existingMember = await this.membersRepository.findById(id);
 
     if (!existingMember) {
-      throw new NotFoundException(`Member with ID ${id} not found`);
+      throw new NotFoundException(`Không tìm thấy hội viên với ID ${id}`);
     }
 
     const {
@@ -174,13 +174,13 @@ export class MembersService {
 
     if (applicationType === 'ENTERPRISE' && !hasEnterpriseDetail) {
       throw new BadRequestException(
-        'Enterprise detail is required for ENTERPRISE application type',
+        'Thông tin doanh nghiệp là bắt buộc cho loại đơn đăng ký DOANH NGHIỆP',
       );
     }
 
     if (applicationType === 'ASSOCIATION' && !hasAssociationDetail) {
       throw new BadRequestException(
-        'Association detail is required for ASSOCIATION application type',
+        'Thông tin hiệp hội là bắt buộc cho loại đơn đăng ký HIỆP HỘI',
       );
     }
 
@@ -244,7 +244,7 @@ export class MembersService {
     const existingMember = await this.membersRepository.findById(id);
 
     if (!existingMember) {
-      throw new NotFoundException(`Member with ID ${id} not found`);
+      throw new NotFoundException(`Không tìm thấy hội viên với ID ${id}`);
     }
 
     await this.membersRepository.delete(id);
@@ -258,7 +258,7 @@ export class MembersService {
     const existingMember = await this.membersRepository.findById(id);
 
     if (!existingMember) {
-      throw new NotFoundException(`Member with ID ${id} not found`);
+      throw new NotFoundException(`Không tìm thấy hội viên với ID ${id}`);
     }
 
     // Validate status transition
@@ -285,13 +285,13 @@ export class MembersService {
     const existingMember = await this.membersRepository.findById(id);
 
     if (!existingMember) {
-      throw new NotFoundException(`Member with ID ${id} not found`);
+      throw new NotFoundException(`Không tìm thấy hội viên với ID ${id}`);
     }
 
     // Validate member must be in APPROVED status
     if (existingMember.status !== MemberStatus.APPROVED) {
       throw new BadRequestException(
-        `Cannot activate member. Current status is ${existingMember.status}. Member must be in APPROVED status.`,
+        `Không thể kích hoạt hội viên. Trạng thái hiện tại là ${existingMember.status}. Hội viên phải ở trạng thái APPROVED.`,
       );
     }
 
@@ -338,7 +338,7 @@ export class MembersService {
 
     if (!validTransitions[currentStatus].includes(newStatus)) {
       throw new BadRequestException(
-        `Cannot transition from ${currentStatus} to ${newStatus}`,
+        `Không thể chuyển trạng thái từ ${currentStatus} sang ${newStatus}`,
       );
     }
   }
