@@ -3551,6 +3551,12 @@
               "$ref": "#/components/schemas/BusinessCategoryResponseDto"
             }
           },
+          "memberPaymentHistory": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
           "attachmentIds": {
             "type": "array",
             "items": {
@@ -3577,6 +3583,7 @@
           "email",
           "contacts",
           "businessCategories",
+          "memberPaymentHistory",
           "attachmentIds",
           "createdAt",
           "updatedAt"

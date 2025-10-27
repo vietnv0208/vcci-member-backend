@@ -67,6 +67,7 @@ export class MembersRepository {
             businessCategory: true,
           },
         },
+        memberPaymentHistory: true,
       },
     });
   }

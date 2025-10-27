@@ -380,6 +380,7 @@ export class MembersService {
       associationDetail: member.associationDetail,
       contacts: member.contacts || [],
       businessCategories,
+      memberPaymentHistory: member.memberPaymentHistory,
       attachmentIds: member.attachmentIds || [],
       createdAt: member.createdAt,
       updatedAt: member.updatedAt,

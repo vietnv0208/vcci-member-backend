@@ -277,7 +277,7 @@ model Member {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  MemberPaymentHistory MemberPaymentHistory[]
+  memberPaymentHistory MemberPaymentHistory[]
 }
 
 /// Chi tiết riêng cho loại Doanh nghiệp
