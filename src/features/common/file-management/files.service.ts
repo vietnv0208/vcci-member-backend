@@ -119,7 +119,7 @@ export class FilesService {
 
     // Get full storage path
     const fullStoragePath = this.getFullStoragePath(file.storagePath);
-    
+
     // Check if file exists on disk
     if (!existsSync(fullStoragePath)) {
       throw new NotFoundException('File not found on disk');
@@ -250,12 +250,12 @@ export class FilesService {
   ): Promise<{ message: string; updatedCount: number }> {
     // Update all files with the given tempKey to the new entityId
     const result = await this.prisma.file.updateMany({
-      where: { 
+      where: {
         tempKey,
         entityType,
         deleted: false,
       },
-      data: { 
+      data: {
         entityId,
         tempKey: null, // Clear tempKey after attaching
       },
@@ -275,15 +275,15 @@ export class FilesService {
 
     // Otherwise, create path based on entityType/category/entityId or tempKey
     const pathParts: string[] = [];
-    
+
     if (body.entityType) {
       pathParts.push(body.entityType);
     }
-    
+
     if (body.category) {
       pathParts.push(body.category);
     }
-    
+
     if (body.entityId) {
       pathParts.push(body.entityId);
     } else if (tempKey) {
@@ -332,6 +332,30 @@ export class FilesService {
       createdAt: file.createdAt,
       updatedAt: file.updatedAt,
       deleted: file.deleted,
+    };
+  }
+
+  async attachByFileIds(
+    fileIds: string[],
+    entityType: string,
+    entityId: string,
+  ): Promise<{ message: string; updatedCount: number }> {
+    // Update all files with the given tempKey to the new entityId
+    const result = await this.prisma.file.updateMany({
+      where: {
+        id: { in: fileIds },
+        // entityType,
+        deleted: false,
+      },
+      data: {
+        entityType,
+        entityId,
+      },
+    });
+
+    return {
+      message: `Successfully attached ${result.count} files to ${entityType}:${entityId}`,
+      updatedCount: result.count,
     };
   }
 }

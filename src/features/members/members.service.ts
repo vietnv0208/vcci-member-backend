@@ -14,11 +14,15 @@ import {
   ChangeMemberStatusDto,
   ActivateMemberDto,
 } from './dto';
-import { Prisma, MemberStatus, FeeStatus } from '@prisma/client';
+import { Prisma, MemberStatus, FeeStatus, EntityType } from '@prisma/client';
+import { FilesService } from '../common/file-management';
 
 @Injectable()
 export class MembersService {
-  constructor(private readonly membersRepository: MembersRepository) {}
+  constructor(
+    private readonly membersRepository: MembersRepository,
+    private readonly filesService: FilesService,
+  ) {}
 
   async create(
     createMemberDto: CreateMemberDto,
@@ -106,7 +110,16 @@ export class MembersService {
     };
 
     const member = await this.membersRepository.create(createData);
-
+    if (
+      createMemberDto.attachmentIds &&
+      createMemberDto.attachmentIds.length > 0
+    ) {
+      await this.filesService.attachByFileIds(
+        createMemberDto.attachmentIds,
+        'MEMBER',
+        member.id,
+      );
+    }
     return this.mapToResponseDto(member);
   }
 
@@ -296,14 +309,25 @@ export class MembersService {
     }
 
     // Activate member with payment
-    const member = await this.membersRepository.activateMember(
-      id,
-      activateDto.feeAmount,
-      activateDto.attachmentIds,
-      userId,
-      activateDto.note,
-    );
-
+    const { member, paymentHistory } =
+      await this.membersRepository.activateMember(
+        id,
+        activateDto.feeAmount,
+        activateDto.attachmentIds,
+        userId,
+        activateDto.note,
+      );
+    if (
+      activateDto.attachmentIds &&
+      activateDto.attachmentIds.length > 0 &&
+      paymentHistory?.id
+    ) {
+      await this.filesService.attachByFileIds(
+        activateDto.attachmentIds,
+        EntityType.MEMBER_PAYMENT,
+        paymentHistory.id,
+      );
+    }
     return this.mapToResponseDto(member);
   }
 

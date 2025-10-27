@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { Prisma, Member, MemberStatus, FeeStatus, PaymentStatus } from '@prisma/client';
+import {
+  Prisma,
+  Member,
+  MemberStatus,
+  FeeStatus,
+  PaymentStatus,
+  MemberPaymentHistory,
+} from '@prisma/client';
 import { QueryMemberDto } from './dto';
 import { BusinessCategoriesService } from '../business-categories/business-categories.service';
 
@@ -151,9 +158,10 @@ export class MembersRepository {
     // Filter by business category (including descendants)
     if (businessCategoryId) {
       // Lấy tất cả descendant IDs (bao gồm cả chính nó)
-      const categoryIds = await this.businessCategoriesService.getAllDescendantIds(
-        businessCategoryId,
-      );
+      const categoryIds =
+        await this.businessCategoriesService.getAllDescendantIds(
+          businessCategoryId,
+        );
 
       // Filter members có ít nhất 1 category trong danh sách
       where.memberBusinessCategories = {
@@ -325,7 +333,7 @@ export class MembersRepository {
     attachmentIds: string[],
     changedById?: string,
     note?: string,
-  ): Promise<Member> {
+  ): Promise<{ member: Member; paymentHistory: MemberPaymentHistory }> {
     return this.prisma.$transaction(async (tx) => {
       const currentYear = new Date().getFullYear();
 
@@ -392,7 +400,7 @@ export class MembersRepository {
       });
 
       // Create payment history record
-      await tx.memberPaymentHistory.create({
+      const paymentHistory = await tx.memberPaymentHistory.create({
         data: {
           memberId: id,
           paymentYear: currentYear,
@@ -415,7 +423,7 @@ export class MembersRepository {
         },
       });
 
-      return member;
+      return { member, paymentHistory };
     });
   }
 

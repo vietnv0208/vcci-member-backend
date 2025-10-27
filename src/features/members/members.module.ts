@@ -5,9 +5,12 @@ import { MembersPublicController } from './members-public.controller';
 import { MembersRepository } from './members.repository';
 import { PrismaService } from '../../common/prisma.service';
 import { BusinessCategoriesModule } from '../business-categories/business-categories.module';
+import { FilesModule } from '../common/file-management';
 
 @Module({
-  imports: [BusinessCategoriesModule],
+  imports: [BusinessCategoriesModule,
+    FilesModule,
+  ],
   controllers: [MembersController, MembersPublicController],
   providers: [MembersService, MembersRepository, PrismaService],
   exports: [MembersService, MembersRepository],
