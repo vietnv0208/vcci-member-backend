@@ -309,7 +309,7 @@ model MemberContact {
   email       String?
   note        String?
 
-  member Member @relation(fields: [memberId], references: [id])
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 }
 
 /// Lịch sử thay đổi trạng thái
@@ -322,7 +322,7 @@ model MemberStatusHistory {
   changedBy   User?        @relation(fields: [changedById], references: [id])
   changedAt   DateTime     @default(now())
 
-  member Member @relation(fields: [memberId], references: [id])
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 }
 
 model MemberEnterpriseBusinessCategory {
@@ -368,7 +368,7 @@ model MemberPaymentHistory {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  member Member @relation(fields: [memberId], references: [id])
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 }
 
 enum PaymentStatus {
