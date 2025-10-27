@@ -453,6 +453,7 @@ export class MembersRepository {
       approvedMembers,
       activeMembers,
       rejectedMembers,
+      paidMembers,
       enterpriseMembers,
       associationMembers,
     ] = await Promise.all([
@@ -461,6 +462,7 @@ export class MembersRepository {
       this.prisma.member.count({ where: { status: 'APPROVED' } }),
       this.prisma.member.count({ where: { status: 'ACTIVE' } }),
       this.prisma.member.count({ where: { status: 'REJECTED' } }),
+      this.prisma.member.count({ where: { feeStatus: 'PAID' } }),
       this.prisma.member.count({ where: { applicationType: 'ENTERPRISE' } }),
       this.prisma.member.count({ where: { applicationType: 'ASSOCIATION' } }),
     ]);
@@ -471,6 +473,7 @@ export class MembersRepository {
       approvedMembers,
       activeMembers,
       rejectedMembers,
+      paidMembers,
       enterpriseMembers,
       associationMembers,
     };
