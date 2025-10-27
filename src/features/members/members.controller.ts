@@ -20,6 +20,7 @@ import {
   MemberResponseDto,
   MemberListResponseDto,
   ChangeMemberStatusDto,
+  ActivateMemberDto,
 } from './dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
@@ -33,6 +34,7 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
+import { ApplicationType, MemberStatus, MemberType } from '@prisma/client';
 
 @ApiTags('Members')
 @ApiBearerAuth('JWT-auth')
@@ -74,26 +76,17 @@ export class MembersController {
   @ApiQuery({
     name: 'applicationType',
     required: false,
-    enum: ['ENTERPRISE', 'ASSOCIATION'],
+    enum: ApplicationType,
   })
   @ApiQuery({
     name: 'memberType',
     required: false,
-    enum: ['LINKED', 'OFFICIAL', 'HONORARY'],
+    enum: MemberType,
   })
   @ApiQuery({
     name: 'status',
     required: false,
-    enum: [
-      'PENDING',
-      'APPROVED',
-      'REJECTED',
-      'CANCELLED',
-      'ACTIVE',
-      'INACTIVE',
-      'SUSPENDED',
-      'TERMINATED',
-    ],
+    enum: MemberStatus,
   })
   @ApiQuery({
     name: 'businessCategoryId',
@@ -203,6 +196,32 @@ export class MembersController {
       changeStatusDto,
       req.user.userId,
     );
+  }
+
+  @Post(':id/activate')
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @ApiOperation({
+    summary: 'Kích hoạt hội viên',
+    description:
+      'Chuyển trạng thái từ APPROVED sang ACTIVE, cập nhật trạng thái hội phí sang PAID và tạo lịch sử thanh toán',
+  })
+  @ApiParam({ name: 'id', description: 'ID của hội viên' })
+  @ApiResponse({
+    status: 200,
+    description: 'Hội viên đã được kích hoạt thành công',
+    type: MemberResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy hội viên' })
+  @ApiResponse({
+    status: 400,
+    description: 'Hội viên không ở trạng thái APPROVED',
+  })
+  async activateMember(
+    @Param('id') id: string,
+    @Body() activateDto: ActivateMemberDto,
+    @Request() req,
+  ): Promise<MemberResponseDto> {
+    return this.membersService.activateMember(id, activateDto, req.user.userId);
   }
 
   @Delete(':id')

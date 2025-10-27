@@ -107,6 +107,7 @@ enum FileType {
 
 enum EntityType {
   MEMBER
+  MEMBER_PAYMENT
 }
 
 enum FileCategory {
@@ -167,11 +168,11 @@ enum MemberStatus {
   PENDING // Chờ xét duyệt
   APPROVED // Được duyệt, trở thành hội viên
   REJECTED // Bị từ chối
-  CANCELLED // Đã hủy đơn
+  CANCELLED // Đã hủy đơn: chưa acction sử dụng trạng thái này
   ACTIVE // Đang hoạt động
-  INACTIVE // Không hoạt động
+  // INACTIVE // Không hoạt động
   SUSPENDED // Tạm ngưng
-  TERMINATED // Chấm dứt tư cách hội viên
+  // TERMINATED // Chấm dứt tư cách hội viên
 }
 
 enum MemberType {
@@ -205,6 +206,22 @@ enum OrganizationType {
   OTHER
 }
 
+enum FeeStatus {
+  PENDING // chờ xử lý
+  PAID
+  UNPAID
+  OVERDUE
+  EXEMPT
+}
+
+// enum MemberClass {
+//   DIAMOND
+//   GOLD
+//   SILVER
+//   BRONZE
+//   NORMAL
+// }
+
 /// Hội viên (đã gộp đơn đăng ký & hội viên chính thức)
 model Member {
   id              String          @id @default(cuid())
@@ -224,6 +241,11 @@ model Member {
   website         String?
   taxCode         String?
 
+  classification  String? // 👈 Phân hạng
+  feeStatus       FeeStatus? @default(PENDING) // 👈 Tình trạng hội phí
+  feeAmount       Decimal? // 👈 Số tiền hội phí
+  lastPaymentDate DateTime? // 👈 Ngày đóng hội phí gần nhất
+
   // --- Ngày tháng ---
   submittedDate DateTime? @default(now())
   approvedDate  DateTime?
@@ -242,6 +264,8 @@ model Member {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  MemberPaymentHistory MemberPaymentHistory[]
 }
 
 /// Chi tiết riêng cho loại Doanh nghiệp
@@ -326,4 +350,35 @@ model BusinessCategory {
   memberBusinessCategories MemberEnterpriseBusinessCategory[]
 
   @@map("business_categories")
+}
+
+/// Lịch sử thanh toán hội phí của hội viên
+model MemberPaymentHistory {
+  id            String         @id @default(cuid())
+  memberId      String
+  paymentYear   Int // Năm hội phí (VD: 2023, 2024)
+  paymentCode   String         @unique // Mã giao dịch: VCCI-PAY-2024-001
+  amount        Decimal        @default(0)
+  paymentDate   DateTime
+  method        PaymentMethod? // Hình thức thanh toán
+  status        PaymentStatus? @default(PAID)
+  note          String?
+  attachmentIds String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  member Member @relation(fields: [memberId], references: [id])
+}
+
+enum PaymentStatus {
+  PENDING // Chưa thanh toán
+  PAID // Đã thanh toán
+  CANCELLED // Hủy giao dịch
+}
+
+enum PaymentMethod {
+  CASH // Tiền mặt
+  BANK_TRANSFER // Chuyển khoản
+  ONLINE // Thanh toán trực tuyến
 }

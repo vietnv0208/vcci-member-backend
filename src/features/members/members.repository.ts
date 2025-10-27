@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
-import { Prisma, Member, MemberStatus } from '@prisma/client';
+import { Prisma, Member, MemberStatus, FeeStatus, PaymentStatus } from '@prisma/client';
 import { QueryMemberDto } from './dto';
 import { BusinessCategoriesService } from '../business-categories/business-categories.service';
 
@@ -310,6 +310,106 @@ export class MembersRepository {
           memberId: id,
           status,
           remark,
+          changedById,
+        },
+      });
+
+      return member;
+    });
+  }
+
+  async activateMember(
+    id: string,
+    feeAmount: number,
+    attachmentIds: string[],
+    changedById?: string,
+    note?: string,
+  ): Promise<Member> {
+    return this.prisma.$transaction(async (tx) => {
+      const currentYear = new Date().getFullYear();
+
+      // Generate payment code
+      const paymentCodePrefix = `VCCI-PAY-${currentYear}-`;
+      const lastPayment = await tx.memberPaymentHistory.findFirst({
+        where: {
+          paymentCode: {
+            startsWith: paymentCodePrefix,
+          },
+        },
+        orderBy: {
+          paymentCode: 'desc',
+        },
+      });
+
+      let paymentNumber = 1;
+      if (lastPayment?.paymentCode) {
+        const lastNumber = parseInt(
+          lastPayment.paymentCode.replace(paymentCodePrefix, ''),
+          10,
+        );
+        if (!isNaN(lastNumber)) {
+          paymentNumber = lastNumber + 1;
+        }
+      }
+
+      const paymentCode = `${paymentCodePrefix}${paymentNumber.toString().padStart(4, '0')}`;
+
+      // Update member to ACTIVE status and update fee info
+      const member = await tx.member.update({
+        where: { id },
+        data: {
+          status: MemberStatus.ACTIVE,
+          feeStatus: FeeStatus.PAID,
+          feeAmount: feeAmount,
+          lastPaymentDate: new Date(),
+          joinDate: new Date(),
+        },
+        include: {
+          enterpriseDetail: true,
+          associationDetail: true,
+          contacts: true,
+          statusHistories: {
+            include: {
+              changedBy: {
+                select: {
+                  id: true,
+                  fullName: true,
+                  email: true,
+                },
+              },
+            },
+            orderBy: {
+              changedAt: 'desc',
+            },
+          },
+          memberBusinessCategories: {
+            include: {
+              businessCategory: true,
+            },
+          },
+        },
+      });
+
+      // Create payment history record
+      await tx.memberPaymentHistory.create({
+        data: {
+          memberId: id,
+          paymentYear: currentYear,
+          paymentCode: paymentCode,
+          amount: feeAmount,
+          paymentDate: new Date(),
+          status: PaymentStatus.PAID,
+          note: note || `Hội phí năm ${currentYear} - Kích hoạt hội viên`,
+          attachmentIds: attachmentIds,
+        },
+      });
+
+      // Create status history record
+      await tx.memberStatusHistory.create({
+        data: {
+          memberId: id,
+          status: MemberStatus.ACTIVE,
+          remark: `Kích hoạt hội viên - Đã thanh toán hội phí năm ${currentYear}`,
           changedById,
         },
       });

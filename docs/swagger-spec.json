@@ -1403,9 +1403,7 @@
                 "REJECTED",
                 "CANCELLED",
                 "ACTIVE",
-                "INACTIVE",
-                "SUSPENDED",
-                "TERMINATED"
+                "SUSPENDED"
               ],
               "type": "string"
             }
@@ -1756,6 +1754,60 @@
           }
         ],
         "summary": "Thay đổi trạng thái hội viên",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/api/members/{id}/activate": {
+      "post": {
+        "description": "Chuyển trạng thái từ APPROVED sang ACTIVE, cập nhật trạng thái hội phí sang PAID và tạo lịch sử thanh toán",
+        "operationId": "MembersController_activateMember",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivateMemberDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Hội viên đã được kích hoạt thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Hội viên không ở trạng thái APPROVED"
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Kích hoạt hội viên",
         "tags": [
           "Members"
         ]
@@ -3431,9 +3483,7 @@
               "REJECTED",
               "CANCELLED",
               "ACTIVE",
-              "INACTIVE",
-              "SUSPENDED",
-              "TERMINATED"
+              "SUSPENDED"
             ]
           },
           "vietnameseName": {
@@ -3678,9 +3728,7 @@
               "REJECTED",
               "CANCELLED",
               "ACTIVE",
-              "INACTIVE",
-              "SUSPENDED",
-              "TERMINATED"
+              "SUSPENDED"
             ],
             "description": "Trạng thái mới"
           },
@@ -3691,6 +3739,37 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "ActivateMemberDto": {
+        "type": "object",
+        "properties": {
+          "feeAmount": {
+            "type": "number",
+            "description": "Số tiền hội phí",
+            "example": 5000000,
+            "minimum": 0
+          },
+          "attachmentIds": {
+            "description": "Danh sách ID file đính kèm (chứng từ thanh toán)",
+            "example": [
+              "file-id-1",
+              "file-id-2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "string",
+            "description": "Ghi chú cho khoản thanh toán",
+            "example": "Hội phí năm 2024"
+          }
+        },
+        "required": [
+          "feeAmount",
+          "attachmentIds"
         ]
       },
       "CreateBusinessCategoryDto": {

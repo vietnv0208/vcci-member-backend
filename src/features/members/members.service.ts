@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { MembersRepository } from './members.repository';
 import {
   CreateMemberDto,
@@ -7,29 +12,40 @@ import {
   MemberResponseDto,
   MemberListResponseDto,
   ChangeMemberStatusDto,
+  ActivateMemberDto,
 } from './dto';
-import { Prisma, MemberStatus } from '@prisma/client';
+import { Prisma, MemberStatus, FeeStatus } from '@prisma/client';
 
 @Injectable()
 export class MembersService {
   constructor(private readonly membersRepository: MembersRepository) {}
 
-  async create(createMemberDto: CreateMemberDto, userId?: string): Promise<MemberResponseDto> {
-    const { 
-      enterpriseDetail, 
-      associationDetail, 
-      contacts, 
+  async create(
+    createMemberDto: CreateMemberDto,
+    userId?: string,
+  ): Promise<MemberResponseDto> {
+    const {
+      enterpriseDetail,
+      associationDetail,
+      contacts,
       businessCategoryIds,
-      ...memberData 
+      ...memberData
     } = createMemberDto;
 
     // Validate application type matches detail type
     if (createMemberDto.applicationType === 'ENTERPRISE' && !enterpriseDetail) {
-      throw new BadRequestException('Enterprise detail is required for ENTERPRISE application type');
+      throw new BadRequestException(
+        'Enterprise detail is required for ENTERPRISE application type',
+      );
     }
 
-    if (createMemberDto.applicationType === 'ASSOCIATION' && !associationDetail) {
-      throw new BadRequestException('Association detail is required for ASSOCIATION application type');
+    if (
+      createMemberDto.applicationType === 'ASSOCIATION' &&
+      !associationDetail
+    ) {
+      throw new BadRequestException(
+        'Association detail is required for ASSOCIATION application type',
+      );
     }
 
     // Check if email already exists
@@ -130,32 +146,42 @@ export class MembersService {
     return this.mapToResponseDto(member);
   }
 
-  async update(id: string, updateMemberDto: UpdateMemberDto): Promise<MemberResponseDto> {
+  async update(
+    id: string,
+    updateMemberDto: UpdateMemberDto,
+  ): Promise<MemberResponseDto> {
     const existingMember = await this.membersRepository.findById(id);
 
     if (!existingMember) {
       throw new NotFoundException(`Member with ID ${id} not found`);
     }
 
-    const { 
-      enterpriseDetail, 
-      associationDetail, 
-      contacts, 
+    const {
+      enterpriseDetail,
+      associationDetail,
+      contacts,
       businessCategoryIds,
-      ...memberData 
+      ...memberData
     } = updateMemberDto;
 
     // Validate application type matches detail type
-    const applicationType = updateMemberDto.applicationType || existingMember.applicationType;
-    const hasEnterpriseDetail = enterpriseDetail || (existingMember as any).enterpriseDetail;
-    const hasAssociationDetail = associationDetail || (existingMember as any).associationDetail;
+    const applicationType =
+      updateMemberDto.applicationType || existingMember.applicationType;
+    const hasEnterpriseDetail =
+      enterpriseDetail || (existingMember as any).enterpriseDetail;
+    const hasAssociationDetail =
+      associationDetail || (existingMember as any).associationDetail;
 
     if (applicationType === 'ENTERPRISE' && !hasEnterpriseDetail) {
-      throw new BadRequestException('Enterprise detail is required for ENTERPRISE application type');
+      throw new BadRequestException(
+        'Enterprise detail is required for ENTERPRISE application type',
+      );
     }
 
     if (applicationType === 'ASSOCIATION' && !hasAssociationDetail) {
-      throw new BadRequestException('Association detail is required for ASSOCIATION application type');
+      throw new BadRequestException(
+        'Association detail is required for ASSOCIATION application type',
+      );
     }
 
     // Build update data
@@ -236,7 +262,10 @@ export class MembersService {
     }
 
     // Validate status transition
-    this.validateStatusTransition(existingMember.status, changeStatusDto.status);
+    this.validateStatusTransition(
+      existingMember.status,
+      changeStatusDto.status,
+    );
 
     const member = await this.membersRepository.updateStatus(
       id,
@@ -248,20 +277,63 @@ export class MembersService {
     return this.mapToResponseDto(member);
   }
 
+  async activateMember(
+    id: string,
+    activateDto: ActivateMemberDto,
+    userId?: string,
+  ): Promise<MemberResponseDto> {
+    const existingMember = await this.membersRepository.findById(id);
+
+    if (!existingMember) {
+      throw new NotFoundException(`Member with ID ${id} not found`);
+    }
+
+    // Validate member must be in APPROVED status
+    if (existingMember.status !== MemberStatus.APPROVED) {
+      throw new BadRequestException(
+        `Cannot activate member. Current status is ${existingMember.status}. Member must be in APPROVED status.`,
+      );
+    }
+
+    // Activate member with payment
+    const member = await this.membersRepository.activateMember(
+      id,
+      activateDto.feeAmount,
+      activateDto.attachmentIds,
+      userId,
+      activateDto.note,
+    );
+
+    return this.mapToResponseDto(member);
+  }
+
   async getStatistics() {
     return this.membersRepository.getStatistics();
   }
 
-  private validateStatusTransition(currentStatus: MemberStatus, newStatus: MemberStatus): void {
+  private validateStatusTransition(
+    currentStatus: MemberStatus,
+    newStatus: MemberStatus,
+  ): void {
     const validTransitions: Record<MemberStatus, MemberStatus[]> = {
-      PENDING: ['APPROVED', 'REJECTED', 'CANCELLED'],
-      APPROVED: ['ACTIVE', 'REJECTED'],
-      REJECTED: ['PENDING'],
-      CANCELLED: ['PENDING'],
-      ACTIVE: ['INACTIVE', 'SUSPENDED'],
-      INACTIVE: ['ACTIVE', 'TERMINATED'],
-      SUSPENDED: ['ACTIVE', 'TERMINATED'],
-      TERMINATED: [],
+      PENDING: [
+        MemberStatus.APPROVED,
+        MemberStatus.REJECTED,
+        MemberStatus.CANCELLED,
+      ],
+      APPROVED: [MemberStatus.ACTIVE, MemberStatus.REJECTED],
+      REJECTED: [MemberStatus.PENDING],
+      CANCELLED: [MemberStatus.PENDING],
+      ACTIVE: [
+        // MemberStatus.INACTIVE,
+        MemberStatus.SUSPENDED,
+      ],
+      // INACTIVE: [MemberStatus.ACTIVE, MemberStatus.TERMINATED],
+      SUSPENDED: [
+        MemberStatus.ACTIVE,
+        // , MemberStatus.TERMINATED
+      ],
+      // TERMINATED: [],
     };
 
     if (!validTransitions[currentStatus].includes(newStatus)) {
@@ -273,14 +345,16 @@ export class MembersService {
 
   private mapToResponseDto(member: any): MemberResponseDto {
     // Map business categories từ memberBusinessCategories relation
-    const businessCategories = (member.memberBusinessCategories || []).map((mbc: any) => ({
-      id: mbc.businessCategory.id,
-      code: mbc.businessCategory.code,
-      name: mbc.businessCategory.name,
-      level: mbc.businessCategory.level,
-      parentId: mbc.businessCategory.parentId,
-      isActive: mbc.businessCategory.isActive,
-    }));
+    const businessCategories = (member.memberBusinessCategories || []).map(
+      (mbc: any) => ({
+        id: mbc.businessCategory.id,
+        code: mbc.businessCategory.code,
+        name: mbc.businessCategory.name,
+        level: mbc.businessCategory.level,
+        parentId: mbc.businessCategory.parentId,
+        isActive: mbc.businessCategory.isActive,
+      }),
+    );
 
     return {
       id: member.id,
