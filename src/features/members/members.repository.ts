@@ -404,6 +404,7 @@ export class MembersRepository {
         data: {
           memberId: id,
           paymentYear: currentYear,
+          paymentName: `Hội phí năm ${currentYear} - Kích hoạt hội viên`,
           paymentCode: paymentCode,
           amount: feeAmount,
           paymentDate: new Date(),

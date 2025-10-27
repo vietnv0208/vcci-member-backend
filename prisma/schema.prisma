@@ -369,6 +369,7 @@ model MemberPaymentHistory {
   id            String         @id @default(cuid())
   memberId      String
   paymentYear   Int // Năm hội phí (VD: 2023, 2024)
+  paymentName   String?
   paymentCode   String         @unique // Mã giao dịch: VCCI-PAY-2024-001
   amount        Decimal        @default(0)
   paymentDate   DateTime

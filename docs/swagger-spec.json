@@ -2183,6 +2183,478 @@
         ]
       }
     },
+    "/api/payment-history": {
+      "post": {
+        "operationId": "PaymentHistoryController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentHistoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tạo lịch sử thanh toán thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentHistoryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ"
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          },
+          "409": {
+            "description": "Mã giao dịch đã tồn tại"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Tạo lịch sử thanh toán mới",
+        "tags": [
+          "Payment History"
+        ]
+      },
+      "get": {
+        "operationId": "PaymentHistoryController_findAll",
+        "parameters": [
+          {
+            "name": "memberId",
+            "required": false,
+            "in": "query",
+            "description": "ID của hội viên",
+            "schema": {
+              "example": "clx1234567890abcdef",
+              "type": "string"
+            }
+          },
+          {
+            "name": "paymentYear",
+            "required": false,
+            "in": "query",
+            "description": "Năm hội phí",
+            "schema": {
+              "minimum": 2000,
+              "maximum": 2100,
+              "example": 2024,
+              "type": "number"
+            }
+          },
+          {
+            "name": "paymentName",
+            "required": false,
+            "in": "query",
+            "description": "Tên giao dịch thanh toán",
+            "schema": {
+              "example": "Hội phí năm 2024",
+              "type": "string"
+            }
+          },
+          {
+            "name": "paymentCode",
+            "required": false,
+            "in": "query",
+            "description": "Mã giao dịch thanh toán",
+            "schema": {
+              "example": "VCCI-PAY-2024-001",
+              "type": "string"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "in": "query",
+            "description": "Hình thức thanh toán",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CASH",
+                "BANK_TRANSFER",
+                "ONLINE"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Trạng thái thanh toán",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "PAID",
+                "CANCELLED"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Tìm kiếm theo từ khóa (tên giao dịch, mã giao dịch, ghi chú)",
+            "schema": {
+              "example": "Hội phí",
+              "type": "string"
+            }
+          },
+          {
+            "name": "fromDate",
+            "required": false,
+            "in": "query",
+            "description": "Từ ngày thanh toán",
+            "schema": {
+              "example": "2024-01-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "toDate",
+            "required": false,
+            "in": "query",
+            "description": "Đến ngày thanh toán",
+            "schema": {
+              "example": "2024-12-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Số trang",
+            "schema": {
+              "minimum": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Số lượng bản ghi mỗi trang",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "example": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sắp xếp theo trường",
+            "schema": {
+              "example": "paymentDate",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Thứ tự sắp xếp",
+            "schema": {
+              "example": "desc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lấy danh sách lịch sử thanh toán thành công"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy danh sách lịch sử thanh toán",
+        "tags": [
+          "Payment History"
+        ]
+      }
+    },
+    "/api/payment-history/summary": {
+      "get": {
+        "operationId": "PaymentHistoryController_getSummary",
+        "parameters": [
+          {
+            "name": "memberId",
+            "required": false,
+            "in": "query",
+            "description": "ID của hội viên (tùy chọn)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Năm hội phí (tùy chọn)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lấy thống kê thanh toán thành công"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy thống kê thanh toán",
+        "tags": [
+          "Payment History"
+        ]
+      }
+    },
+    "/api/payment-history/generate-code/{year}": {
+      "get": {
+        "operationId": "PaymentHistoryController_generatePaymentCode",
+        "parameters": [
+          {
+            "name": "year",
+            "required": true,
+            "in": "path",
+            "description": "Năm hội phí",
+            "schema": {
+              "example": 2024,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tạo mã giao dịch thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "paymentCode": {
+                      "type": "string",
+                      "example": "VCCI-PAY-2024-001"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Tạo mã giao dịch mới cho năm",
+        "tags": [
+          "Payment History"
+        ]
+      }
+    },
+    "/api/payment-history/member/{memberId}": {
+      "get": {
+        "operationId": "PaymentHistoryController_findByMemberId",
+        "parameters": [
+          {
+            "name": "memberId",
+            "required": true,
+            "in": "path",
+            "description": "ID của hội viên",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Năm hội phí (tùy chọn)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lấy lịch sử thanh toán của hội viên thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PaymentHistoryResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy lịch sử thanh toán của hội viên",
+        "tags": [
+          "Payment History"
+        ]
+      }
+    },
+    "/api/payment-history/{id}": {
+      "get": {
+        "operationId": "PaymentHistoryController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của lịch sử thanh toán",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lấy chi tiết lịch sử thanh toán thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentHistoryResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy lịch sử thanh toán"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy chi tiết lịch sử thanh toán",
+        "tags": [
+          "Payment History"
+        ]
+      },
+      "patch": {
+        "operationId": "PaymentHistoryController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của lịch sử thanh toán",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePaymentHistoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cập nhật lịch sử thanh toán thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentHistoryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ"
+          },
+          "404": {
+            "description": "Không tìm thấy lịch sử thanh toán hoặc hội viên"
+          },
+          "409": {
+            "description": "Mã giao dịch đã tồn tại"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Cập nhật lịch sử thanh toán",
+        "tags": [
+          "Payment History"
+        ]
+      },
+      "delete": {
+        "operationId": "PaymentHistoryController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của lịch sử thanh toán",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Xóa lịch sử thanh toán thành công"
+          },
+          "404": {
+            "description": "Không tìm thấy lịch sử thanh toán"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Xóa lịch sử thanh toán",
+        "tags": [
+          "Payment History"
+        ]
+      }
+    },
     "/api/common/categories": {
       "get": {
         "description": "Supports filtering by type, searching by code/name, and pagination",
@@ -3837,6 +4309,263 @@
             "description": "ID của danh mục cha (null để xóa parent)",
             "example": "clxxxxxxxxxxxxx",
             "nullable": true
+          }
+        }
+      },
+      "CreatePaymentHistoryDto": {
+        "type": "object",
+        "properties": {
+          "memberId": {
+            "type": "string",
+            "description": "ID của hội viên",
+            "example": "clx1234567890abcdef"
+          },
+          "paymentYear": {
+            "type": "number",
+            "description": "Năm hội phí",
+            "example": 2024,
+            "minimum": 2000,
+            "maximum": 2100
+          },
+          "paymentName": {
+            "type": "string",
+            "description": "Tên giao dịch thanh toán",
+            "example": "Hội phí năm 2024 - Công ty ABC"
+          },
+          "paymentCode": {
+            "type": "string",
+            "description": "Mã giao dịch thanh toán",
+            "example": "VCCI-PAY-2024-001"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Số tiền thanh toán",
+            "example": 500000
+          },
+          "paymentDate": {
+            "type": "string",
+            "description": "Ngày thanh toán",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "method": {
+            "type": "string",
+            "description": "Hình thức thanh toán",
+            "enum": [
+              "CASH",
+              "BANK_TRANSFER",
+              "ONLINE"
+            ],
+            "example": "BANK_TRANSFER"
+          },
+          "status": {
+            "type": "string",
+            "description": "Trạng thái thanh toán",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "CANCELLED"
+            ],
+            "example": "PAID"
+          },
+          "note": {
+            "type": "string",
+            "description": "Ghi chú",
+            "example": "Thanh toán hội phí năm 2024"
+          },
+          "attachmentIds": {
+            "description": "Danh sách ID file đính kèm",
+            "example": [
+              "file1",
+              "file2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "memberId",
+          "paymentYear",
+          "paymentCode",
+          "amount",
+          "paymentDate"
+        ]
+      },
+      "PaymentHistoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID của lịch sử thanh toán",
+            "example": "clx1234567890abcdef"
+          },
+          "memberId": {
+            "type": "string",
+            "description": "ID của hội viên",
+            "example": "clx1234567890abcdef"
+          },
+          "paymentYear": {
+            "type": "number",
+            "description": "Năm hội phí",
+            "example": 2024
+          },
+          "paymentName": {
+            "type": "object",
+            "description": "Tên giao dịch thanh toán",
+            "example": "Hội phí năm 2024 - Công ty ABC"
+          },
+          "paymentCode": {
+            "type": "string",
+            "description": "Mã giao dịch thanh toán",
+            "example": "VCCI-PAY-2024-001"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Số tiền thanh toán",
+            "example": 500000
+          },
+          "paymentDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày thanh toán",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "method": {
+            "type": "string",
+            "description": "Hình thức thanh toán",
+            "enum": [
+              "CASH",
+              "BANK_TRANSFER",
+              "ONLINE"
+            ],
+            "example": "BANK_TRANSFER"
+          },
+          "status": {
+            "type": "string",
+            "description": "Trạng thái thanh toán",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "CANCELLED"
+            ],
+            "example": "PAID"
+          },
+          "note": {
+            "type": "object",
+            "description": "Ghi chú",
+            "example": "Thanh toán hội phí năm 2024"
+          },
+          "attachmentIds": {
+            "description": "Danh sách ID file đính kèm",
+            "example": [
+              "file1",
+              "file2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày tạo",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày cập nhật",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "member": {
+            "type": "object",
+            "description": "Thông tin hội viên"
+          }
+        },
+        "required": [
+          "id",
+          "memberId",
+          "paymentYear",
+          "paymentCode",
+          "amount",
+          "paymentDate",
+          "attachmentIds",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdatePaymentHistoryDto": {
+        "type": "object",
+        "properties": {
+          "memberId": {
+            "type": "string",
+            "description": "ID của hội viên",
+            "example": "clx1234567890abcdef"
+          },
+          "paymentYear": {
+            "type": "number",
+            "description": "Năm hội phí",
+            "example": 2024,
+            "minimum": 2000,
+            "maximum": 2100
+          },
+          "paymentName": {
+            "type": "string",
+            "description": "Tên giao dịch thanh toán",
+            "example": "Hội phí năm 2024 - Công ty ABC"
+          },
+          "paymentCode": {
+            "type": "string",
+            "description": "Mã giao dịch thanh toán",
+            "example": "VCCI-PAY-2024-001"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Số tiền thanh toán",
+            "example": 500000
+          },
+          "paymentDate": {
+            "type": "string",
+            "description": "Ngày thanh toán",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "method": {
+            "type": "string",
+            "description": "Hình thức thanh toán",
+            "enum": [
+              "CASH",
+              "BANK_TRANSFER",
+              "ONLINE"
+            ],
+            "example": "BANK_TRANSFER"
+          },
+          "status": {
+            "type": "string",
+            "description": "Trạng thái thanh toán",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "CANCELLED"
+            ],
+            "example": "PAID"
+          },
+          "note": {
+            "type": "string",
+            "description": "Ghi chú",
+            "example": "Thanh toán hội phí năm 2024"
+          },
+          "attachmentIds": {
+            "description": "Danh sách ID file đính kèm",
+            "example": [
+              "file1",
+              "file2"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
