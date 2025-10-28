@@ -2223,6 +2223,117 @@
         ]
       }
     },
+    "/api/activity-logs": {
+      "get": {
+        "operationId": "ActivityLogController_getActivityLogs",
+        "parameters": [
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "SUBMIT_APPLICATION",
+                "APPROVE_APPLICATION",
+                "REJECT_APPLICATION",
+                "PAY_ANNUAL_FEE",
+                "MEMBER_ACTIVATED",
+                "MEMBER_SUSPENDED",
+                "PAY_MULTI_YEARS",
+                "EDIT_BASIC_INFO",
+                "UPDATE_ATTACHMENT",
+                "LOGIN",
+                "LOGOUT",
+                "CHANGE_PASSWORD",
+                "RESET_PASSWORD",
+                "CREATE_USER",
+                "UPDATE_USER",
+                "DELETE_USER",
+                "UPLOAD_FILE",
+                "DELETE_FILE"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "MEMBER",
+                "USER",
+                "FILE",
+                "SYSTEM"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "targetId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy danh sách hoạt động",
+        "tags": [
+          "Activity Logs"
+        ]
+      }
+    },
     "/api/payment-history": {
       "post": {
         "operationId": "PaymentHistoryController_create",

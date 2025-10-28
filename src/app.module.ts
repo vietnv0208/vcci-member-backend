@@ -10,6 +10,7 @@ import { PaymentHistoryModule } from './features/members/payment-history';
 import { BusinessCategoriesModule } from './features/business-categories/business-categories.module';
 import { CategoryModule } from './features/common/category/category.module';
 import { DatabaseSeederModule } from './features/database-seeder/database-seeder.module';
+import { ActivityLogModule } from './features/common/activity-log/activity-log.module';
 import { PrismaService } from './common/prisma.service';
 
 @Module({
@@ -25,6 +26,7 @@ import { PrismaService } from './common/prisma.service';
     BusinessCategoriesModule,
     CategoryModule,
     DatabaseSeederModule,
+    ActivityLogModule,
   ],
   controllers: [AppController],
   providers: [
