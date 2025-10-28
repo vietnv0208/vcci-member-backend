@@ -439,7 +439,7 @@ export class MembersRepository {
         data: {
           memberId: id,
           paymentYear: currentYear,
-          paymentName: `Hội phí năm ${currentYear} - Kích hoạt hội viên`,
+          paymentName: `Thanh toán hội phí lần đầu`,
           paymentCode: paymentCode,
           amount: feeAmount,
           paymentDate: new Date(),
