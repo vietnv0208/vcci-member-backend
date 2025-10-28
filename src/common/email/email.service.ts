@@ -55,41 +55,9 @@ export class EmailService {
           });
           return { success: true, messageId: result?.messageId };
         } catch (err) {
-          // Fall back to N8N if SMTP fails
+          throw err;
           console.error('App Password SMTP failed, falling back to N8N:', err);
         }
-      }
-
-      const data = JSON.stringify({
-        to: toEmail.map((email) => ({ email })),
-        subject,
-        content: [
-          {
-            type: 'text/plain',
-            value: content,
-          },
-        ],
-      });
-
-      const baseUrl = this.configService.get(
-        'N8N_WEBHOOK',
-        'https://erp.twendeesoft.com/webhook',
-      );
-      const config = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: `${baseUrl}/send-email-common`,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: data,
-      };
-
-      try {
-        const response = await axios.request(config);
-        return response.data;
-      } catch (error) {
-        throw error;
       }
     } catch (e) {
       console.error('sendEmail failed:', e);
