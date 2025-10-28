@@ -8,6 +8,7 @@ import {
   ValidateNested,
   IsInt,
   IsNumber,
+  ValidateIf,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -45,6 +46,7 @@ export class CreateMemberContactDto {
 
   @ApiPropertyOptional({ description: 'Email' })
   @IsOptional()
+  @ValidateIf((o) => o.email !== '')
   @IsEmail({}, { message: 'Email không hợp lệ' })
   email?: string;
 
