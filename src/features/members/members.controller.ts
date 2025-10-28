@@ -71,7 +71,7 @@ export class MembersController {
   @ApiQuery({
     name: 'search',
     required: false,
-    description: 'Tìm kiếm theo tên, email, mã số thuế',
+    description: 'Tìm kiếm theo tên, email, mã số thuế, mã hội viên, mã đơn đăng ký',
   })
   @ApiQuery({
     name: 'applicationType',
@@ -145,7 +145,7 @@ export class MembersController {
 
   @Get('code/:code')
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGEMENT)
-  @ApiOperation({ summary: 'Lấy thông tin hội viên theo mã' })
+  @ApiOperation({ summary: 'Lấy thông tin hội viên theo mã hội viên' })
   @ApiParam({ name: 'code', description: 'Mã hội viên' })
   @ApiResponse({
     status: 200,
@@ -155,6 +155,20 @@ export class MembersController {
   @ApiResponse({ status: 404, description: 'Không tìm thấy hội viên' })
   async findByCode(@Param('code') code: string): Promise<MemberResponseDto> {
     return this.membersService.findByCode(code);
+  }
+
+  @Get('application-code/:applicationCode')
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGEMENT)
+  @ApiOperation({ summary: 'Lấy thông tin hội viên theo mã đơn đăng ký' })
+  @ApiParam({ name: 'applicationCode', description: 'Mã đơn đăng ký hội viên' })
+  @ApiResponse({
+    status: 200,
+    description: 'Thông tin chi tiết hội viên',
+    type: MemberResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy hội viên' })
+  async findByApplicationCode(@Param('applicationCode') applicationCode: string): Promise<MemberResponseDto> {
+    return this.membersService.findByApplicationCode(applicationCode);
   }
 
   @Patch(':id')

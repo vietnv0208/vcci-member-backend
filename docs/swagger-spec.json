@@ -1359,7 +1359,7 @@
             "name": "search",
             "required": false,
             "in": "query",
-            "description": "Tìm kiếm theo tên, email, mã số thuế",
+            "description": "Tìm kiếm theo tên, email, mã số thuế, mã hội viên, mã đơn đăng ký",
             "schema": {
               "type": "string"
             }
@@ -1700,7 +1700,47 @@
             "JWT-auth": []
           }
         ],
-        "summary": "Lấy thông tin hội viên theo mã",
+        "summary": "Lấy thông tin hội viên theo mã hội viên",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/api/members/application-code/{applicationCode}": {
+      "get": {
+        "operationId": "MembersController_findByApplicationCode",
+        "parameters": [
+          {
+            "name": "applicationCode",
+            "required": true,
+            "in": "path",
+            "description": "Mã đơn đăng ký hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin chi tiết hội viên",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy thông tin hội viên theo mã đơn đăng ký",
         "tags": [
           "Members"
         ]
@@ -3930,6 +3970,9 @@
             "type": "string"
           },
           "code": {
+            "type": "string"
+          },
+          "applicationCode": {
             "type": "string"
           },
           "applicationType": {

@@ -112,6 +112,9 @@ export class MemberResponseDto {
   @ApiPropertyOptional()
   code?: string;
 
+  @ApiPropertyOptional()
+  applicationCode?: string;
+
   @ApiProperty({ enum: ApplicationType })
   applicationType: ApplicationType;
 

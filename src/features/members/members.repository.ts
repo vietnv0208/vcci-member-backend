@@ -109,6 +109,37 @@ export class MembersRepository {
     });
   }
 
+  async findByApplicationCode(applicationCode: string): Promise<Member | null> {
+    return this.prisma.member.findUnique({
+      where: { applicationCode },
+      include: {
+        enterpriseDetail: true,
+        associationDetail: true,
+        contacts: true,
+        statusHistories: {
+          include: {
+            changedBy: {
+              select: {
+                id: true,
+                fullName: true,
+                email: true,
+              },
+            },
+          },
+          orderBy: {
+            changedAt: 'desc',
+          },
+        },
+        memberBusinessCategories: {
+          include: {
+            businessCategory: true,
+          },
+        },
+        memberPaymentHistory: true,
+      },
+    });
+  }
+
   async findMany(
     query: QueryMemberDto,
   ): Promise<{ data: Member[]; total: number }> {
@@ -140,6 +171,7 @@ export class MembersRepository {
         { email: { contains: search, mode: 'insensitive' } },
         { taxCode: { contains: search, mode: 'insensitive' } },
         { code: { contains: search, mode: 'insensitive' } },
+        { applicationCode: { contains: search, mode: 'insensitive' } },
       ];
     }
 
@@ -334,6 +366,8 @@ export class MembersRepository {
     changedById?: string,
     note?: string,
   ): Promise<{ member: Member; paymentHistory: MemberPaymentHistory }> {
+    const code = await this.generateMemberCode();
+
     return this.prisma.$transaction(async (tx) => {
       const currentYear = new Date().getFullYear();
 
@@ -367,6 +401,7 @@ export class MembersRepository {
       const member = await tx.member.update({
         where: { id },
         data: {
+          code, // set member code upon activation
           status: MemberStatus.ACTIVE,
           feeStatus: FeeStatus.PAID,
           feeAmount: feeAmount,
@@ -452,7 +487,34 @@ export class MembersRepository {
       }
     }
 
-    return `${prefix}${nextNumber.toString().padStart(4, '0')}`;
+    return `${prefix}${nextNumber > 9999 ? nextNumber : nextNumber.toString().padStart(4, '0')}`;
+  }
+
+  async generateApplicationCode(): Promise<string> {
+    const year = new Date().getFullYear();
+    const prefix = `VCCI-REG-${year}-`;
+
+    // Find the last member code for this year
+    const lastMember = await this.prisma.member.findFirst({
+      where: {
+        applicationCode: {
+          startsWith: prefix,
+        },
+      },
+      orderBy: {
+        applicationCode: 'desc',
+      },
+    });
+
+    let nextNumber = 1;
+    if (lastMember?.applicationCode) {
+      const lastNumber = parseInt(lastMember.applicationCode.replace(prefix, ''), 10);
+      if (!isNaN(lastNumber)) {
+        nextNumber = lastNumber + 1;
+      }
+    }
+
+    return `${prefix}${nextNumber > 9999 ? nextNumber : nextNumber.toString().padStart(4, '0')}`;
   }
 
   async getStatistics() {

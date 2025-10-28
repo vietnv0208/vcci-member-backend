@@ -64,12 +64,13 @@ export class MembersService {
     }
 
     // Generate member code
-    const code = await this.membersRepository.generateMemberCode();
+    // const code = await this.membersRepository.generateMemberCode();
+    const applicationCode = await this.membersRepository.generateApplicationCode();
 
     // Build create data
     const createData: Prisma.MemberCreateInput = {
       ...memberData,
-      code,
+      applicationCode,
       contacts: {
         create: contacts,
       },
@@ -154,6 +155,16 @@ export class MembersService {
 
     if (!member) {
       throw new NotFoundException(`Không tìm thấy hội viên với mã ${code}`);
+    }
+
+    return this.mapToResponseDto(member);
+  }
+
+  async findByApplicationCode(applicationCode: string): Promise<MemberResponseDto> {
+    const member = await this.membersRepository.findByApplicationCode(applicationCode);
+
+    if (!member) {
+      throw new NotFoundException(`Không tìm thấy hội viên với mã đơn đăng ký ${applicationCode}`);
     }
 
     return this.mapToResponseDto(member);
@@ -383,6 +394,7 @@ export class MembersService {
     return {
       id: member.id,
       code: member.code,
+      applicationCode: member.applicationCode,
       applicationType: member.applicationType,
       memberType: member.memberType,
       status: member.status,
