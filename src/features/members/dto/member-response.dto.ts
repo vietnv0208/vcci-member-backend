@@ -182,7 +182,7 @@ export class MemberResponseDto {
   businessCategories: BusinessCategoryResponseDto[];
 
   @ApiProperty({ type: [Object] })
-  memberPaymentHistory: any[];
+  memberPaymentHistory?: any[];
 
   @ApiProperty({ type: [String] })
   attachmentIds: string[];

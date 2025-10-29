@@ -1892,6 +1892,41 @@
         ]
       }
     },
+    "/api/public/members/application-code/{applicationCode}": {
+      "get": {
+        "operationId": "MembersPublicController_findByApplicationCode",
+        "parameters": [
+          {
+            "name": "applicationCode",
+            "required": true,
+            "in": "path",
+            "description": "Mã đơn đăng ký hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thông tin chi tiết hội viên",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "summary": "Lấy thông tin hội viên theo mã đơn đăng ký",
+        "tags": [
+          "Members (Public)"
+        ]
+      }
+    },
     "/api/business-categories": {
       "post": {
         "operationId": "BusinessCategoriesController_create",
