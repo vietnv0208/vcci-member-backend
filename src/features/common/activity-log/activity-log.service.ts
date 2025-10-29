@@ -72,7 +72,7 @@ export class ActivityLogService {
       },
       [ActivityActionType.CREATE_USER_FOR_MEMBER]: {
         title: 'Tạo tài khoản',
-        description: 'Tạo tài khoản cho hội viên {memberName}: {email}',
+        description: 'Tạo tài khoản cho hội viên "{memberName}" tên đăng nhập: {email}',
       },
       [ActivityActionType.CREATE_USER]: {
         title: 'Tạo tài khoản',
