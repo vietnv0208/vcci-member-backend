@@ -45,7 +45,7 @@ export class CategoryQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(99999)
   limit?: number = 10;
 }
 

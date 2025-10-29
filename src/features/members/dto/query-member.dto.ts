@@ -64,7 +64,7 @@ export class QueryMemberDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(99999)
   limit?: number = 10;
 
   @ApiPropertyOptional({ description: 'Sắp xếp theo trường', default: 'createdAt' })
