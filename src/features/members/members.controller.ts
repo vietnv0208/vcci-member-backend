@@ -249,8 +249,9 @@ export class MembersController {
   async createMemberAccount(
     @Param('id') id: string,
     @Body() body: CreateMemberAccountDto,
+    @Request() req,
   ): Promise<any> {
-    return this.membersService.createMemberAccount(id, body.email, body.password);
+    return this.membersService.createMemberAccount(id, body.email, body.password, req.user.userId);
   }
 
   @Delete(':id')

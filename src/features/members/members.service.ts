@@ -165,20 +165,29 @@ export class MembersService {
     return this.mapToResponseDto(member);
   }
 
-  async createMemberAccount(memberId: string, email: string, password: string) {
+  async createMemberAccount(
+    memberId: string,
+    email: string,
+    password: string,
+    userId?: string,
+  ) {
     const member = await this.membersRepository.findById(memberId);
     if (!member) {
       throw new NotFoundException(`Không tìm thấy hội viên với ID ${memberId}`);
     }
 
     // Check if member already has an account
-    const existingMemberUser = await this.prisma.user.findFirst({ where: { memberId } });
+    const existingMemberUser = await this.prisma.user.findFirst({
+      where: { memberId },
+    });
     if (existingMemberUser) {
       throw new ConflictException('Hội viên này đã có tài khoản');
     }
 
     // Check if email is already used
-    const existingEmail = await this.prisma.user.findUnique({ where: { email } });
+    const existingEmail = await this.prisma.user.findUnique({
+      where: { email },
+    });
     if (existingEmail) {
       throw new ConflictException('Email đã tồn tại trong hệ thống');
     }
@@ -203,7 +212,20 @@ export class MembersService {
         createdAt: true,
       },
     });
-
+    // Log submit application
+    await this.activityLogService.logActivity(
+      ActivityActionType.CREATE_USER_FOR_MEMBER,
+      {
+        memberName: member.vietnameseName || member.englishName || 'Hội viên',
+        email: email,
+        date: new Date().toLocaleDateString('vi-VN'),
+      },
+      {
+        targetType: ActivityTargetType.MEMBER,
+        targetId: member.id,
+        userId,
+      },
+    );
     return user;
   }
 
