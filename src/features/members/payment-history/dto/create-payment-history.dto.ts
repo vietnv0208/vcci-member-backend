@@ -1,6 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsInt, IsDecimal, IsDateString, IsEnum, IsOptional, IsArray, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsDecimal,
+  IsDateString,
+  IsEnum,
+  IsOptional,
+  IsArray,
+  Min,
+  Max,
+  IsNumber,
+} from 'class-validator';
 import { PaymentMethod, PaymentStatus } from '@prisma/client';
+import { Type } from 'class-transformer';
 
 export class CreatePaymentHistoryDto {
   @ApiProperty({
@@ -41,7 +53,9 @@ export class CreatePaymentHistoryDto {
     description: 'Số tiền thanh toán',
     example: 500000,
   })
-  @IsDecimal({ decimal_digits: '0,2' })
+
+  @IsNumber()
+  @Type(() => Number)
   amount: number;
 
   @ApiProperty({
