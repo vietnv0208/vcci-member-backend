@@ -70,17 +70,21 @@ export class ActivityLogService {
         title: 'Reset mật khẩu',
         description: 'Reset mật khẩu cho tài khoản {username}',
       },
+      [ActivityActionType.CREATE_USER_FOR_MEMBER]: {
+        title: 'Tạo tài khoản',
+        description: 'Tạo tài khoản cho hội viên {memberCode}: {email}',
+      },
       [ActivityActionType.CREATE_USER]: {
         title: 'Tạo tài khoản',
-        description: 'Tạo tài khoản mới: {username} - {role}',
+        description: 'Tạo tài khoản mới: {email} - {role}',
       },
       [ActivityActionType.UPDATE_USER]: {
         title: 'Cập nhật tài khoản',
-        description: 'Cập nhật thông tin tài khoản: {username}',
+        description: 'Cập nhật thông tin tài khoản: {email}',
       },
       [ActivityActionType.DELETE_USER]: {
         title: 'Xóa tài khoản',
-        description: 'Xóa tài khoản: {username}',
+        description: 'Xóa tài khoản: {email}',
       },
       [ActivityActionType.UPLOAD_FILE]: {
         title: 'Tải lên tài liệu',

@@ -2281,6 +2281,7 @@
                 "LOGOUT",
                 "CHANGE_PASSWORD",
                 "RESET_PASSWORD",
+                "CREATE_USER_FOR_MEMBER",
                 "CREATE_USER",
                 "UPDATE_USER",
                 "DELETE_USER",

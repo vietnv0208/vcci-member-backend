@@ -413,18 +413,4 @@ model ActivityLog {
   createdAt    DateTime @default(now())
 }
 
-enum ActivityActionType {
-  SUBMIT_APPLICATION
-  APPROVE_APPLICATION
-  REJECT_APPLICATION
-  PAY_ANNUAL_FEE
-  MEMBER_ACTIVATED
-  MEMBER_SUSPENDED
-  PAY_MULTI_YEARS
-  EDIT_BASIC_INFO
-  UPDATE_ATTACHMENT
-}
-
-enum ActivityTargetType {
-  MEMBER
-}
+// ======================================================
