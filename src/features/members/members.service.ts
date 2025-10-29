@@ -580,6 +580,8 @@ export class MembersService {
       }),
     );
 
+    const primaryUser = Array.isArray(member.User) && member.User.length > 0 ? member.User[0] : undefined;
+
     return {
       id: member.id,
       code: member.code,
@@ -607,6 +609,12 @@ export class MembersService {
       businessCategories,
       memberPaymentHistory: member.memberPaymentHistory,
       attachmentIds: member.attachmentIds || [],
+      user: primaryUser
+        ? {
+            fullName: primaryUser.fullName,
+            email: primaryUser.email,
+          }
+        : undefined,
       createdAt: member.createdAt,
       updatedAt: member.updatedAt,
     };

@@ -105,6 +105,14 @@ export class MemberAssociationDetailResponseDto {
   totalMembers?: number;
 }
 
+export class MemberUserInfoDto {
+  @ApiProperty()
+  fullName: string;
+
+  @ApiProperty()
+  email: string;
+}
+
 export class MemberResponseDto {
   @ApiProperty()
   id: string;
@@ -171,6 +179,9 @@ export class MemberResponseDto {
 
   @ApiPropertyOptional({ type: MemberAssociationDetailResponseDto })
   associationDetail?: MemberAssociationDetailResponseDto;
+
+  @ApiPropertyOptional({ type: MemberUserInfoDto, description: 'Tài khoản người dùng gắn với hội viên' })
+  user?: MemberUserInfoDto;
 
   @ApiProperty({ type: [MemberContactResponseDto] })
   contacts: MemberContactResponseDto[];

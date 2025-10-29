@@ -4071,6 +4071,21 @@
           "establishmentLicenseNo"
         ]
       },
+      "MemberUserInfoDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fullName",
+          "email"
+        ]
+      },
       "MemberContactResponseDto": {
         "type": "object",
         "properties": {
@@ -4245,6 +4260,14 @@
           },
           "associationDetail": {
             "$ref": "#/components/schemas/MemberAssociationDetailResponseDto"
+          },
+          "user": {
+            "description": "Tài khoản người dùng gắn với hội viên",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberUserInfoDto"
+              }
+            ]
           },
           "contacts": {
             "type": "array",

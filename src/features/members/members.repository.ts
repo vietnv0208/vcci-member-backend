@@ -25,6 +25,9 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        User: {
+          select: { id: true, fullName: true, email: true },
+        },
         statusHistories: {
           include: {
             changedBy: {
@@ -55,6 +58,9 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        User: {
+          select: { id: true, fullName: true, email: true },
+        },
         statusHistories: {
           include: {
             changedBy: {
@@ -86,6 +92,9 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        User: {
+          select: { id: true, fullName: true, email: true },
+        },
         statusHistories: {
           include: {
             changedBy: {
@@ -116,6 +125,9 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        User: {
+          select: { id: true, fullName: true, email: true },
+        },
         statusHistories: {
           include: {
             changedBy: {
@@ -239,6 +251,9 @@ export class MembersRepository {
           enterpriseDetail: true,
           associationDetail: true,
           contacts: true,
+          User: {
+            select: { id: true, fullName: true, email: true },
+          },
           statusHistories: {
             include: {
               changedBy: {
@@ -323,6 +338,9 @@ export class MembersRepository {
           enterpriseDetail: true,
           associationDetail: true,
           contacts: true,
+          User: {
+            select: { id: true, fullName: true, email: true },
+          },
           statusHistories: {
             include: {
               changedBy: {
