@@ -14,13 +14,15 @@ import {
   ChangeMemberStatusDto,
   ActivateMemberDto,
 } from './dto';
-import { Prisma, MemberStatus, FeeStatus, EntityType } from '@prisma/client';
+import { Prisma, MemberStatus, FeeStatus, EntityType, UserRole } from '@prisma/client';
 import { FilesService } from '../common/file-management';
 import {
   ActivityLogService,
   ActivityActionType,
   ActivityTargetType,
 } from '../common/activity-log';
+import { PrismaService } from '../../common/prisma.service';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class MembersService {
@@ -28,6 +30,7 @@ export class MembersService {
     private readonly membersRepository: MembersRepository,
     private readonly filesService: FilesService,
     private readonly activityLogService: ActivityLogService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async create(
@@ -160,6 +163,48 @@ export class MembersService {
       },
     );
     return this.mapToResponseDto(member);
+  }
+
+  async createMemberAccount(memberId: string, email: string, password: string) {
+    const member = await this.membersRepository.findById(memberId);
+    if (!member) {
+      throw new NotFoundException(`Không tìm thấy hội viên với ID ${memberId}`);
+    }
+
+    // Check if member already has an account
+    const existingMemberUser = await this.prisma.user.findFirst({ where: { memberId } });
+    if (existingMemberUser) {
+      throw new ConflictException('Hội viên này đã có tài khoản');
+    }
+
+    // Check if email is already used
+    const existingEmail = await this.prisma.user.findUnique({ where: { email } });
+    if (existingEmail) {
+      throw new ConflictException('Email đã tồn tại trong hệ thống');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await this.prisma.user.create({
+      data: {
+        fullName: member.vietnameseName || member.englishName || 'Hội viên',
+        email,
+        password: hashedPassword,
+        role: UserRole.MEMBER,
+        active: true,
+        memberId,
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        role: true,
+        active: true,
+        createdAt: true,
+      },
+    });
+
+    return user;
   }
 
   async findAll(query: QueryMemberDto): Promise<MemberListResponseDto> {

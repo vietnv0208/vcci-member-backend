@@ -21,6 +21,7 @@ import {
   MemberListResponseDto,
   ChangeMemberStatusDto,
   ActivateMemberDto,
+  CreateMemberAccountDto,
 } from './dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
@@ -236,6 +237,20 @@ export class MembersController {
     @Request() req,
   ): Promise<MemberResponseDto> {
     return this.membersService.activateMember(id, activateDto, req.user.userId);
+  }
+
+  @Post(':id/create-account')
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGEMENT)
+  @ApiOperation({ summary: 'Tạo tài khoản đăng nhập cho hội viên (role MEMBER)' })
+  @ApiParam({ name: 'id', description: 'ID của hội viên' })
+  @ApiResponse({ status: 201, description: 'Tạo tài khoản thành công' })
+  @ApiResponse({ status: 404, description: 'Không tìm thấy hội viên' })
+  @ApiResponse({ status: 409, description: 'Email đã tồn tại hoặc hội viên đã có tài khoản' })
+  async createMemberAccount(
+    @Param('id') id: string,
+    @Body() body: CreateMemberAccountDto,
+  ): Promise<any> {
+    return this.membersService.createMemberAccount(id, body.email, body.password);
   }
 
   @Delete(':id')

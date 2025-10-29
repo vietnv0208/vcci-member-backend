@@ -1853,6 +1853,52 @@
         ]
       }
     },
+    "/api/members/{id}/create-account": {
+      "post": {
+        "operationId": "MembersController_createMemberAccount",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID của hội viên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberAccountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tạo tài khoản thành công"
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          },
+          "409": {
+            "description": "Email đã tồn tại hoặc hội viên đã có tài khoản"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Tạo tài khoản đăng nhập cho hội viên (role MEMBER)",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
     "/api/public/members/register": {
       "post": {
         "description": "API công khai cho phép doanh nghiệp/hiệp hội tự đăng ký làm hội viên VCCI. Đơn đăng ký sẽ có trạng thái PENDING và chờ xét duyệt.",
@@ -4439,6 +4485,24 @@
         "required": [
           "feeAmount",
           "attachmentIds"
+        ]
+      },
+      "CreateMemberAccountDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email đăng nhập của hội viên"
+          },
+          "password": {
+            "type": "string",
+            "description": "Mật khẩu tài khoản",
+            "minLength": 6
+          }
+        },
+        "required": [
+          "email",
+          "password"
         ]
       },
       "CreateBusinessCategoryDto": {
