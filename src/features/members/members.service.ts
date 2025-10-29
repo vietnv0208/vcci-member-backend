@@ -16,12 +16,18 @@ import {
 } from './dto';
 import { Prisma, MemberStatus, FeeStatus, EntityType } from '@prisma/client';
 import { FilesService } from '../common/file-management';
+import {
+  ActivityLogService,
+  ActivityActionType,
+  ActivityTargetType,
+} from '../common/activity-log';
 
 @Injectable()
 export class MembersService {
   constructor(
     private readonly membersRepository: MembersRepository,
     private readonly filesService: FilesService,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async create(
@@ -65,7 +71,8 @@ export class MembersService {
 
     // Generate member code
     // const code = await this.membersRepository.generateMemberCode();
-    const applicationCode = await this.membersRepository.generateApplicationCode();
+    const applicationCode =
+      await this.membersRepository.generateApplicationCode();
 
     // Build create data
     const createData: Prisma.MemberCreateInput = {
@@ -120,7 +127,38 @@ export class MembersService {
         'MEMBER',
         member.id,
       );
+
+      // Log update attachment
+      await this.activityLogService.logActivity(
+        ActivityActionType.UPDATE_ATTACHMENT,
+        {
+          memberCode: member.applicationCode,
+          memberName: member.vietnameseName,
+          fileName: `${createMemberDto.attachmentIds.length} tệp đính kèm`,
+        },
+        {
+          targetType: ActivityTargetType.MEMBER,
+          targetId: member.id,
+          userId,
+        },
+      );
     }
+
+    // Log submit application
+    await this.activityLogService.logActivity(
+      ActivityActionType.SUBMIT_APPLICATION,
+      {
+        memberCode: member.applicationCode,
+        memberName: member.vietnameseName,
+        date: new Date().toLocaleDateString('vi-VN'),
+      },
+      {
+        targetType: ActivityTargetType.MEMBER,
+        targetId: member.id,
+        userId,
+        requestData: createMemberDto,
+      },
+    );
     return this.mapToResponseDto(member);
   }
 
@@ -160,11 +198,16 @@ export class MembersService {
     return this.mapToResponseDto(member);
   }
 
-  async findByApplicationCode(applicationCode: string): Promise<MemberResponseDto> {
-    const member = await this.membersRepository.findByApplicationCode(applicationCode);
+  async findByApplicationCode(
+    applicationCode: string,
+  ): Promise<MemberResponseDto> {
+    const member =
+      await this.membersRepository.findByApplicationCode(applicationCode);
 
     if (!member) {
-      throw new NotFoundException(`Không tìm thấy hội viên với mã đơn đăng ký ${applicationCode}`);
+      throw new NotFoundException(
+        `Không tìm thấy hội viên với mã đơn đăng ký ${applicationCode}`,
+      );
     }
 
     return this.mapToResponseDto(member);
@@ -260,7 +303,22 @@ export class MembersService {
     }
 
     const member = await this.membersRepository.update(id, updateData);
-
+    // Log edit basic info with changed fields
+    const changedFields = Object.keys(memberData || {});
+    if (changedFields.length > 0) {
+      await this.activityLogService.logActivity(
+        ActivityActionType.EDIT_BASIC_INFO,
+        {
+          memberCode: member.code || member.applicationCode,
+          memberName: member.vietnameseName,
+          fields: changedFields.join(', '),
+        },
+        {
+          targetType: ActivityTargetType.MEMBER,
+          targetId: id,
+        },
+      );
+    }
     return this.mapToResponseDto(member);
   }
 
@@ -297,6 +355,38 @@ export class MembersService {
       userId,
       changeStatusDto.remark,
     );
+
+    // Log activity based on status change
+    let action: ActivityActionType;
+    let context: any = {
+      memberCode: member.code || member.applicationCode,
+      memberName: member.vietnameseName,
+      fromStatus: existingMember.status,
+      toStatus: changeStatusDto.status,
+    };
+
+    switch (changeStatusDto.status) {
+      case MemberStatus.APPROVED:
+        action = ActivityActionType.APPROVE_APPLICATION;
+        break;
+      case MemberStatus.REJECTED:
+        action = ActivityActionType.REJECT_APPLICATION;
+        context.reason = changeStatusDto.remark;
+        break;
+      case MemberStatus.SUSPENDED:
+        action = ActivityActionType.MEMBER_SUSPENDED;
+        context.reason = changeStatusDto.remark;
+        break;
+      default:
+        action = ActivityActionType.EDIT_BASIC_INFO;
+        context.fields = `Thay đổi trạng thái từ ${existingMember.status} sang ${changeStatusDto.status}`;
+    }
+
+    await this.activityLogService.logActivity(action, context, {
+      targetType: ActivityTargetType.MEMBER,
+      targetId: id,
+      userId,
+    });
 
     return this.mapToResponseDto(member);
   }
@@ -338,7 +428,39 @@ export class MembersService {
         EntityType.MEMBER_PAYMENT,
         paymentHistory.id,
       );
+
+      // Log update attachment for activation
+      await this.activityLogService.logActivity(
+        ActivityActionType.UPDATE_ATTACHMENT,
+        {
+          memberCode: member.code,
+          memberName: member.vietnameseName,
+          fileName: `${activateDto.attachmentIds.length} tệp đính kèm`,
+        },
+        {
+          targetType: ActivityTargetType.MEMBER,
+          targetId: id,
+          userId,
+        },
+      );
     }
+
+    // Log activation activity
+    await this.activityLogService.logActivity(
+      ActivityActionType.MEMBER_ACTIVATED,
+      {
+        memberCode: member.code || member.applicationCode,
+        memberName: member.vietnameseName,
+        feeAmount: activateDto.feeAmount,
+        note: activateDto.note,
+      },
+      {
+        targetType: ActivityTargetType.MEMBER,
+        targetId: id,
+        userId,
+      },
+    );
+
     return this.mapToResponseDto(member);
   }
 

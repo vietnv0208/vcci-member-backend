@@ -38,6 +38,7 @@ model User {
   refreshTokens       RefreshToken[]
   File                File[]
   MemberStatusHistory MemberStatusHistory[]
+  ActivityLog         ActivityLog[]
 }
 
 model RefreshToken {
@@ -395,4 +396,35 @@ enum PaymentMethod {
   CASH // Tiền mặt
   BANK_TRANSFER // Chuyển khoản
   ONLINE // Thanh toán trực tuyến
+}
+
+model ActivityLog {
+  id           String   @id @default(cuid())
+  action       String // e.g., "SUBMIT_APPLICATION", "APPROVE_APPLICATION"
+  title        String // e.g., "Thanh toán hội phí năm 2024"
+  description  String?
+  targetType   String? // e.g., "MEMBER", "USER"
+  targetId     String? // e.g., ID của hội viên hoặc đối tượng liên quan
+  userId       String? // ID của user thực hiện hành động
+  user         User?    @relation(fields: [userId], references: [id])
+  requestData  Json?
+  responseData Json?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+}
+
+enum ActivityActionType {
+  SUBMIT_APPLICATION
+  APPROVE_APPLICATION
+  REJECT_APPLICATION
+  PAY_ANNUAL_FEE
+  MEMBER_ACTIVATED
+  MEMBER_SUSPENDED
+  PAY_MULTI_YEARS
+  EDIT_BASIC_INFO
+  UPDATE_ATTACHMENT
+}
+
+enum ActivityTargetType {
+  MEMBER
 }

@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PaymentHistoryRepository } from './payment-history.repository';
+import { ActivityLogService } from '../../common/activity-log';
+import { ActivityActionType, ActivityTargetType } from '../../common/activity-log';
 import { PrismaService } from '../../../common/prisma.service';
 import {
   CreatePaymentHistoryDto,
@@ -13,6 +15,7 @@ export class PaymentHistoryService {
   constructor(
     private paymentHistoryRepository: PaymentHistoryRepository,
     private prisma: PrismaService,
+    private activityLogService: ActivityLogService,
   ) {}
 
   async create(createPaymentHistoryDto: CreatePaymentHistoryDto): Promise<PaymentHistoryResponseDto> {
@@ -36,6 +39,24 @@ export class PaymentHistoryService {
 
     // Tạo lịch sử thanh toán
     const paymentHistory = await this.paymentHistoryRepository.create(createPaymentHistoryDto);
+
+    // Log pay annual fee / multi years
+    await this.activityLogService.logActivity(
+      createPaymentHistoryDto.paymentYear
+        ? ActivityActionType.PAY_ANNUAL_FEE
+        : ActivityActionType.PAY_MULTI_YEARS,
+      {
+        memberName: member.vietnameseName,
+        memberCode: member.code || member.applicationCode,
+        year: createPaymentHistoryDto.paymentYear,
+        years: createPaymentHistoryDto.paymentYear,
+        amount: createPaymentHistoryDto.amount,
+      },
+      {
+        targetType: ActivityTargetType.MEMBER,
+        targetId: createPaymentHistoryDto.memberId,
+      },
+    );
 
     return {
       ...paymentHistory,
