@@ -6,8 +6,9 @@ services:
     ports:
       - "${APP_PORT:-3002}:3000"  # Cho phép override port qua .env
     pull_policy: always
-#    volumes:
-#      - ${PUBLIC_DIR:-~/root/public}:/app/public
+    volumes:
+      - ${PUBLIC_DIR:-~/root/public}:/app/public
+      - ${UPLOAD_PATH:-/usr/local/vcci_member/uploads}:${UPLOAD_PATH:-/usr/local/vcci_member/uploads}
     restart: on-failure
     env_file:
       - .env
@@ -19,5 +20,6 @@ services:
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-24h}
       PORT: ${PORT:-3000}
       NODE_ENV: ${NODE_ENV:-development}
+      UPLOAD_PATH: ${UPLOAD_PATH:-./uploads}
 
 

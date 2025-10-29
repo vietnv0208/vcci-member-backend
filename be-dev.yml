@@ -10,6 +10,7 @@ services:
     pull_policy: always
     volumes:
       - ${PUBLIC_DIR:-~/root/public}:/app/public
+      - ${UPLOAD_PATH:-/usr/local/uploads}:${UPLOAD_PATH:-/usr/local/uploads}
     restart: on-failure
     env_file:
       - .env
