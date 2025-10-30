@@ -214,24 +214,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string"
-                    },
-                    "fullName": {
-                      "type": "string"
-                    },
-                    "role": {
-                      "type": "string"
-                    },
-                    "department": {
-                      "type": "string"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ProfileResponseDto"
                 }
               }
             }
@@ -797,516 +780,6 @@
         "summary": "Permanently delete user",
         "tags": [
           "Users"
-        ]
-      }
-    },
-    "/api/files/upload": {
-      "post": {
-        "description": "Uploads a file directly to the backend, which handles S3 upload internally",
-        "operationId": "FilesController_uploadFile",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "File to upload"
-                  },
-                  "category": {
-                    "type": "string",
-                    "enum": [
-                      "MEMBERSHIP_APPLICATION",
-                      "BUSINESS_LICENSE",
-                      "FINANCIAL_REPORT",
-                      "PAYMENT_PROOF",
-                      "OTHER_DOCUMENT"
-                    ],
-                    "description": "File category"
-                  },
-                  "entityId": {
-                    "type": "string",
-                    "description": "ID of the entity this file belongs to"
-                  },
-                  "entityType": {
-                    "type": "string",
-                    "description": "Type of entity this file belongs to"
-                  },
-                  "folderPath": {
-                    "type": "string",
-                    "description": "Target folder path for upload (e.g., /Documents/Projects)"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "File uploaded successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileResponseDto"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation error or file type not allowed"
-          }
-        },
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ],
-        "summary": "Upload file directly to backend",
-        "tags": [
-          "Files"
-        ]
-      }
-    },
-    "/api/files/{id}": {
-      "get": {
-        "description": "Retrieves file metadata by ID",
-        "operationId": "FilesController_getFile",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "File ID",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "File information retrieved",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "File not found"
-          }
-        },
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ],
-        "summary": "Get file information",
-        "tags": [
-          "Files"
-        ]
-      },
-      "delete": {
-        "description": "Deletes the file from both storage and the database",
-        "operationId": "FilesController_deleteFile",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "File ID",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "File deleted successfully"
-          },
-          "404": {
-            "description": "File not found"
-          }
-        },
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ],
-        "summary": "Delete file",
-        "tags": [
-          "Files"
-        ]
-      }
-    },
-    "/api/files/{id}/download": {
-      "get": {
-        "description": "Streams the file content directly from the server",
-        "operationId": "FilesController_downloadFile",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "File ID",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "File content streamed",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "File not found"
-          }
-        },
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ],
-        "summary": "Download file",
-        "tags": [
-          "Files"
-        ]
-      }
-    },
-    "/api/files/{id}/download-url": {
-      "get": {
-        "description": "Get download URL for the file",
-        "operationId": "FilesController_downloadFileUrl",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "File ID",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Download URL retrieved",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "downloadUrl": {
-                      "type": "string",
-                      "description": "Download URL for the file"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "File not found"
-          }
-        },
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ],
-        "summary": "Download file url",
-        "tags": [
-          "Files"
-        ]
-      }
-    },
-    "/api/files": {
-      "get": {
-        "description": "Retrieves all files associated with a specific entity",
-        "operationId": "FilesController_getFilesByEntity",
-        "parameters": [
-          {
-            "name": "entityType",
-            "required": true,
-            "in": "query",
-            "description": "Type of entity (e.g., User, LeaveRequest)",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "entityId",
-            "required": true,
-            "in": "query",
-            "description": "ID of the entity",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Files retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FileResponseDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ],
-        "summary": "Get files by entity",
-        "tags": [
-          "Files"
-        ]
-      }
-    },
-    "/api/files/drives/{entityType}/{entityId}/folders": {
-      "post": {
-        "description": "Creates a new folder in the specified drive",
-        "operationId": "FilesController_createFolder",
-        "parameters": [
-          {
-            "name": "entityType",
-            "required": true,
-            "in": "path",
-            "description": "Type of entity",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "entityId",
-            "required": true,
-            "in": "path",
-            "description": "ID of the entity",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateFolderDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Folder created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "path": {
-                      "type": "string"
-                    },
-                    "parentId": {
-                      "type": "string"
-                    },
-                    "driveId": {
-                      "type": "string"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ],
-        "summary": "Create folder",
-        "tags": [
-          "Files"
-        ]
-      }
-    },
-    "/api/files/attach": {
-      "post": {
-        "description": "Attach files uploaded with tempKey to a specific entity",
-        "operationId": "FilesController_attachTempFiles",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AttachFilesDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Files attached successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttachFilesResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No files found with the given tempKey"
-          }
-        },
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ],
-        "summary": "Attach temporary files to entity",
-        "tags": [
-          "Files"
-        ]
-      }
-    },
-    "/api/public/files/upload": {
-      "post": {
-        "description": "Uploads a file directly to the backend, which handles S3 upload internally",
-        "operationId": "FilesPublicController_uploadFile",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "File to upload"
-                  },
-                  "category": {
-                    "type": "string",
-                    "enum": [
-                      "MEMBERSHIP_APPLICATION",
-                      "BUSINESS_LICENSE",
-                      "FINANCIAL_REPORT",
-                      "PAYMENT_PROOF",
-                      "OTHER_DOCUMENT"
-                    ],
-                    "description": "File category"
-                  },
-                  "entityId": {
-                    "type": "string",
-                    "description": "ID of the entity this file belongs to"
-                  },
-                  "entityType": {
-                    "type": "string",
-                    "description": "Type of entity this file belongs to"
-                  },
-                  "folderPath": {
-                    "type": "string",
-                    "description": "Target folder path for upload (e.g., /Documents/Projects)"
-                  }
-                },
-                "required": [
-                  "file"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "File uploaded successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileResponseDto"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation error or file type not allowed"
-          }
-        },
-        "summary": "Upload file directly to backend",
-        "tags": [
-          "Public Files"
-        ]
-      }
-    },
-    "/api/public/files/attach": {
-      "post": {
-        "description": "Attach files uploaded with tempKey to a specific entity",
-        "operationId": "FilesPublicController_attachTempFiles",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AttachFilesDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Files attached successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AttachFilesResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No files found with the given tempKey"
-          }
-        },
-        "summary": "Attach temporary files to entity",
-        "tags": [
-          "Public Files"
         ]
       }
     },
@@ -2301,6 +1774,516 @@
         "summary": "Lấy cây phân cấp business categories (Public, chỉ isActive)",
         "tags": [
           "Business Categories (Public)"
+        ]
+      }
+    },
+    "/api/files/upload": {
+      "post": {
+        "description": "Uploads a file directly to the backend, which handles S3 upload internally",
+        "operationId": "FilesController_uploadFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "MEMBERSHIP_APPLICATION",
+                      "BUSINESS_LICENSE",
+                      "FINANCIAL_REPORT",
+                      "PAYMENT_PROOF",
+                      "OTHER_DOCUMENT"
+                    ],
+                    "description": "File category"
+                  },
+                  "entityId": {
+                    "type": "string",
+                    "description": "ID of the entity this file belongs to"
+                  },
+                  "entityType": {
+                    "type": "string",
+                    "description": "Type of entity this file belongs to"
+                  },
+                  "folderPath": {
+                    "type": "string",
+                    "description": "Target folder path for upload (e.g., /Documents/Projects)"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponseDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error or file type not allowed"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Upload file directly to backend",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/api/files/{id}": {
+      "get": {
+        "description": "Retrieves file metadata by ID",
+        "operationId": "FilesController_getFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "File ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File information retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get file information",
+        "tags": [
+          "Files"
+        ]
+      },
+      "delete": {
+        "description": "Deletes the file from both storage and the database",
+        "operationId": "FilesController_deleteFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "File ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File deleted successfully"
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete file",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/api/files/{id}/download": {
+      "get": {
+        "description": "Streams the file content directly from the server",
+        "operationId": "FilesController_downloadFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "File ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File content streamed",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Download file",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/api/files/{id}/download-url": {
+      "get": {
+        "description": "Get download URL for the file",
+        "operationId": "FilesController_downloadFileUrl",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "File ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download URL retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "downloadUrl": {
+                      "type": "string",
+                      "description": "Download URL for the file"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Download file url",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/api/files": {
+      "get": {
+        "description": "Retrieves all files associated with a specific entity",
+        "operationId": "FilesController_getFilesByEntity",
+        "parameters": [
+          {
+            "name": "entityType",
+            "required": true,
+            "in": "query",
+            "description": "Type of entity (e.g., User, LeaveRequest)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": true,
+            "in": "query",
+            "description": "ID of the entity",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Files retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FileResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get files by entity",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/api/files/drives/{entityType}/{entityId}/folders": {
+      "post": {
+        "description": "Creates a new folder in the specified drive",
+        "operationId": "FilesController_createFolder",
+        "parameters": [
+          {
+            "name": "entityType",
+            "required": true,
+            "in": "path",
+            "description": "Type of entity",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "entityId",
+            "required": true,
+            "in": "path",
+            "description": "ID of the entity",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFolderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Folder created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "parentId": {
+                      "type": "string"
+                    },
+                    "driveId": {
+                      "type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create folder",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/api/files/attach": {
+      "post": {
+        "description": "Attach files uploaded with tempKey to a specific entity",
+        "operationId": "FilesController_attachTempFiles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachFilesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Files attached successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachFilesResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No files found with the given tempKey"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Attach temporary files to entity",
+        "tags": [
+          "Files"
+        ]
+      }
+    },
+    "/api/public/files/upload": {
+      "post": {
+        "description": "Uploads a file directly to the backend, which handles S3 upload internally",
+        "operationId": "FilesPublicController_uploadFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "MEMBERSHIP_APPLICATION",
+                      "BUSINESS_LICENSE",
+                      "FINANCIAL_REPORT",
+                      "PAYMENT_PROOF",
+                      "OTHER_DOCUMENT"
+                    ],
+                    "description": "File category"
+                  },
+                  "entityId": {
+                    "type": "string",
+                    "description": "ID of the entity this file belongs to"
+                  },
+                  "entityType": {
+                    "type": "string",
+                    "description": "Type of entity this file belongs to"
+                  },
+                  "folderPath": {
+                    "type": "string",
+                    "description": "Target folder path for upload (e.g., /Documents/Projects)"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileResponseDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error or file type not allowed"
+          }
+        },
+        "summary": "Upload file directly to backend",
+        "tags": [
+          "Public Files"
+        ]
+      }
+    },
+    "/api/public/files/attach": {
+      "post": {
+        "description": "Attach files uploaded with tempKey to a specific entity",
+        "operationId": "FilesPublicController_attachTempFiles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachFilesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Files attached successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttachFilesResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No files found with the given tempKey"
+          }
+        },
+        "summary": "Attach temporary files to entity",
+        "tags": [
+          "Public Files"
         ]
       }
     },
@@ -3483,525 +3466,6 @@
           "newPassword"
         ]
       },
-      "CreateUserDto": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "description": "Full name of the user"
-          },
-          "email": {
-            "type": "string",
-            "description": "Email address for login",
-            "uniqueItems": true
-          },
-          "password": {
-            "type": "string",
-            "description": "Password for the user",
-            "minLength": 6
-          },
-          "role": {
-            "type": "string",
-            "description": "Role of the user",
-            "enum": [
-              "SUPER_ADMIN",
-              "ADMIN",
-              "MANAGEMENT",
-              "MEMBER"
-            ],
-            "default": "MANAGEMENT"
-          },
-          "department": {
-            "type": "string",
-            "description": "Department of the user"
-          },
-          "active": {
-            "type": "boolean",
-            "description": "Whether the user is active",
-            "default": true
-          }
-        },
-        "required": [
-          "fullName",
-          "email",
-          "password",
-          "role",
-          "active"
-        ]
-      },
-      "UpdateUserDto": {
-        "type": "object",
-        "properties": {
-          "fullName": {
-            "type": "string",
-            "description": "Full name of the user"
-          },
-          "email": {
-            "type": "string",
-            "description": "Email address for login"
-          },
-          "password": {
-            "type": "string",
-            "description": "New password (will be hashed automatically)",
-            "minLength": 6
-          },
-          "role": {
-            "type": "string",
-            "description": "Role of the user",
-            "enum": [
-              "SUPER_ADMIN",
-              "ADMIN",
-              "MANAGEMENT",
-              "MEMBER"
-            ]
-          },
-          "department": {
-            "type": "string",
-            "description": "Department of the user"
-          },
-          "active": {
-            "type": "boolean",
-            "description": "Whether the user is active"
-          }
-        }
-      },
-      "UpdateUserStatusDto": {
-        "type": "object",
-        "properties": {
-          "active": {
-            "type": "boolean",
-            "description": "Whether the user should be active or inactive"
-          }
-        },
-        "required": [
-          "active"
-        ]
-      },
-      "ResetPasswordDto": {
-        "type": "object",
-        "properties": {
-          "newPassword": {
-            "type": "string",
-            "description": "New password for the user",
-            "minLength": 6
-          }
-        },
-        "required": [
-          "newPassword"
-        ]
-      },
-      "FileResponseDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "File ID"
-          },
-          "fileName": {
-            "type": "string",
-            "description": "File name"
-          },
-          "fileType": {
-            "type": "string",
-            "enum": [
-              "IMAGE",
-              "VIDEO",
-              "AUDIO",
-              "DOCUMENT",
-              "PDF",
-              "EXCEL",
-              "OTHER"
-            ],
-            "description": "File type"
-          },
-          "storeType": {
-            "type": "string",
-            "enum": [
-              "LOCAL",
-              "S3"
-            ],
-            "description": "Storage type"
-          },
-          "mimeType": {
-            "type": "string",
-            "description": "MIME type"
-          },
-          "fileSize": {
-            "type": "number",
-            "description": "File size in bytes"
-          },
-          "storagePath": {
-            "type": "string",
-            "description": "Storage path or S3 key"
-          },
-          "publicUrl": {
-            "type": "string",
-            "description": "Public URL"
-          },
-          "checksum": {
-            "type": "string",
-            "description": "File checksum"
-          },
-          "entityType": {
-            "type": "string",
-            "description": "Entity type"
-          },
-          "entityId": {
-            "type": "string",
-            "description": "Entity ID"
-          },
-          "tempKey": {
-            "type": "string",
-            "description": "Temporary key for grouping files"
-          },
-          "category": {
-            "type": "string",
-            "description": "File category"
-          },
-          "description": {
-            "type": "string",
-            "description": "File description"
-          },
-          "folderId": {
-            "type": "string",
-            "description": "Folder ID"
-          },
-          "uploadedById": {
-            "type": "string",
-            "description": "Uploaded by user ID"
-          },
-          "visibility": {
-            "type": "string",
-            "enum": [
-              "PUBLIC",
-              "PRIVATE",
-              "INTERNAL"
-            ],
-            "description": "File visibility"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Creation date"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Last update date"
-          },
-          "deleted": {
-            "type": "boolean",
-            "description": "Whether file is deleted"
-          }
-        },
-        "required": [
-          "id",
-          "fileName",
-          "fileType",
-          "storeType",
-          "storagePath",
-          "visibility",
-          "createdAt",
-          "updatedAt",
-          "deleted"
-        ]
-      },
-      "CreateFolderDto": {
-        "type": "object",
-        "properties": {
-          "parentPath": {
-            "type": "string",
-            "description": "Parent folder path"
-          },
-          "name": {
-            "type": "string",
-            "description": "Folder name"
-          }
-        },
-        "required": [
-          "parentPath",
-          "name"
-        ]
-      },
-      "AttachFilesDto": {
-        "type": "object",
-        "properties": {
-          "tempKey": {
-            "type": "string",
-            "description": "Temporary key to identify files to attach",
-            "example": "temp_abc123"
-          },
-          "entityType": {
-            "type": "string",
-            "description": "Type of entity to attach files to",
-            "example": "MEMBER"
-          },
-          "entityId": {
-            "type": "string",
-            "description": "ID of the entity to attach files to",
-            "example": "uuid-member-id"
-          }
-        },
-        "required": [
-          "tempKey",
-          "entityType",
-          "entityId"
-        ]
-      },
-      "AttachFilesResponseDto": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "description": "Success message"
-          },
-          "updatedCount": {
-            "type": "number",
-            "description": "Number of files updated"
-          }
-        },
-        "required": [
-          "message",
-          "updatedCount"
-        ]
-      },
-      "CreateMemberEnterpriseDetailDto": {
-        "type": "object",
-        "properties": {
-          "businessRegistrationNo": {
-            "type": "string",
-            "description": "Số đăng ký kinh doanh"
-          },
-          "businessRegistrationDate": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Ngày đăng ký kinh doanh"
-          },
-          "issuedBy": {
-            "type": "string",
-            "description": "Nơi cấp"
-          },
-          "registeredCapital": {
-            "type": "number",
-            "description": "Vốn điều lệ"
-          },
-          "totalAsset": {
-            "type": "number",
-            "description": "Tổng tài sản"
-          },
-          "previousYearRevenue": {
-            "type": "number",
-            "description": "Doanh thu năm trước"
-          },
-          "totalEmployees": {
-            "type": "number",
-            "description": "Tổng số nhân viên"
-          },
-          "branchInfo": {
-            "type": "string",
-            "description": "Thông tin chi nhánh"
-          },
-          "organizationTypes": {
-            "description": "Loại hình tổ chức",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "businessRegistrationNo",
-          "organizationTypes"
-        ]
-      },
-      "CreateMemberAssociationDetailDto": {
-        "type": "object",
-        "properties": {
-          "establishmentLicenseNo": {
-            "type": "string",
-            "description": "Số quyết định thành lập"
-          },
-          "establishmentDate": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Ngày thành lập"
-          },
-          "issuedBy": {
-            "type": "string",
-            "description": "Nơi cấp"
-          },
-          "totalMembers": {
-            "type": "number",
-            "description": "Tổng số hội viên"
-          }
-        },
-        "required": [
-          "establishmentLicenseNo"
-        ]
-      },
-      "CreateMemberContactDto": {
-        "type": "object",
-        "properties": {
-          "contactRole": {
-            "type": "string",
-            "enum": [
-              "CHAIR_PERSON",
-              "CEO",
-              "CHIEF_OFFICE",
-              "SECRETARY_GENERAL",
-              "CONTACT_1",
-              "CONTACT_2"
-            ],
-            "description": "Vai trò liên hệ"
-          },
-          "fullName": {
-            "type": "string",
-            "description": "Họ và tên"
-          },
-          "gender": {
-            "type": "string",
-            "enum": [
-              "MALE",
-              "FEMALE",
-              "OTHER"
-            ],
-            "description": "Giới tính"
-          },
-          "telephone": {
-            "type": "string",
-            "description": "Số điện thoại cố định"
-          },
-          "mobile": {
-            "type": "string",
-            "description": "Số điện thoại di động"
-          },
-          "email": {
-            "type": "string",
-            "description": "Email"
-          },
-          "note": {
-            "type": "string",
-            "description": "Ghi chú"
-          }
-        },
-        "required": [
-          "contactRole",
-          "fullName"
-        ]
-      },
-      "CreateMemberDto": {
-        "type": "object",
-        "properties": {
-          "applicationType": {
-            "type": "string",
-            "enum": [
-              "ENTERPRISE",
-              "ASSOCIATION"
-            ],
-            "description": "Loại đơn đăng ký"
-          },
-          "memberType": {
-            "type": "string",
-            "enum": [
-              "LINKED",
-              "OFFICIAL",
-              "HONORARY"
-            ],
-            "description": "Loại hội viên",
-            "default": "LINKED"
-          },
-          "vietnameseName": {
-            "type": "string",
-            "description": "Tên tiếng Việt"
-          },
-          "englishName": {
-            "type": "string",
-            "description": "Tên tiếng Anh"
-          },
-          "abbreviation": {
-            "type": "string",
-            "description": "Tên viết tắt"
-          },
-          "officeAddress": {
-            "type": "string",
-            "description": "Địa chỉ trụ sở chính"
-          },
-          "businessAddress": {
-            "type": "string",
-            "description": "Địa chỉ kinh doanh"
-          },
-          "telephone": {
-            "type": "string",
-            "description": "Số điện thoại"
-          },
-          "email": {
-            "type": "string",
-            "description": "Email"
-          },
-          "website": {
-            "type": "string",
-            "description": "Website"
-          },
-          "taxCode": {
-            "type": "string",
-            "description": "Mã số thuế"
-          },
-          "expireDate": {
-            "format": "date-time",
-            "type": "string",
-            "description": "Ngày hết hạn"
-          },
-          "remarks": {
-            "type": "string",
-            "description": "Ghi chú"
-          },
-          "enterpriseDetail": {
-            "description": "Chi tiết doanh nghiệp",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CreateMemberEnterpriseDetailDto"
-              }
-            ]
-          },
-          "associationDetail": {
-            "description": "Chi tiết hiệp hội",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CreateMemberAssociationDetailDto"
-              }
-            ]
-          },
-          "contacts": {
-            "description": "Danh sách người liên hệ",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreateMemberContactDto"
-            }
-          },
-          "businessCategoryIds": {
-            "description": "Danh mục ngành nghề",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "attachmentIds": {
-            "description": "Danh sách file đính kèm",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "applicationType",
-          "vietnameseName",
-          "officeAddress",
-          "telephone",
-          "email",
-          "contacts"
-        ]
-      },
       "MemberEnterpriseDetailResponseDto": {
         "type": "object",
         "properties": {
@@ -4320,6 +3784,407 @@
           "updatedAt"
         ]
       },
+      "ProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "department": {
+            "type": "object"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "member": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MemberResponseDto"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastLogin": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "fullName",
+          "role",
+          "active",
+          "deleted",
+          "member",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Full name of the user"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address for login",
+            "uniqueItems": true
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for the user",
+            "minLength": 6
+          },
+          "role": {
+            "type": "string",
+            "description": "Role of the user",
+            "enum": [
+              "SUPER_ADMIN",
+              "ADMIN",
+              "MANAGEMENT",
+              "MEMBER"
+            ],
+            "default": "MANAGEMENT"
+          },
+          "department": {
+            "type": "string",
+            "description": "Department of the user"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the user is active",
+            "default": true
+          }
+        },
+        "required": [
+          "fullName",
+          "email",
+          "password",
+          "role",
+          "active"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Full name of the user"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email address for login"
+          },
+          "password": {
+            "type": "string",
+            "description": "New password (will be hashed automatically)",
+            "minLength": 6
+          },
+          "role": {
+            "type": "string",
+            "description": "Role of the user",
+            "enum": [
+              "SUPER_ADMIN",
+              "ADMIN",
+              "MANAGEMENT",
+              "MEMBER"
+            ]
+          },
+          "department": {
+            "type": "string",
+            "description": "Department of the user"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Whether the user is active"
+          }
+        }
+      },
+      "UpdateUserStatusDto": {
+        "type": "object",
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Whether the user should be active or inactive"
+          }
+        },
+        "required": [
+          "active"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "description": "New password for the user",
+            "minLength": 6
+          }
+        },
+        "required": [
+          "newPassword"
+        ]
+      },
+      "CreateMemberEnterpriseDetailDto": {
+        "type": "object",
+        "properties": {
+          "businessRegistrationNo": {
+            "type": "string",
+            "description": "Số đăng ký kinh doanh"
+          },
+          "businessRegistrationDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày đăng ký kinh doanh"
+          },
+          "issuedBy": {
+            "type": "string",
+            "description": "Nơi cấp"
+          },
+          "registeredCapital": {
+            "type": "number",
+            "description": "Vốn điều lệ"
+          },
+          "totalAsset": {
+            "type": "number",
+            "description": "Tổng tài sản"
+          },
+          "previousYearRevenue": {
+            "type": "number",
+            "description": "Doanh thu năm trước"
+          },
+          "totalEmployees": {
+            "type": "number",
+            "description": "Tổng số nhân viên"
+          },
+          "branchInfo": {
+            "type": "string",
+            "description": "Thông tin chi nhánh"
+          },
+          "organizationTypes": {
+            "description": "Loại hình tổ chức",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "businessRegistrationNo",
+          "organizationTypes"
+        ]
+      },
+      "CreateMemberAssociationDetailDto": {
+        "type": "object",
+        "properties": {
+          "establishmentLicenseNo": {
+            "type": "string",
+            "description": "Số quyết định thành lập"
+          },
+          "establishmentDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày thành lập"
+          },
+          "issuedBy": {
+            "type": "string",
+            "description": "Nơi cấp"
+          },
+          "totalMembers": {
+            "type": "number",
+            "description": "Tổng số hội viên"
+          }
+        },
+        "required": [
+          "establishmentLicenseNo"
+        ]
+      },
+      "CreateMemberContactDto": {
+        "type": "object",
+        "properties": {
+          "contactRole": {
+            "type": "string",
+            "enum": [
+              "CHAIR_PERSON",
+              "CEO",
+              "CHIEF_OFFICE",
+              "SECRETARY_GENERAL",
+              "CONTACT_1",
+              "CONTACT_2"
+            ],
+            "description": "Vai trò liên hệ"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Họ và tên"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE",
+              "OTHER"
+            ],
+            "description": "Giới tính"
+          },
+          "telephone": {
+            "type": "string",
+            "description": "Số điện thoại cố định"
+          },
+          "mobile": {
+            "type": "string",
+            "description": "Số điện thoại di động"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "note": {
+            "type": "string",
+            "description": "Ghi chú"
+          }
+        },
+        "required": [
+          "contactRole",
+          "fullName"
+        ]
+      },
+      "CreateMemberDto": {
+        "type": "object",
+        "properties": {
+          "applicationType": {
+            "type": "string",
+            "enum": [
+              "ENTERPRISE",
+              "ASSOCIATION"
+            ],
+            "description": "Loại đơn đăng ký"
+          },
+          "memberType": {
+            "type": "string",
+            "enum": [
+              "LINKED",
+              "OFFICIAL",
+              "HONORARY"
+            ],
+            "description": "Loại hội viên",
+            "default": "LINKED"
+          },
+          "vietnameseName": {
+            "type": "string",
+            "description": "Tên tiếng Việt"
+          },
+          "englishName": {
+            "type": "string",
+            "description": "Tên tiếng Anh"
+          },
+          "abbreviation": {
+            "type": "string",
+            "description": "Tên viết tắt"
+          },
+          "officeAddress": {
+            "type": "string",
+            "description": "Địa chỉ trụ sở chính"
+          },
+          "businessAddress": {
+            "type": "string",
+            "description": "Địa chỉ kinh doanh"
+          },
+          "telephone": {
+            "type": "string",
+            "description": "Số điện thoại"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "website": {
+            "type": "string",
+            "description": "Website"
+          },
+          "taxCode": {
+            "type": "string",
+            "description": "Mã số thuế"
+          },
+          "expireDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày hết hạn"
+          },
+          "remarks": {
+            "type": "string",
+            "description": "Ghi chú"
+          },
+          "enterpriseDetail": {
+            "description": "Chi tiết doanh nghiệp",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateMemberEnterpriseDetailDto"
+              }
+            ]
+          },
+          "associationDetail": {
+            "description": "Chi tiết hiệp hội",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateMemberAssociationDetailDto"
+              }
+            ]
+          },
+          "contacts": {
+            "description": "Danh sách người liên hệ",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateMemberContactDto"
+            }
+          },
+          "businessCategoryIds": {
+            "description": "Danh mục ngành nghề",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachmentIds": {
+            "description": "Danh sách file đính kèm",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "applicationType",
+          "vietnameseName",
+          "officeAddress",
+          "telephone",
+          "email",
+          "contacts"
+        ]
+      },
       "MemberListResponseDto": {
         "type": "object",
         "properties": {
@@ -4588,6 +4453,181 @@
             "nullable": true
           }
         }
+      },
+      "FileResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "File ID"
+          },
+          "fileName": {
+            "type": "string",
+            "description": "File name"
+          },
+          "fileType": {
+            "type": "string",
+            "enum": [
+              "IMAGE",
+              "VIDEO",
+              "AUDIO",
+              "DOCUMENT",
+              "PDF",
+              "EXCEL",
+              "OTHER"
+            ],
+            "description": "File type"
+          },
+          "storeType": {
+            "type": "string",
+            "enum": [
+              "LOCAL",
+              "S3"
+            ],
+            "description": "Storage type"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "MIME type"
+          },
+          "fileSize": {
+            "type": "number",
+            "description": "File size in bytes"
+          },
+          "storagePath": {
+            "type": "string",
+            "description": "Storage path or S3 key"
+          },
+          "publicUrl": {
+            "type": "string",
+            "description": "Public URL"
+          },
+          "checksum": {
+            "type": "string",
+            "description": "File checksum"
+          },
+          "entityType": {
+            "type": "string",
+            "description": "Entity type"
+          },
+          "entityId": {
+            "type": "string",
+            "description": "Entity ID"
+          },
+          "tempKey": {
+            "type": "string",
+            "description": "Temporary key for grouping files"
+          },
+          "category": {
+            "type": "string",
+            "description": "File category"
+          },
+          "description": {
+            "type": "string",
+            "description": "File description"
+          },
+          "folderId": {
+            "type": "string",
+            "description": "Folder ID"
+          },
+          "uploadedById": {
+            "type": "string",
+            "description": "Uploaded by user ID"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE",
+              "INTERNAL"
+            ],
+            "description": "File visibility"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Creation date"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update date"
+          },
+          "deleted": {
+            "type": "boolean",
+            "description": "Whether file is deleted"
+          }
+        },
+        "required": [
+          "id",
+          "fileName",
+          "fileType",
+          "storeType",
+          "storagePath",
+          "visibility",
+          "createdAt",
+          "updatedAt",
+          "deleted"
+        ]
+      },
+      "CreateFolderDto": {
+        "type": "object",
+        "properties": {
+          "parentPath": {
+            "type": "string",
+            "description": "Parent folder path"
+          },
+          "name": {
+            "type": "string",
+            "description": "Folder name"
+          }
+        },
+        "required": [
+          "parentPath",
+          "name"
+        ]
+      },
+      "AttachFilesDto": {
+        "type": "object",
+        "properties": {
+          "tempKey": {
+            "type": "string",
+            "description": "Temporary key to identify files to attach",
+            "example": "temp_abc123"
+          },
+          "entityType": {
+            "type": "string",
+            "description": "Type of entity to attach files to",
+            "example": "MEMBER"
+          },
+          "entityId": {
+            "type": "string",
+            "description": "ID of the entity to attach files to",
+            "example": "uuid-member-id"
+          }
+        },
+        "required": [
+          "tempKey",
+          "entityType",
+          "entityId"
+        ]
+      },
+      "AttachFilesResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success message"
+          },
+          "updatedCount": {
+            "type": "number",
+            "description": "Number of files updated"
+          }
+        },
+        "required": [
+          "message",
+          "updatedCount"
+        ]
       },
       "CreatePaymentHistoryDto": {
         "type": "object",

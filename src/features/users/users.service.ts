@@ -5,6 +5,9 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma.service';
+import { MembersService } from '../members/members.service';
+import { MemberResponseDto } from '../members/dto/member-response.dto';
+import { ProfileResponseDto } from '../../auth/dto/profile-response.dto';
 import * as bcrypt from 'bcryptjs';
 import {
   CreateUserDto,
@@ -25,7 +28,7 @@ export interface PaginatedUsers {
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private membersService: MembersService) {}
 
   async create(createUserDto: CreateUserDto) {
     // Check if email already exists
@@ -162,6 +165,40 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async findProfileById(id: string): Promise<ProfileResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        fullName: true,
+        role: true,
+        email: true,
+        department: true,
+        active: true,
+        deleted: true,
+        createdAt: true,
+        updatedAt: true,
+        lastLogin: true,
+        memberId: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    let member: MemberResponseDto | null = null;
+    if ((user as any).memberId) {
+      member = await this.membersService.findOne((user as any).memberId);
+    }
+
+    const { memberId, ...userBase } = user as any;
+    return {
+      ...userBase,
+      member,
+    } as ProfileResponseDto;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

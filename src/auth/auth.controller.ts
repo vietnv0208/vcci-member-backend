@@ -13,6 +13,8 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { UsersService } from '../features/users/users.service';
+import { ProfileResponseDto } from './dto/profile-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
@@ -26,7 +28,10 @@ import {
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('login')
   @UseGuards(LocalAuthGuard)
@@ -132,20 +137,11 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User profile retrieved successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        id: { type: 'string' },
-        email: { type: 'string' },
-        fullName: { type: 'string' },
-        role: { type: 'string' },
-        department: { type: 'string' },
-      },
-    },
+    type: ProfileResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getProfile(@Request() req) {
-    return req.user;
+  async getProfile(@Request() req): Promise<ProfileResponseDto> {
+    return this.usersService.findProfileById(req.user.id);
   }
 
   @Post('revoke-refresh-token')
@@ -184,9 +180,7 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async revokeAllRefreshTokens(
-    @Request() req,
-  ): Promise<{ message: string }> {
+  async revokeAllRefreshTokens(@Request() req): Promise<{ message: string }> {
     return this.authService.revokeAllUserRefreshTokens(req.user.id);
   }
 

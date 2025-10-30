@@ -9,11 +9,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RefreshTokenCleanupTask } from './tasks/refresh-token-cleanup.task';
 import { PrismaService } from '../common/prisma.service';
+import { UsersModule } from '../features/users/users.module';
 
 @Module({
   imports: [
     PassportModule,
     ScheduleModule.forRoot(),
+    UsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
