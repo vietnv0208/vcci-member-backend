@@ -14,7 +14,13 @@ import {
   ChangeMemberStatusDto,
   ActivateMemberDto,
 } from './dto';
-import { Prisma, MemberStatus, FeeStatus, EntityType, UserRole } from '@prisma/client';
+import {
+  Prisma,
+  MemberStatus,
+  FeeStatus,
+  EntityType,
+  UserRole,
+} from '@prisma/client';
 import { FilesService } from '../common/file-management';
 import {
   ActivityLogService,
@@ -23,6 +29,7 @@ import {
 } from '../common/activity-log';
 import { PrismaService } from '../../common/prisma.service';
 import * as bcrypt from 'bcryptjs';
+import { ProfileResponseDto } from '../../auth/dto/profile-response.dto';
 
 @Injectable()
 export class MembersService {
@@ -580,7 +587,10 @@ export class MembersService {
       }),
     );
 
-    const primaryUser = Array.isArray(member.User) && member.User.length > 0 ? member.User[0] : undefined;
+    const primaryUser =
+      Array.isArray(member.User) && member.User.length > 0
+        ? member.User[0]
+        : undefined;
 
     return {
       id: member.id,
@@ -618,5 +628,37 @@ export class MembersService {
       createdAt: member.createdAt,
       updatedAt: member.updatedAt,
     };
+  }
+
+  async findMyApplicationByUserId(
+    id: string,
+  ): Promise<MemberResponseDto> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        fullName: true,
+        role: true,
+        email: true,
+        department: true,
+        active: true,
+        deleted: true,
+        createdAt: true,
+        updatedAt: true,
+        lastLogin: true,
+        memberId: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    let member: MemberResponseDto= {} as MemberResponseDto;
+    if (user.memberId) {
+      member = await this.findOne((user as any).memberId);
+    }
+
+    return member;
   }
 }

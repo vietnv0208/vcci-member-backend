@@ -1446,6 +1446,121 @@
         ]
       }
     },
+    "/api/members-my/application": {
+      "get": {
+        "operationId": "MembersMyController_findOne",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Thông tin chi tiết đơn đăng ký",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Không tìm thấy đơn đăng ký"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Lấy thông tin chi tiết đơn đăng ký",
+        "tags": [
+          "Members (My Application)"
+        ]
+      }
+    },
+    "/api/members-my/activity-logs": {
+      "get": {
+        "operationId": "MembersMyController_getActivityLogs",
+        "parameters": [
+          {
+            "name": "action",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "SUBMIT_APPLICATION",
+                "APPROVE_APPLICATION",
+                "REJECT_APPLICATION",
+                "PAY_ANNUAL_FEE",
+                "MEMBER_ACTIVATED",
+                "MEMBER_SUSPENDED",
+                "PAY_MULTI_YEARS",
+                "EDIT_BASIC_INFO",
+                "UPDATE_ATTACHMENT",
+                "LOGIN",
+                "LOGOUT",
+                "CHANGE_PASSWORD",
+                "RESET_PASSWORD",
+                "CREATE_USER_FOR_MEMBER",
+                "CREATE_USER",
+                "UPDATE_USER",
+                "DELETE_USER",
+                "UPLOAD_FILE",
+                "DELETE_FILE"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách lịch sử hoạt động"
+          },
+          "404": {
+            "description": "Không tìm thấy hội viên"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Xem lịch sử hoạt động của hội viên",
+        "tags": [
+          "Members (My Application)"
+        ]
+      }
+    },
     "/api/business-categories": {
       "post": {
         "operationId": "BusinessCategoriesController_create",

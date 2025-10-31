@@ -148,7 +148,9 @@ export class PaymentHistoryRepository {
         vietnameseName: sortOrder,
       };
     } else {
-      orderBy[sortBy as keyof Prisma.MemberPaymentHistoryOrderByWithRelationInput] = sortOrder;
+      orderBy[
+        sortBy as keyof Prisma.MemberPaymentHistoryOrderByWithRelationInput
+      ] = sortOrder;
     }
 
     const [data, total] = await Promise.all([
@@ -179,9 +181,12 @@ export class PaymentHistoryRepository {
     };
   }
 
-  async update(id: string, data: Partial<CreatePaymentHistoryDto>): Promise<MemberPaymentHistory> {
+  async update(
+    id: string,
+    data: Partial<CreatePaymentHistoryDto>,
+  ): Promise<MemberPaymentHistory> {
     const updateData: Prisma.MemberPaymentHistoryUpdateInput = { ...data };
-    
+
     if (data.paymentDate) {
       updateData.paymentDate = new Date(data.paymentDate);
     }
@@ -242,8 +247,10 @@ export class PaymentHistoryRepository {
     });
   }
 
-  async findByPaymentCode(paymentCode: string): Promise<MemberPaymentHistory | null> {
-    return this.prisma.memberPaymentHistory.findUnique({
+  async findByPaymentCode(
+    paymentCode: string,
+  ): Promise<MemberPaymentHistory | null> {
+    return this.prisma.memberPaymentHistory.findFirst({
       where: { paymentCode },
       include: {
         member: {
@@ -268,24 +275,25 @@ export class PaymentHistoryRepository {
       where.paymentYear = year;
     }
 
-    const [totalAmount, totalCount, paidCount, pendingCount, cancelledCount] = await Promise.all([
-      this.prisma.memberPaymentHistory.aggregate({
-        where,
-        _sum: {
-          amount: true,
-        },
-      }),
-      this.prisma.memberPaymentHistory.count({ where }),
-      this.prisma.memberPaymentHistory.count({
-        where: { ...where, status: 'PAID' },
-      }),
-      this.prisma.memberPaymentHistory.count({
-        where: { ...where, status: 'PENDING' },
-      }),
-      this.prisma.memberPaymentHistory.count({
-        where: { ...where, status: 'CANCELLED' },
-      }),
-    ]);
+    const [totalAmount, totalCount, paidCount, pendingCount, cancelledCount] =
+      await Promise.all([
+        this.prisma.memberPaymentHistory.aggregate({
+          where,
+          _sum: {
+            amount: true,
+          },
+        }),
+        this.prisma.memberPaymentHistory.count({ where }),
+        this.prisma.memberPaymentHistory.count({
+          where: { ...where, status: 'PAID' },
+        }),
+        this.prisma.memberPaymentHistory.count({
+          where: { ...where, status: 'PENDING' },
+        }),
+        this.prisma.memberPaymentHistory.count({
+          where: { ...where, status: 'CANCELLED' },
+        }),
+      ]);
 
     return {
       totalAmount: totalAmount._sum.amount || 0,
@@ -296,7 +304,10 @@ export class PaymentHistoryRepository {
     };
   }
 
-  async checkDuplicatePaymentCode(paymentCode: string, excludeId?: string): Promise<boolean> {
+  async checkDuplicatePaymentCode(
+    paymentCode: string,
+    excludeId?: string,
+  ): Promise<boolean> {
     const where: Prisma.MemberPaymentHistoryWhereInput = {
       paymentCode,
     };
