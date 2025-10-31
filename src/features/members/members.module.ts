@@ -8,11 +8,14 @@ import { BusinessCategoriesModule } from '../business-categories/business-catego
 import { FilesModule } from '../common/file-management';
 import { ActivityLogModule } from '../common/activity-log/activity-log.module';
 import { MembersMyController } from './members-my.controller';
+import { PaymentHistoryModule } from './payment-history/payment-history.module';
 
 @Module({
-  imports: [BusinessCategoriesModule,
+  imports: [
+    BusinessCategoriesModule,
     FilesModule,
     ActivityLogModule,
+    PaymentHistoryModule,
   ],
   controllers: [MembersController, MembersPublicController, MembersMyController],
   providers: [MembersService, MembersRepository, PrismaService],
