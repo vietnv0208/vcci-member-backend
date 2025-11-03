@@ -12,6 +12,7 @@ import { CategoryModule } from './features/common/category/category.module';
 import { DatabaseSeederModule } from './features/database-seeder/database-seeder.module';
 import { ActivityLogModule } from './features/common/activity-log/activity-log.module';
 import { PrismaService } from './common/prisma.service';
+import { BranchCategoriesModule } from './features/branch-categories/branch-categories.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PrismaService } from './common/prisma.service';
     MembersModule,
     PaymentHistoryModule,
     BusinessCategoriesModule,
+    BranchCategoriesModule,
     CategoryModule,
     DatabaseSeederModule,
     ActivityLogModule,
