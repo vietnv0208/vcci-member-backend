@@ -5,3 +5,4 @@ export * from './enums/activity-action-type.enum';
 export * from './enums/activity-target-type.enum';
 export * from './interfaces/activity-log.interface';
 export * from './dto/create-activity-log.dto';
+export * from './utils/change-detection.util';

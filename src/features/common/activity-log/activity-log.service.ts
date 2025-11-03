@@ -48,7 +48,7 @@ export class ActivityLogService {
       },
       [ActivityActionType.EDIT_BASIC_INFO]: {
         title: 'Cập nhật thông tin',
-        description: 'Cập nhật thông tin: {fields}',
+        description: 'Cập nhật thông tin hội viên',
       },
       [ActivityActionType.UPDATE_ATTACHMENT]: {
         title: 'Cập nhật tài liệu',

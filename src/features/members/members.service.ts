@@ -27,6 +27,12 @@ import {
   ActivityActionType,
   ActivityTargetType,
 } from '../common/activity-log';
+import {
+  getChangedFields,
+  hasArrayOfObjectsChanges,
+  hasObjectChanges,
+  hasSetChanges,
+} from '../common/activity-log';
 import { PrismaService } from '../../common/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { ProfileResponseDto } from '../../auth/dto/profile-response.dto';
@@ -378,7 +384,42 @@ export class MembersService {
 
     const member = await this.membersRepository.update(id, updateData);
     // Log edit basic info with changed fields
-    const changedFields = Object.keys(memberData || {});
+    const basicChangedFields = getChangedFields(
+      memberData || {},
+      existingMember,
+    );
+
+    const extraChangedFields: string[] = [];
+    if (enterpriseDetail) {
+      const oldEnterprise = (existingMember as any).enterpriseDetail || {};
+      if (hasObjectChanges(enterpriseDetail, oldEnterprise)) {
+        extraChangedFields.push('enterpriseDetail');
+      }
+    }
+    if (associationDetail) {
+      const oldAssociation = (existingMember as any).associationDetail || {};
+      if (hasObjectChanges(associationDetail, oldAssociation)) {
+        extraChangedFields.push('associationDetail');
+      }
+    }
+    if (contacts) {
+      const oldContacts = (existingMember as any).contacts || [];
+      if (hasArrayOfObjectsChanges(contacts, oldContacts)) {
+        extraChangedFields.push('contacts');
+      }
+    }
+    if (businessCategoryIds) {
+      const oldCategoryIds = ((existingMember as any).memberBusinessCategories || []).map(
+        (mbc: any) => mbc.businessCategory?.id || mbc.businessCategoryId,
+      ).filter(Boolean);
+      if (hasSetChanges(businessCategoryIds, oldCategoryIds)) {
+        extraChangedFields.push('businessCategoryIds');
+      }
+    }
+
+    const changedFields = Array.from(
+      new Set([...basicChangedFields, ...extraChangedFields]),
+    );
     if (changedFields.length > 0) {
       await this.activityLogService.logActivity(
         ActivityActionType.EDIT_BASIC_INFO,
@@ -395,6 +436,8 @@ export class MembersService {
     }
     return this.mapToResponseDto(member);
   }
+
+  
 
   async remove(id: string): Promise<void> {
     const existingMember = await this.membersRepository.findById(id);
