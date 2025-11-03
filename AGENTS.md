@@ -363,6 +363,61 @@ export class UsersRepository {
 - Phân quyền với `@Roles(Role.ADMIN, Role.SUPER_ADMIN)`
 - Validate input với DTOs
 
+### **DTO Input Conversion (class-transformer):**
+- **Luôn sử dụng** `@Type(() => Boolean)` cho các trường kiểu boolean (đặc biệt là query params) để chuyển đổi từ string → boolean.
+- **Luôn sử dụng** `@Type(() => Number)` cho các trường kiểu số (id, pagination, limit, offset, numeric filters, v.v.) để chuyển đổi từ string → number.
+- **Lý do:** `ValidationPipe` nhận dữ liệu từ HTTP dưới dạng string; nếu không chỉ định `@Type`, validation & code-gen có thể lỗi hoặc sai kiểu.
+- **Pagination:** `limit` mặc định 20 và tối đa 99999. Luôn ràng buộc với `@Max(99999)` và đặt giá trị mặc định khi không truyền.
+
+Ví dụ cơ bản:
+```typescript
+import { Type } from 'class-transformer';
+import { IsBoolean, IsInt, IsOptional, Min, Max } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+
+export class QueryDto {
+  @IsOptional()
+  @Type(() => Boolean)
+  @IsBoolean()
+  active?: boolean;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  page?: number;
+
+  @ApiPropertyOptional({ description: 'Số bản ghi mỗi trang', default: 20 })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(99999)
+  @IsOptional()
+  limit?: number;
+}
+```
+
+Ví dụ với mảng giá trị (query như `?ids=1&ids=2` hoặc `?ids=1,2` — cần custom transform nếu dùng CSV):
+```typescript
+import { Transform, Type } from 'class-transformer';
+import { IsArray, IsInt, ArrayNotEmpty } from 'class-validator';
+
+export class IdsDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  @Transform(({ value }) =>
+    Array.isArray(value)
+      ? value.map((v) => Number(v))
+      : String(value)
+          .split(',')
+          .map((v) => Number(v.trim())),
+  )
+  @Type(() => Number)
+  @IsInt({ each: true })
+  ids: number[];
+}
+```
+
 ### **Error Messages:**
 - **Tất cả error messages phải bằng tiếng Việt**
 - **Exception types:**
