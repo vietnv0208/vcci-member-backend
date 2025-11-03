@@ -174,6 +174,13 @@ export class MemberResponseDto {
   @ApiPropertyOptional()
   remarks?: string;
 
+  @ApiPropertyOptional({ description: 'Chi nhánh VCCI' })
+  branchCategory?: {
+    id: string;
+    name: string;
+    address?: string | null;
+  };
+
   @ApiPropertyOptional({ type: MemberEnterpriseDetailResponseDto })
   enterpriseDetail?: MemberEnterpriseDetailResponseDto;
 

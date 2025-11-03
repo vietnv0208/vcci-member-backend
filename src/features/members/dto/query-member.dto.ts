@@ -32,6 +32,11 @@ export class QueryMemberDto {
   @IsString()
   businessCategoryId?: string;
 
+  @ApiPropertyOptional({ description: 'Lọc theo chi nhánh VCCI' })
+  @IsOptional()
+  @IsString()
+  branchCategoryId?: string;
+
   @ApiPropertyOptional({ description: 'Lọc theo ngày đăng ký từ' })
   @IsOptional()
   @IsDateString()

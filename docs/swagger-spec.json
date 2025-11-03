@@ -892,6 +892,15 @@
             }
           },
           {
+            "name": "branchCategoryId",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo chi nhánh VCCI",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "submittedDateFrom",
             "required": false,
             "in": "query",
@@ -4119,6 +4128,10 @@
           "remarks": {
             "type": "string"
           },
+          "branchCategory": {
+            "type": "object",
+            "description": "Chi nhánh VCCI"
+          },
           "enterpriseDetail": {
             "$ref": "#/components/schemas/MemberEnterpriseDetailResponseDto"
           },
@@ -4538,6 +4551,10 @@
             "type": "string",
             "description": "Ghi chú"
           },
+          "branchCategoryId": {
+            "type": "string",
+            "description": "ID chi nhánh VCCI"
+          },
           "enterpriseDetail": {
             "description": "Chi tiết doanh nghiệp",
             "allOf": [
@@ -4680,6 +4697,10 @@
           "remarks": {
             "type": "string",
             "description": "Ghi chú"
+          },
+          "branchCategoryId": {
+            "type": "string",
+            "description": "ID chi nhánh VCCI"
           },
           "enterpriseDetail": {
             "description": "Chi tiết doanh nghiệp",

@@ -55,6 +55,7 @@ export class MembersService {
       associationDetail,
       contacts,
       businessCategoryIds,
+      branchCategoryId,
       ...memberData
     } = createMemberDto;
 
@@ -98,6 +99,15 @@ export class MembersService {
         create: contacts,
       },
     };
+
+    // Set branch category if provided
+    if (branchCategoryId) {
+      const exists = await this.prisma.branchCategory.findUnique({ where: { id: branchCategoryId } });
+      if (!exists) {
+        throw new BadRequestException('Chi nhánh không tồn tại');
+      }
+      createData.branchCategory = { connect: { id: branchCategoryId } } as any;
+    }
 
     // Add enterprise detail if exists
     if (enterpriseDetail) {
@@ -308,6 +318,7 @@ export class MembersService {
       associationDetail,
       contacts,
       businessCategoryIds,
+      branchCategoryId,
       ...memberData
     } = updateMemberDto;
 
@@ -335,6 +346,19 @@ export class MembersService {
     const updateData: Prisma.MemberUpdateInput = {
       ...memberData,
     };
+
+    // Update branch category
+    if (typeof branchCategoryId !== 'undefined') {
+      if (branchCategoryId === null || branchCategoryId === '') {
+        updateData.branchCategory = { disconnect: true } as any;
+      } else {
+        const exists = await this.prisma.branchCategory.findUnique({ where: { id: branchCategoryId } });
+        if (!exists) {
+          throw new BadRequestException('Chi nhánh không tồn tại');
+        }
+        updateData.branchCategory = { connect: { id: branchCategoryId } } as any;
+      }
+    }
 
     // Update enterprise detail
     if (enterpriseDetail) {
@@ -656,6 +680,13 @@ export class MembersService {
       joinDate: member.joinDate,
       expireDate: member.expireDate,
       remarks: member.remarks,
+      branchCategory: member.branchCategory
+        ? {
+            id: member.branchCategory.id,
+            name: member.branchCategory.name,
+            address: member.branchCategory.address,
+          }
+        : undefined,
       enterpriseDetail: member.enterpriseDetail,
       associationDetail: member.associationDetail,
       contacts: member.contacts || [],
