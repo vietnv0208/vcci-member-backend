@@ -74,16 +74,16 @@ export class MembersService {
       );
     }
 
-    // Check if email already exists
-    const existingMember = await this.membersRepository.findMany({
-      search: createMemberDto.email,
-      page: 1,
-      limit: 1,
-    });
-
-    if (existingMember.total > 0) {
-      throw new ConflictException('Email đã tồn tại trong hệ thống');
-    }
+    // // Check if email already exists
+    // const existingMember = await this.membersRepository.findMany({
+    //   search: createMemberDto.email,
+    //   page: 1,
+    //   limit: 1,
+    // });
+    //
+    // if (existingMember.total > 0) {
+    //   throw new ConflictException('Email đã tồn tại trong hệ thống');
+    // }
 
     // Generate member code
     // const code = await this.membersRepository.generateMemberCode();
