@@ -25,6 +25,7 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        branchCategory: true,
         User: {
           select: { id: true, fullName: true, email: true },
         },
@@ -58,6 +59,7 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        branchCategory: true,
         User: {
           select: { id: true, fullName: true, email: true },
         },
@@ -92,6 +94,7 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        branchCategory: true,
         User: {
           select: { id: true, fullName: true, email: true },
         },
@@ -125,6 +128,7 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        branchCategory: true,
         User: {
           select: { id: true, fullName: true, email: true },
         },
@@ -161,6 +165,7 @@ export class MembersRepository {
       memberType,
       status,
       businessCategoryId,
+      branchCategoryId,
       submittedDateFrom,
       submittedDateTo,
       approvedDateFrom,
@@ -185,6 +190,10 @@ export class MembersRepository {
         { code: { contains: search, mode: 'insensitive' } },
         { applicationCode: { contains: search, mode: 'insensitive' } },
       ];
+    }
+
+    if (branchCategoryId) {
+      where.branchCategoryId = branchCategoryId;
     }
 
     if (applicationType) {
@@ -251,6 +260,7 @@ export class MembersRepository {
           enterpriseDetail: true,
           associationDetail: true,
           contacts: true,
+          branchCategory: true,
           User: {
             select: { id: true, fullName: true, email: true },
           },
@@ -290,6 +300,7 @@ export class MembersRepository {
         enterpriseDetail: true,
         associationDetail: true,
         contacts: true,
+        branchCategory: true,
         statusHistories: {
           include: {
             changedBy: {

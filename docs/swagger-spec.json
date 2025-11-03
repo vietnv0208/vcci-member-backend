@@ -892,6 +892,15 @@
             }
           },
           {
+            "name": "branchCategoryId",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo chi nhánh VCCI",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "submittedDateFrom",
             "required": false,
             "in": "query",
@@ -3029,6 +3038,248 @@
         ]
       }
     },
+    "/api/branch-categories": {
+      "post": {
+        "operationId": "BranchCategoriesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBranchCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tạo chi nhánh thành công"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Tạo chi nhánh mới",
+        "tags": [
+          "Branch Categories"
+        ]
+      },
+      "get": {
+        "operationId": "BranchCategoriesController_findAll",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Từ khóa tìm kiếm theo tên",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo trạng thái hoạt động",
+            "schema": {
+              "$ref": "#/components/schemas/Object"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Trang",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Số bản ghi mỗi trang",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "description": "Sắp xếp theo trường",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "description": "Thứ tự sắp xếp",
+            "schema": {
+              "default": "asc",
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lấy danh sách chi nhánh thành công"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Danh sách chi nhánh (phân trang, lọc)",
+        "tags": [
+          "Branch Categories"
+        ]
+      }
+    },
+    "/api/branch-categories/{id}": {
+      "get": {
+        "operationId": "BranchCategoriesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lấy chi tiết chi nhánh thành công"
+          },
+          "404": {
+            "description": "Không tìm thấy chi nhánh"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Chi tiết chi nhánh",
+        "tags": [
+          "Branch Categories"
+        ]
+      },
+      "patch": {
+        "operationId": "BranchCategoriesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBranchCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cập nhật thành công"
+          },
+          "404": {
+            "description": "Không tìm thấy chi nhánh"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Cập nhật chi nhánh",
+        "tags": [
+          "Branch Categories"
+        ]
+      },
+      "delete": {
+        "operationId": "BranchCategoriesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Xóa chi nhánh thành công"
+          },
+          "404": {
+            "description": "Không tìm thấy chi nhánh"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Xóa chi nhánh",
+        "tags": [
+          "Branch Categories"
+        ]
+      }
+    },
+    "/api/public/branch-categories": {
+      "get": {
+        "operationId": "BranchCategoriesPublicController_getActive",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Từ khóa tìm kiếm theo tên",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Danh sách chi nhánh active"
+          }
+        },
+        "summary": "Lấy danh sách chi nhánh đang hoạt động (Public)",
+        "tags": [
+          "Branch Categories (Public)"
+        ]
+      }
+    },
     "/api/common/categories": {
       "get": {
         "description": "Supports filtering by type, searching by code/name, and pagination",
@@ -3877,6 +4128,10 @@
           "remarks": {
             "type": "string"
           },
+          "branchCategory": {
+            "type": "object",
+            "description": "Chi nhánh VCCI"
+          },
           "enterpriseDetail": {
             "$ref": "#/components/schemas/MemberEnterpriseDetailResponseDto"
           },
@@ -4296,6 +4551,10 @@
             "type": "string",
             "description": "Ghi chú"
           },
+          "branchCategoryId": {
+            "type": "string",
+            "description": "ID chi nhánh VCCI"
+          },
           "enterpriseDetail": {
             "description": "Chi tiết doanh nghiệp",
             "allOf": [
@@ -4438,6 +4697,10 @@
           "remarks": {
             "type": "string",
             "description": "Ghi chú"
+          },
+          "branchCategoryId": {
+            "type": "string",
+            "description": "ID chi nhánh VCCI"
           },
           "enterpriseDetail": {
             "description": "Chi tiết doanh nghiệp",
@@ -5041,6 +5304,45 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "CreateBranchCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Tên chi nhánh"
+          },
+          "address": {
+            "type": "string",
+            "description": "Địa chỉ chi nhánh"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Trạng thái hoạt động",
+            "default": true
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateBranchCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Tên chi nhánh"
+          },
+          "address": {
+            "type": "string",
+            "description": "Địa chỉ chi nhánh"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Trạng thái hoạt động",
+            "default": true
           }
         }
       },

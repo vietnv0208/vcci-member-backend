@@ -191,6 +191,11 @@ export class CreateMemberDto {
   @IsString()
   remarks?: string;
 
+  @ApiPropertyOptional({ description: 'ID chi nhánh VCCI' })
+  @IsOptional()
+  @IsString()
+  branchCategoryId?: string;
+
   @ApiPropertyOptional({ description: 'Chi tiết doanh nghiệp' })
   @IsOptional()
   @ValidateNested()

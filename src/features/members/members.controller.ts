@@ -96,6 +96,12 @@ export class MembersController {
     description: 'Lọc theo ngành nghề kinh doanh (sẽ tìm cả category con)',
   })
   @ApiQuery({
+    name: 'branchCategoryId',
+    required: false,
+    type: String,
+    description: 'Lọc theo chi nhánh VCCI',
+  })
+  @ApiQuery({
     name: 'page',
     required: false,
     type: Number,

@@ -275,6 +275,9 @@ model Member {
   associationDetail        MemberAssociationDetail?
   memberBusinessCategories MemberEnterpriseBusinessCategory[] // productsServices Sản phẩm, dịch vụ chính va activityArea
 
+  branchCategoryId String?
+  branchCategory   BranchCategory? @relation(fields: [branchCategoryId], references: [id], onDelete: SetNull)
+
   contacts        MemberContact[]
   statusHistories MemberStatusHistory[]
   attachmentIds   String[]
@@ -418,3 +421,13 @@ model ActivityLog {
 }
 
 // ======================================================
+
+model BranchCategory {
+  id       String   @id @default(cuid())
+  name     String
+  address  String?
+  isActive Boolean  @default(true)
+  Member   Member[]
+
+  @@map("branch_categories")
+}
