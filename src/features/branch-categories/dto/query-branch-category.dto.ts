@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBooleanString, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class QueryBranchCategoryDto {
   @ApiPropertyOptional({ description: 'Từ khóa tìm kiếm theo tên' })
@@ -9,16 +10,19 @@ export class QueryBranchCategoryDto {
 
   @ApiPropertyOptional({ description: 'Lọc theo trạng thái hoạt động' })
   @IsBooleanString()
+  @Type(() => Boolean)
   @IsOptional()
   isActive?: any;
 
   @ApiPropertyOptional({ description: 'Trang', default: 1 })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   @IsOptional()
   page?: number;
 
   @ApiPropertyOptional({ description: 'Số bản ghi mỗi trang', default: 20 })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
