@@ -450,7 +450,7 @@ export class MembersService {
         {
           memberCode: member.code || member.applicationCode,
           memberName: member.vietnameseName,
-          fields: changedFields.join(', '),
+          // fields: changedFields.join(', '),
         },
         {
           targetType: ActivityTargetType.MEMBER,
