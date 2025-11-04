@@ -397,7 +397,7 @@ export class MembersRepository {
 
   async activateMember(
     id: string,
-    paymentDto: ActivateMemberDto,
+    paymentDto: CreatePaymentHistoryDto,
     changedById?: string,
   ): Promise<{ member: Member; paymentHistory: MemberPaymentHistory }> {
     const code = await this.generateMemberCode();

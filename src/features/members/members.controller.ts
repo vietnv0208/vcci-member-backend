@@ -246,7 +246,7 @@ export class MembersController {
   })
   async activateMember(
     @Param('id') id: string,
-    @Body() paymentDto: ActivateMemberDto,
+    @Body() paymentDto: CreatePaymentHistoryDto,
     @Request() req,
   ): Promise<MemberResponseDto> {
     return this.membersService.activateMember(id, paymentDto, req.user.userId);
