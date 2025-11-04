@@ -36,6 +36,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ApplicationType, MemberStatus, MemberType } from '@prisma/client';
+import { MemberClassification } from './dto/classification.enum';
 
 @ApiTags('Members')
 @ApiBearerAuth('JWT-auth')
@@ -88,6 +89,12 @@ export class MembersController {
     name: 'status',
     required: false,
     enum: MemberStatus,
+  })
+  @ApiQuery({
+    name: 'classification',
+    required: false,
+    enum: MemberClassification,
+    description: 'Lọc theo phân hạng hội viên',
   })
   @ApiQuery({
     name: 'businessCategoryId',

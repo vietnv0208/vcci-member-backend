@@ -164,6 +164,7 @@ export class MembersRepository {
       applicationType,
       memberType,
       status,
+      classification,
       businessCategoryId,
       branchCategoryId,
       submittedDateFrom,
@@ -206,6 +207,10 @@ export class MembersRepository {
 
     if (status) {
       where.status = status;
+    }
+
+    if (classification) {
+      where.classification = classification;
     }
 
     // Filter by business category (including descendants)

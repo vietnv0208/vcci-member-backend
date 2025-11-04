@@ -882,6 +882,21 @@
             }
           },
           {
+            "name": "classification",
+            "required": false,
+            "in": "query",
+            "description": "Lọc theo phân hạng hội viên",
+            "schema": {
+              "enum": [
+                "NONE",
+                "BASIC",
+                "SPECIAL",
+                "PREMIUM"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "businessCategoryId",
             "required": false,
             "in": "query",
@@ -4109,6 +4124,16 @@
           "taxCode": {
             "type": "string"
           },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "BASIC",
+              "SPECIAL",
+              "PREMIUM"
+            ],
+            "description": "Phân hạng hội viên"
+          },
           "submittedDate": {
             "format": "date-time",
             "type": "string"
@@ -4542,6 +4567,16 @@
             "type": "string",
             "description": "Mã số thuế"
           },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "BASIC",
+              "SPECIAL",
+              "PREMIUM"
+            ],
+            "description": "Phân hạng hội viên"
+          },
           "expireDate": {
             "format": "date-time",
             "type": "string",
@@ -4688,6 +4723,16 @@
           "taxCode": {
             "type": "string",
             "description": "Mã số thuế"
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "BASIC",
+              "SPECIAL",
+              "PREMIUM"
+            ],
+            "description": "Phân hạng hội viên"
           },
           "expireDate": {
             "format": "date-time",

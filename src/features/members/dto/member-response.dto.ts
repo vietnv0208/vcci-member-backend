@@ -6,6 +6,7 @@ import {
   ContactRole,
   Gender,
 } from '@prisma/client';
+import { MemberClassification } from './classification.enum';
 
 export class BusinessCategoryResponseDto {
   @ApiProperty({ description: 'ID của business category' })
@@ -158,6 +159,12 @@ export class MemberResponseDto {
 
   @ApiPropertyOptional()
   taxCode?: string;
+
+  @ApiPropertyOptional({
+    enum: MemberClassification,
+    description: 'Phân hạng hội viên',
+  })
+  classification?: MemberClassification;
 
   @ApiPropertyOptional()
   submittedDate?: Date;

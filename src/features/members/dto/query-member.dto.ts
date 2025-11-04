@@ -2,6 +2,7 @@ import { IsOptional, IsString, IsEnum, IsDateString, IsInt, Min, Max } from 'cla
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ApplicationType, MemberType, MemberStatus } from '@prisma/client';
+import { MemberClassification } from './classification.enum';
 
 export class QueryMemberDto {
   @ApiPropertyOptional({ description: 'Tìm kiếm theo tên, email, mã số thuế' })
@@ -23,6 +24,11 @@ export class QueryMemberDto {
   @IsOptional()
   @IsEnum(MemberStatus)
   status?: MemberStatus;
+
+  @ApiPropertyOptional({ enum: MemberClassification, description: 'Lọc theo phân hạng hội viên' })
+  @IsOptional()
+  @IsEnum(MemberClassification)
+  classification?: MemberClassification;
 
   @ApiPropertyOptional({ 
     description: 'Lọc theo ngành nghề kinh doanh (sẽ tìm cả category con)',

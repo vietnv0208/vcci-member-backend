@@ -19,6 +19,7 @@ import {
   Gender,
   OrganizationType,
 } from '@prisma/client';
+import { MemberClassification } from './classification.enum';
 
 export class CreateMemberContactDto {
   @ApiProperty({ enum: ContactRole, description: 'Vai trò liên hệ' })
@@ -180,6 +181,14 @@ export class CreateMemberDto {
   @IsOptional()
   @IsString()
   taxCode?: string;
+
+  @ApiPropertyOptional({
+    enum: MemberClassification,
+    description: 'Phân hạng hội viên',
+  })
+  @IsOptional()
+  @IsEnum(MemberClassification)
+  classification?: MemberClassification;
 
   @ApiPropertyOptional({ description: 'Ngày hết hạn' })
   @IsOptional()

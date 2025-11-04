@@ -675,6 +675,7 @@ export class MembersService {
       email: member.email,
       website: member.website,
       taxCode: member.taxCode,
+      classification: member.classification,
       submittedDate: member.submittedDate,
       approvedDate: member.approvedDate,
       joinDate: member.joinDate,
