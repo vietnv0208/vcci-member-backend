@@ -20,6 +20,7 @@ import {
   FeeStatus,
   EntityType,
   UserRole,
+  ApplicationType,
 } from '@prisma/client';
 import { FilesService } from '../common/file-management';
 import {
@@ -45,6 +46,17 @@ export class MembersService {
     private readonly activityLogService: ActivityLogService,
     private readonly prisma: PrismaService,
   ) {}
+
+  /**
+   * Helper function để map ApplicationType sang tên tiếng Việt
+   */
+  private getApplicationTypeName(applicationType: ApplicationType): string {
+    const typeMap: Record<ApplicationType, string> = {
+      [ApplicationType.ENTERPRISE]: 'Doanh nghiệp',
+      [ApplicationType.ASSOCIATION]: 'Hiệp hội',
+    };
+    return typeMap[applicationType] || applicationType;
+  }
 
   async create(
     createMemberDto: CreateMemberDto,
@@ -174,6 +186,7 @@ export class MembersService {
     await this.activityLogService.logActivity(
       ActivityActionType.SUBMIT_APPLICATION,
       {
+        applicationTypeName: this.getApplicationTypeName(member.applicationType),
         memberCode: member.applicationCode,
         memberName: member.vietnameseName,
         date: new Date().toLocaleDateString('vi-VN'),

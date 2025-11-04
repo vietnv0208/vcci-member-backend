@@ -41,15 +41,21 @@ export class PaymentHistoryService {
     const paymentHistory = await this.paymentHistoryRepository.create(createPaymentHistoryDto);
 
     // Log pay annual fee / multi years
+    const isMultiYears = !createPaymentHistoryDto.paymentYear;
     await this.activityLogService.logActivity(
-      createPaymentHistoryDto.paymentYear
-        ? ActivityActionType.PAY_ANNUAL_FEE
-        : ActivityActionType.PAY_MULTI_YEARS,
+      isMultiYears
+        ? ActivityActionType.PAY_MULTI_YEARS
+        : ActivityActionType.PAY_ANNUAL_FEE,
       {
         memberName: member.vietnameseName,
         memberCode: member.code || member.applicationCode,
         year: createPaymentHistoryDto.paymentYear,
-        years: createPaymentHistoryDto.paymentYear,
+        // For PAY_MULTI_YEARS, years should be a formatted string (e.g., "2024, 2025, 2026")
+        // Currently paymentYear is required, so this will be a single year
+        // In the future, if multi-year payment is implemented, this should be an array formatted as string
+        years: createPaymentHistoryDto.paymentYear
+          ? String(createPaymentHistoryDto.paymentYear)
+          : '',
         amount: createPaymentHistoryDto.amount,
       },
       {

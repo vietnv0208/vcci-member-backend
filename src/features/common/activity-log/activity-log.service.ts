@@ -17,7 +17,7 @@ export class ActivityLogService {
     {
       [ActivityActionType.SUBMIT_APPLICATION]: {
         title: 'Nộp hồ sơ gia nhập',
-        description: 'Nộp hồ sơ gia nhập VCCI ngày {date}',
+        description: '{applicationTypeName} {memberName} Nộp hồ sơ gia nhập VCCI ngày {date}',
       },
       [ActivityActionType.APPROVE_APPLICATION]: {
         title: 'Xét duyệt hồ sơ',
@@ -30,7 +30,7 @@ export class ActivityLogService {
       },
       [ActivityActionType.PAY_ANNUAL_FEE]: {
         title: 'Thanh toán hội phí',
-        description: 'Thanh toán hội phí năm {year}, Số tiền: {amount} VNĐ',
+        description: 'Hội viên {memberName} - {memberCode} thanh toán hội phí năm {year}, Số tiền: {amount} VNĐ',
       },
       [ActivityActionType.MEMBER_ACTIVATED]: {
         title: 'Kích hoạt hội viên',
@@ -44,7 +44,7 @@ export class ActivityLogService {
       },
       [ActivityActionType.PAY_MULTI_YEARS]: {
         title: 'Thanh toán nhiều năm',
-        description: 'Thanh toán hội phí các năm {years}, Tổng: {amount} VNĐ',
+        description: 'Hội viên {memberName} - {memberCode} thanh toán hội phí các năm {years}, Tổng: {amount} VNĐ',
       },
       [ActivityActionType.EDIT_BASIC_INFO]: {
         title: 'Cập nhật thông tin',
