@@ -671,6 +671,7 @@ export class MembersService {
             existingId,
             dto as unknown as UpdateMemberDto,
           );
+          await this.upsertPaymentYears(updated.id, dto.paymentYears);
           details.updated.push({
             id: updated.id,
             code: updated.code,
@@ -680,6 +681,7 @@ export class MembersService {
           });
         } else {
           const created = await this.create(dto, userId);
+          await this.upsertPaymentYears(created.id, dto.paymentYears);
           details.created.push({
             id: created.id,
             code: created.code,
@@ -705,6 +707,40 @@ export class MembersService {
       },
       details,
     };
+  }
+
+  private extractYearsFromString(input?: string): number[] {
+    if (!input) return [];
+    const matches = input.match(/(?:19|20)\d{2}/g) || [];
+    const years = matches
+      .map((y) => parseInt(y, 10))
+      .filter((y) => y >= 1900 && y <= 2100);
+    return Array.from(new Set(years));
+  }
+
+  private async upsertPaymentYears(
+    memberId: string,
+    paymentYears?: string,
+  ): Promise<void> {
+    const years = this.extractYearsFromString(paymentYears);
+    if (years.length === 0) return;
+
+    for (const year of years) {
+      const exists = await this.prisma.memberPaymentHistory.findFirst({
+        where: { memberId, paymentYear: year },
+        select: { id: true },
+      });
+      if (exists) continue;
+      await this.prisma.memberPaymentHistory.create({
+        data: {
+          memberId,
+          paymentYear: year,
+          paymentName: `Hội phí năm ${year}`,
+          note: `Nhập từ file excel`,
+          attachmentIds: [],
+        },
+      });
+    }
   }
 
   private validateStatusTransition(

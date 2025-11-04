@@ -8,7 +8,13 @@ export class UpsertMemberDto extends CreateMemberDto {
   @IsString()
   code?: string;
 
-  paymentYears: string;// text từ file excel example: 2001200320042006|
+  @ApiPropertyOptional({
+    description:
+      'Chuỗi năm hội phí từ file import. Có thể là nối liền hoặc có ký tự phân tách. Ví dụ: "2001200320042006|" hoặc "2001,2003,2004,2006"',
+  })
+  @IsOptional()
+  @IsString()
+  paymentYears?: string; // text từ file excel
 
 }
 
