@@ -4813,33 +4813,12 @@
       "ActivateMemberDto": {
         "type": "object",
         "properties": {
-          "feeAmount": {
-            "type": "number",
-            "description": "Số tiền hội phí",
-            "example": 5000000,
-            "minimum": 0
-          },
-          "attachmentIds": {
-            "description": "Danh sách ID file đính kèm (chứng từ thanh toán)",
-            "example": [
-              "file-id-1",
-              "file-id-2"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "note": {
+          "memberId": {
             "type": "string",
-            "description": "Ghi chú cho khoản thanh toán",
-            "example": "Hội phí năm 2024"
+            "description": "ID của hội viên",
+            "example": ""
           }
-        },
-        "required": [
-          "feeAmount",
-          "attachmentIds"
-        ]
+        }
       },
       "CreateMemberAccountDto": {
         "type": "object",

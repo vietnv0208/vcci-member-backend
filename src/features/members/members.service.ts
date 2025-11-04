@@ -11,9 +11,9 @@ import {
   QueryMemberDto,
   MemberResponseDto,
   MemberListResponseDto,
-  ChangeMemberStatusDto,
-  ActivateMemberDto,
+  ChangeMemberStatusDto, ActivateMemberDto,
 } from './dto';
+import { CreatePaymentHistoryDto } from './payment-history/dto/create-payment-history.dto';
 import {
   Prisma,
   MemberStatus,
@@ -547,7 +547,7 @@ export class MembersService {
 
   async activateMember(
     id: string,
-    activateDto: ActivateMemberDto,
+    paymentDto: ActivateMemberDto,
     userId?: string,
   ): Promise<MemberResponseDto> {
     const existingMember = await this.membersRepository.findById(id);
@@ -563,22 +563,26 @@ export class MembersService {
       );
     }
 
+    // Override memberId from DTO with URL param
+    const paymentData = {
+      ...paymentDto,
+      memberId: id,
+    };
+
     // Activate member with payment
     const { member, paymentHistory } =
       await this.membersRepository.activateMember(
         id,
-        activateDto.feeAmount,
-        activateDto.attachmentIds,
+        paymentData,
         userId,
-        activateDto.note,
       );
     if (
-      activateDto.attachmentIds &&
-      activateDto.attachmentIds.length > 0 &&
+      paymentDto.attachmentIds &&
+      paymentDto.attachmentIds.length > 0 &&
       paymentHistory?.id
     ) {
       await this.filesService.attachByFileIds(
-        activateDto.attachmentIds,
+        paymentDto.attachmentIds,
         EntityType.MEMBER_PAYMENT,
         paymentHistory.id,
       );
@@ -589,7 +593,7 @@ export class MembersService {
         {
           memberCode: member.code,
           memberName: member.vietnameseName,
-          fileName: `${activateDto.attachmentIds.length} tệp đính kèm`,
+          fileName: `${paymentDto.attachmentIds.length} tệp đính kèm`,
         },
         {
           targetType: ActivityTargetType.MEMBER,
@@ -605,8 +609,8 @@ export class MembersService {
       {
         memberCode: member.code || member.applicationCode,
         memberName: member.vietnameseName,
-        feeAmount: activateDto.feeAmount,
-        note: activateDto.note,
+        feeAmount: paymentDto.amount,
+        note: paymentDto.note,
       },
       {
         targetType: ActivityTargetType.MEMBER,
