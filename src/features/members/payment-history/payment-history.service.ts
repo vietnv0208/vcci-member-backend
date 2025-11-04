@@ -27,15 +27,15 @@ export class PaymentHistoryService {
     if (!member) {
       throw new NotFoundException(`Không tìm thấy hội viên với ID ${createPaymentHistoryDto.memberId}`);
     }
-
-    // Kiểm tra mã giao dịch đã tồn tại chưa
-    const existingPayment = await this.paymentHistoryRepository.findByPaymentCode(
-      createPaymentHistoryDto.paymentCode,
-    );
-
-    if (existingPayment) {
-      throw new ConflictException(`Mã giao dịch ${createPaymentHistoryDto.paymentCode} đã tồn tại trong hệ thống`);
-    }
+    //
+    // // Kiểm tra mã giao dịch đã tồn tại chưa
+    // const existingPayment = await this.paymentHistoryRepository.findByPaymentCode(
+    //   createPaymentHistoryDto.paymentCode,
+    // );
+    //
+    // if (existingPayment) {
+    //   throw new ConflictException(`Mã giao dịch ${createPaymentHistoryDto.paymentCode} đã tồn tại trong hệ thống`);
+    // }
 
     // Tạo lịch sử thanh toán
     const paymentHistory = await this.paymentHistoryRepository.create(createPaymentHistoryDto);
@@ -125,17 +125,17 @@ export class PaymentHistoryService {
       }
     }
 
-    // Nếu cập nhật paymentCode, kiểm tra trùng lặp
-    if (updatePaymentHistoryDto.paymentCode) {
-      const isDuplicate = await this.paymentHistoryRepository.checkDuplicatePaymentCode(
-        updatePaymentHistoryDto.paymentCode,
-        id,
-      );
-
-      if (isDuplicate) {
-        throw new ConflictException(`Mã giao dịch ${updatePaymentHistoryDto.paymentCode} đã tồn tại trong hệ thống`);
-      }
-    }
+    // // Nếu cập nhật paymentCode, kiểm tra trùng lặp
+    // if (updatePaymentHistoryDto.paymentCode) {
+    //   const isDuplicate = await this.paymentHistoryRepository.checkDuplicatePaymentCode(
+    //     updatePaymentHistoryDto.paymentCode,
+    //     id,
+    //   );
+    //
+    //   if (isDuplicate) {
+    //     throw new ConflictException(`Mã giao dịch ${updatePaymentHistoryDto.paymentCode} đã tồn tại trong hệ thống`);
+    //   }
+    // }
 
     const updatedPaymentHistory = await this.paymentHistoryRepository.update(id, updatePaymentHistoryDto);
 
