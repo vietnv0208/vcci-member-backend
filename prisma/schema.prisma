@@ -310,8 +310,8 @@ model MemberEnterpriseDetail {
 model MemberAssociationDetail {
   id                     String    @id @default(cuid())
   memberId               String    @unique
-  establishmentLicenseNo String
-  establishmentDate      DateTime?
+  establishmentLicenseNo String //Quyết định thành lập số 
+  establishmentDate      DateTime? //Ngày/tháng/năm ký quyết định
   issuedBy               String?
   totalMembers           Int?
 
