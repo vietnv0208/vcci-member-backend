@@ -13,6 +13,7 @@ import {
   MemberListResponseDto,
   ChangeMemberStatusDto,
   ActivateMemberDto,
+  UpsertMemberDto,
 } from './dto';
 import { CreatePaymentHistoryDto } from './payment-history/dto/create-payment-history.dto';
 import {
@@ -301,6 +302,18 @@ export class MembersService {
 
     if (!member) {
       throw new NotFoundException(`Không tìm thấy hội viên với mã ${code}`);
+    }
+
+    return this.mapToResponseDto(member);
+  }
+
+  async findByVietnameseName(name: string): Promise<MemberResponseDto> {
+    const member = await this.membersRepository.findByVietnameseNameExact(name);
+
+    if (!member) {
+      throw new NotFoundException(
+        `Không tìm thấy hội viên với tên tiếng Việt "${name}"`,
+      );
     }
 
     return this.mapToResponseDto(member);
@@ -629,6 +642,69 @@ export class MembersService {
 
   async getStatistics() {
     return this.membersRepository.getStatistics();
+  }
+
+  async bulkUpsert(dtos: UpsertMemberDto[], userId?: string): Promise<any> {
+    const details = {
+      created: [] as any[],
+      updated: [] as any[],
+      errors: [] as any[],
+    };
+
+    for (const dto of dtos) {
+      try {
+        let existingId: string | null = null;
+
+        if (dto.code) {
+          const byCode = await this.membersRepository.findByCode(dto.code);
+          if (byCode) existingId = byCode.id;
+        }
+        if (!existingId && dto.vietnameseName) {
+          const byName = await this.membersRepository.findByVietnameseNameExact(
+            dto.vietnameseName,
+          );
+          if (byName) existingId = byName.id;
+        }
+
+        if (existingId) {
+          const updated = await this.update(
+            existingId,
+            dto as unknown as UpdateMemberDto,
+          );
+          details.updated.push({
+            id: updated.id,
+            code: updated.code,
+            applicationCode: updated.applicationCode,
+            vietnameseName: updated.vietnameseName,
+            action: 'updated',
+          });
+        } else {
+          const created = await this.create(dto, userId);
+          details.created.push({
+            id: created.id,
+            code: created.code,
+            applicationCode: created.applicationCode,
+            vietnameseName: created.vietnameseName,
+            action: 'created',
+          });
+        }
+      } catch (error: any) {
+        details.errors.push({
+          key: dto.code || dto.vietnameseName,
+          error: error?.message || 'Lỗi không xác định',
+        });
+      }
+    }
+
+    return {
+      summary: {
+        total: dtos.length,
+        created: details.created.length,
+        updated: details.updated.length,
+        errors: details.errors.length,
+      },
+      details,
+    };
   }
 
   private validateStatusTransition(

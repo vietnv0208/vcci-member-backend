@@ -20,7 +20,7 @@ import {
   MemberResponseDto,
   MemberListResponseDto,
   ChangeMemberStatusDto,
-  CreateMemberAccountDto, ActivateMemberDto,
+  CreateMemberAccountDto, ActivateMemberDto, UpsertMemberDto,
 } from './dto';
 import { CreatePaymentHistoryDto } from './payment-history/dto/create-payment-history.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -34,6 +34,7 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { ApplicationType, MemberStatus, MemberType } from '@prisma/client';
 import { MemberClassification } from './dto/classification.enum';
@@ -265,6 +266,19 @@ export class MembersController {
     @Request() req,
   ): Promise<any> {
     return this.membersService.createMemberAccount(id, body.email, body.password, req.user.userId);
+  }
+
+  @Post('bulk-upsert')
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGEMENT)
+  @ApiOperation({ summary: 'Tạo hoặc cập nhật nhiều hội viên theo danh sách (bulk upsert)' })
+  @ApiBody({ description: 'Danh sách hội viên cần tạo/cập nhật. Nếu có code sẽ ưu tiên tìm theo code, nếu không có sẽ tìm theo vietnameseName.', isArray: true, type: UpsertMemberDto })
+  @ApiResponse({ status: 200, description: 'Danh sách hội viên đã được tạo/cập nhật', type: MemberListResponseDto })
+  @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
+  async bulkUpsert(
+    @Body() dtos: UpsertMemberDto[],
+    @Request() req,
+  ): Promise<any> {
+    return this.membersService.bulkUpsert(dtos, req.user.userId);
   }
 
   @Delete(':id')
