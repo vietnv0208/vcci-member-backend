@@ -241,7 +241,7 @@ enum FeeStatus {
 /// Hội viên (đã gộp đơn đăng ký & hội viên chính thức)
 model Member {
   id              String          @id @default(cuid())
-  code            String?         @unique // Mã hội viên
+  code            String?         @unique // Mã hội viên memberNo
   applicationCode String?         @unique // Mã đơn đăng ký hội viên
   applicationType ApplicationType
   memberType      MemberType?
