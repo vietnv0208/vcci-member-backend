@@ -379,9 +379,9 @@ model MemberPaymentHistory {
   memberId      String
   paymentYear   Int // Năm hội phí (VD: 2023, 2024)
   paymentName   String?
-  paymentCode   String // Mã giao dịch: VCCI-PAY-2024-001
+  paymentCode   String? // Mã giao dịch: VCCI-PAY-2024-001
   amount        Decimal        @default(0)
-  paymentDate   DateTime
+  paymentDate   DateTime?
   method        PaymentMethod? // Hình thức thanh toán
   status        PaymentStatus? @default(PAID)
   note          String?
