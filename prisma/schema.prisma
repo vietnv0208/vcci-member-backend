@@ -380,7 +380,7 @@ model MemberPaymentHistory {
   paymentYear   Int // Năm hội phí (VD: 2023, 2024)
   paymentName   String?
   paymentCode   String? // Mã giao dịch: VCCI-PAY-2024-001
-  amount        Decimal        @default(0)
+  amount        Decimal?
   paymentDate   DateTime?
   method        PaymentMethod? // Hình thức thanh toán
   status        PaymentStatus? @default(PAID)

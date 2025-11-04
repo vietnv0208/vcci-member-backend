@@ -7,6 +7,9 @@ export class UpsertMemberDto extends CreateMemberDto {
   @IsOptional()
   @IsString()
   code?: string;
+
+  paymentYears: string;// text từ file excel example: 2001200320042006|
+
 }
 
 
