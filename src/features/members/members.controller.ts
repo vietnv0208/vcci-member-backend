@@ -20,9 +20,9 @@ import {
   MemberResponseDto,
   MemberListResponseDto,
   ChangeMemberStatusDto,
-  ActivateMemberDto,
-  CreateMemberAccountDto,
+  CreateMemberAccountDto, ActivateMemberDto,
 } from './dto';
+import { CreatePaymentHistoryDto } from './payment-history/dto/create-payment-history.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
@@ -246,10 +246,10 @@ export class MembersController {
   })
   async activateMember(
     @Param('id') id: string,
-    @Body() activateDto: ActivateMemberDto,
+    @Body() paymentDto: CreatePaymentHistoryDto,
     @Request() req,
   ): Promise<MemberResponseDto> {
-    return this.membersService.activateMember(id, activateDto, req.user.userId);
+    return this.membersService.activateMember(id, paymentDto, req.user.userId);
   }
 
   @Post(':id/create-account')

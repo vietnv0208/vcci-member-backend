@@ -7,9 +7,11 @@ import {
   FeeStatus,
   PaymentStatus,
   MemberPaymentHistory,
+  PaymentMethod,
 } from '@prisma/client';
-import { QueryMemberDto } from './dto';
+import { ActivateMemberDto, QueryMemberDto } from './dto';
 import { BusinessCategoriesService } from '../business-categories/business-categories.service';
+import { CreatePaymentHistoryDto } from './payment-history/dto/create-payment-history.dto';
 
 @Injectable()
 export class MembersRepository {
@@ -395,41 +397,15 @@ export class MembersRepository {
 
   async activateMember(
     id: string,
-    feeAmount: number,
-    attachmentIds: string[],
+    paymentDto: CreatePaymentHistoryDto,
     changedById?: string,
-    note?: string,
   ): Promise<{ member: Member; paymentHistory: MemberPaymentHistory }> {
     const code = await this.generateMemberCode();
 
     return this.prisma.$transaction(async (tx) => {
-      const currentYear = new Date().getFullYear();
-
-      // Generate payment code
-      const paymentCodePrefix = `VCCI-PAY-${currentYear}-`;
-      const lastPayment = await tx.memberPaymentHistory.findFirst({
-        where: {
-          paymentCode: {
-            startsWith: paymentCodePrefix,
-          },
-        },
-        orderBy: {
-          paymentCode: 'desc',
-        },
-      });
-
-      let paymentNumber = 1;
-      if (lastPayment?.paymentCode) {
-        const lastNumber = parseInt(
-          lastPayment.paymentCode.replace(paymentCodePrefix, ''),
-          10,
-        );
-        if (!isNaN(lastNumber)) {
-          paymentNumber = lastNumber + 1;
-        }
-      }
-
-      const paymentCode = `${paymentCodePrefix}${paymentNumber.toString().padStart(4, '0')}`;
+      // Use paymentYear from DTO, fallback to current year
+      const paymentYear = paymentDto.paymentYear || new Date().getFullYear();
+      const paymentDate = paymentDto.paymentDate ? new Date(paymentDto.paymentDate) : new Date();
 
       // Update member to ACTIVE status and update fee info
       const member = await tx.member.update({
@@ -438,8 +414,8 @@ export class MembersRepository {
           code, // set member code upon activation
           status: MemberStatus.ACTIVE,
           feeStatus: FeeStatus.PAID,
-          feeAmount: feeAmount,
-          lastPaymentDate: new Date(),
+          feeAmount: paymentDto.amount,
+          lastPaymentDate: paymentDate,
           joinDate: new Date(),
         },
         include: {
@@ -472,14 +448,15 @@ export class MembersRepository {
       const paymentHistory = await tx.memberPaymentHistory.create({
         data: {
           memberId: id,
-          paymentYear: currentYear,
-          paymentName: `Thanh toán hội phí lần đầu`,
-          paymentCode: paymentCode,
-          amount: feeAmount,
-          paymentDate: new Date(),
-          status: PaymentStatus.PAID,
-          note: note || `Hội phí năm ${currentYear} - Kích hoạt hội viên`,
-          attachmentIds: attachmentIds,
+          paymentYear: paymentYear,
+          paymentName: paymentDto.paymentName || `Thanh toán hội phí lần đầu`,
+          paymentCode: paymentDto.paymentCode,
+          amount: paymentDto.amount,
+          paymentDate: paymentDate,
+          method: paymentDto.method || PaymentMethod.BANK_TRANSFER,
+          status: paymentDto.status || PaymentStatus.PAID,
+          note: paymentDto.note || `Hội phí năm ${paymentYear} - Kích hoạt hội viên`,
+          attachmentIds: paymentDto.attachmentIds || [],
         },
       });
 
@@ -488,7 +465,7 @@ export class MembersRepository {
         data: {
           memberId: id,
           status: MemberStatus.ACTIVE,
-          remark: `Kích hoạt hội viên - Đã thanh toán hội phí năm ${currentYear}`,
+          remark: `Kích hoạt hội viên - Đã thanh toán hội phí năm ${paymentYear}`,
           changedById,
         },
       });

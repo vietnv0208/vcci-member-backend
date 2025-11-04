@@ -14,6 +14,7 @@ import {
   ChangeMemberStatusDto,
   ActivateMemberDto,
 } from './dto';
+import { CreatePaymentHistoryDto } from './payment-history/dto/create-payment-history.dto';
 import {
   Prisma,
   MemberStatus,
@@ -114,7 +115,9 @@ export class MembersService {
 
     // Set branch category if provided
     if (branchCategoryId) {
-      const exists = await this.prisma.branchCategory.findUnique({ where: { id: branchCategoryId } });
+      const exists = await this.prisma.branchCategory.findUnique({
+        where: { id: branchCategoryId },
+      });
       if (!exists) {
         throw new BadRequestException('Chi nhánh không tồn tại');
       }
@@ -186,7 +189,9 @@ export class MembersService {
     await this.activityLogService.logActivity(
       ActivityActionType.SUBMIT_APPLICATION,
       {
-        applicationTypeName: this.getApplicationTypeName(member.applicationType),
+        applicationTypeName: this.getApplicationTypeName(
+          member.applicationType,
+        ),
         memberCode: member.applicationCode,
         memberName: member.vietnameseName,
         date: new Date().toLocaleDateString('vi-VN'),
@@ -365,11 +370,15 @@ export class MembersService {
       if (branchCategoryId === null || branchCategoryId === '') {
         updateData.branchCategory = { disconnect: true } as any;
       } else {
-        const exists = await this.prisma.branchCategory.findUnique({ where: { id: branchCategoryId } });
+        const exists = await this.prisma.branchCategory.findUnique({
+          where: { id: branchCategoryId },
+        });
         if (!exists) {
           throw new BadRequestException('Chi nhánh không tồn tại');
         }
-        updateData.branchCategory = { connect: { id: branchCategoryId } } as any;
+        updateData.branchCategory = {
+          connect: { id: branchCategoryId },
+        } as any;
       }
     }
 
@@ -446,9 +455,11 @@ export class MembersService {
       }
     }
     if (businessCategoryIds) {
-      const oldCategoryIds = ((existingMember as any).memberBusinessCategories || []).map(
-        (mbc: any) => mbc.businessCategory?.id || mbc.businessCategoryId,
-      ).filter(Boolean);
+      const oldCategoryIds = (
+        (existingMember as any).memberBusinessCategories || []
+      )
+        .map((mbc: any) => mbc.businessCategory?.id || mbc.businessCategoryId)
+        .filter(Boolean);
       if (hasSetChanges(businessCategoryIds, oldCategoryIds)) {
         extraChangedFields.push('businessCategoryIds');
       }
@@ -473,8 +484,6 @@ export class MembersService {
     }
     return this.mapToResponseDto(member);
   }
-
-  
 
   async remove(id: string): Promise<void> {
     const existingMember = await this.membersRepository.findById(id);
@@ -547,7 +556,7 @@ export class MembersService {
 
   async activateMember(
     id: string,
-    activateDto: ActivateMemberDto,
+    paymentDto: CreatePaymentHistoryDto,
     userId?: string,
   ): Promise<MemberResponseDto> {
     const existingMember = await this.membersRepository.findById(id);
@@ -563,22 +572,22 @@ export class MembersService {
       );
     }
 
+    // Override memberId from DTO with URL param
+    const paymentData = {
+      ...paymentDto,
+      memberId: id,
+    };
+
     // Activate member with payment
     const { member, paymentHistory } =
-      await this.membersRepository.activateMember(
-        id,
-        activateDto.feeAmount,
-        activateDto.attachmentIds,
-        userId,
-        activateDto.note,
-      );
+      await this.membersRepository.activateMember(id, paymentData, userId);
     if (
-      activateDto.attachmentIds &&
-      activateDto.attachmentIds.length > 0 &&
+      paymentDto.attachmentIds &&
+      paymentDto.attachmentIds.length > 0 &&
       paymentHistory?.id
     ) {
       await this.filesService.attachByFileIds(
-        activateDto.attachmentIds,
+        paymentDto.attachmentIds,
         EntityType.MEMBER_PAYMENT,
         paymentHistory.id,
       );
@@ -589,7 +598,7 @@ export class MembersService {
         {
           memberCode: member.code,
           memberName: member.vietnameseName,
-          fileName: `${activateDto.attachmentIds.length} tệp đính kèm`,
+          fileName: `${paymentDto.attachmentIds.length} tệp đính kèm`,
         },
         {
           targetType: ActivityTargetType.MEMBER,
@@ -605,8 +614,8 @@ export class MembersService {
       {
         memberCode: member.code || member.applicationCode,
         memberName: member.vietnameseName,
-        feeAmount: activateDto.feeAmount,
-        note: activateDto.note,
+        feeAmount: paymentDto.amount,
+        note: paymentDto.note,
       },
       {
         targetType: ActivityTargetType.MEMBER,
@@ -718,9 +727,7 @@ export class MembersService {
     };
   }
 
-  async findMyApplicationByUserId(
-    id: string,
-  ): Promise<MemberResponseDto> {
+  async findMyApplicationByUserId(id: string): Promise<MemberResponseDto> {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -742,7 +749,7 @@ export class MembersService {
       throw new NotFoundException('User not found');
     }
 
-    let member: MemberResponseDto= {} as MemberResponseDto;
+    let member: MemberResponseDto = {} as MemberResponseDto;
     if (user.memberId) {
       member = await this.findOne((user as any).memberId);
     }
