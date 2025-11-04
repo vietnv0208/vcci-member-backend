@@ -28,7 +28,7 @@ import {
   ActivityTargetType,
 } from '../common/activity-log';
 import { PaymentHistoryService } from './payment-history/payment-history.service';
-import { PaymentHistoryResponseDto } from './payment-history/dto';
+import { PaymentHistoryResponseDto, QueryPaymentHistoryDto } from './payment-history/dto';
 
 @ApiTags('Members (My Application)')
 @ApiBearerAuth('JWT-auth')
@@ -105,20 +105,13 @@ export class MembersMyController {
   @ApiOperation({ summary: 'Xem lịch sử thanh toán của hội viên' })
   @ApiResponse({
     status: 200,
-    description: 'Danh sách lịch sử thanh toán',
-    type: [PaymentHistoryResponseDto],
+    description: 'Danh sách lịch sử thanh toán (hỗ trợ đầy đủ bộ lọc như admin)',
   })
   @ApiResponse({ status: 404, description: 'Không tìm thấy hội viên' })
-  @ApiQuery({
-    name: 'year',
-    description: 'Năm hội phí (tùy chọn)',
-    required: false,
-    type: Number,
-  })
   async getPaymentHistory(
     @Request() req,
-    @Query('year') year?: number,
-  ): Promise<PaymentHistoryResponseDto[]> {
+    @Query() query: QueryPaymentHistoryDto,
+  ) {
     // Lấy thông tin user để lấy memberId
     const member = await this.membersService.findMyApplicationByUserId(
       req.user.id,
@@ -128,7 +121,12 @@ export class MembersMyController {
       throw new NotFoundException('Không tìm thấy thông tin hội viên');
     }
 
-    // Lấy lịch sử thanh toán của member
-    return this.paymentHistoryService.findByMemberId(member.id, year);
+    // Ép memberId theo user hiện tại, giữ nguyên các bộ lọc khác
+    const finalQuery: QueryPaymentHistoryDto = {
+      ...query,
+      memberId: member.id,
+    };
+
+    return this.paymentHistoryService.findAll(finalQuery);
   }
 }
