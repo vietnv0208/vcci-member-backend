@@ -181,6 +181,9 @@ export class MemberResponseDto {
   @ApiPropertyOptional()
   remarks?: string;
 
+  @ApiProperty()
+  branchCategoryId?: string;
+
   @ApiPropertyOptional({ description: 'Chi nhánh VCCI' })
   branchCategory?: {
     id: string;

@@ -902,7 +902,7 @@
             "in": "query",
             "description": "Lọc theo ngành nghề kinh doanh (sẽ tìm cả category con)",
             "schema": {
-              "example": "clxxxxxxxxxxxxxx",
+              "example": "",
               "type": "string"
             }
           },
@@ -4281,6 +4281,9 @@
           "remarks": {
             "type": "string"
           },
+          "branchCategoryId": {
+            "type": "string"
+          },
           "branchCategory": {
             "type": "object",
             "description": "Chi nhánh VCCI"
@@ -4342,6 +4345,7 @@
           "officeAddress",
           "telephone",
           "email",
+          "branchCategoryId",
           "contacts",
           "businessCategories",
           "memberPaymentHistory",

@@ -32,7 +32,7 @@ export class QueryMemberDto {
 
   @ApiPropertyOptional({ 
     description: 'Lọc theo ngành nghề kinh doanh (sẽ tìm cả category con)',
-    example: 'clxxxxxxxxxxxxxx'
+    example: ''
   })
   @IsOptional()
   @IsString()

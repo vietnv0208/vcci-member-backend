@@ -703,6 +703,7 @@ export class MembersService {
       joinDate: member.joinDate,
       expireDate: member.expireDate,
       remarks: member.remarks,
+      branchCategoryId: member.branchCategoryId,
       branchCategory: member.branchCategory
         ? {
             id: member.branchCategory.id,
