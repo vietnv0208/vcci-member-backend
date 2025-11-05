@@ -220,7 +220,7 @@ export class PaymentHistoryService {
     let nextNumber = 1;
     if (lastPayment) {
       // Lấy số cuối cùng từ mã giao dịch cuối cùng
-      const lastNumber = parseInt(lastPayment.paymentCode.split('-').pop() || '0');
+      const lastNumber = parseInt(lastPayment.paymentCode?.split('-').pop() || '0');
       nextNumber = lastNumber + 1;
     }
 

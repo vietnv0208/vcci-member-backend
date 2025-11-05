@@ -1316,7 +1316,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ActivateMemberDto"
+                "$ref": "#/components/schemas/CreatePaymentHistoryDto"
               }
             }
           }
@@ -3228,7 +3228,7 @@
             "in": "query",
             "description": "Lọc theo trạng thái hoạt động",
             "schema": {
-              "$ref": "#/components/schemas/Object"
+              "type": "boolean"
             }
           },
           {
@@ -4938,35 +4938,84 @@
           "status"
         ]
       },
-      "ActivateMemberDto": {
+      "CreatePaymentHistoryDto": {
         "type": "object",
         "properties": {
-          "feeAmount": {
+          "memberId": {
+            "type": "string",
+            "description": "ID của hội viên",
+            "example": "clx1234567890abcdef"
+          },
+          "paymentYear": {
             "type": "number",
-            "description": "Số tiền hội phí",
-            "example": 5000000,
-            "minimum": 0
+            "description": "Năm hội phí",
+            "example": 2024,
+            "minimum": 2000,
+            "maximum": 2100
+          },
+          "paymentName": {
+            "type": "string",
+            "description": "Tên giao dịch thanh toán",
+            "example": "Hội phí năm 2024 - Công ty ABC"
+          },
+          "paymentCode": {
+            "type": "string",
+            "description": "Mã giao dịch thanh toán",
+            "example": "VCCI-PAY-2024-001"
+          },
+          "amount": {
+            "type": "number",
+            "description": "Số tiền thanh toán",
+            "example": 500000
+          },
+          "paymentDate": {
+            "type": "string",
+            "description": "Ngày thanh toán",
+            "example": "2024-01-15T10:30:00.000Z"
+          },
+          "method": {
+            "type": "string",
+            "description": "Hình thức thanh toán",
+            "enum": [
+              "CASH",
+              "BANK_TRANSFER",
+              "ONLINE"
+            ],
+            "example": "BANK_TRANSFER"
+          },
+          "status": {
+            "type": "string",
+            "description": "Trạng thái thanh toán",
+            "enum": [
+              "PENDING",
+              "PAID",
+              "CANCELLED"
+            ],
+            "example": "PAID"
+          },
+          "note": {
+            "type": "string",
+            "description": "Ghi chú",
+            "example": "Thanh toán hội phí năm 2024"
           },
           "attachmentIds": {
-            "description": "Danh sách ID file đính kèm (chứng từ thanh toán)",
+            "description": "Danh sách ID file đính kèm",
             "example": [
-              "file-id-1",
-              "file-id-2"
+              "file1",
+              "file2"
             ],
             "type": "array",
             "items": {
               "type": "string"
             }
-          },
-          "note": {
-            "type": "string",
-            "description": "Ghi chú cho khoản thanh toán",
-            "example": "Hội phí năm 2024"
           }
         },
         "required": [
-          "feeAmount",
-          "attachmentIds"
+          "memberId",
+          "paymentYear",
+          "paymentCode",
+          "amount",
+          "paymentDate"
         ]
       },
       "CreateMemberAccountDto": {
@@ -5223,86 +5272,6 @@
           "updatedCount"
         ]
       },
-      "CreatePaymentHistoryDto": {
-        "type": "object",
-        "properties": {
-          "memberId": {
-            "type": "string",
-            "description": "ID của hội viên",
-            "example": "clx1234567890abcdef"
-          },
-          "paymentYear": {
-            "type": "number",
-            "description": "Năm hội phí",
-            "example": 2024,
-            "minimum": 2000,
-            "maximum": 2100
-          },
-          "paymentName": {
-            "type": "string",
-            "description": "Tên giao dịch thanh toán",
-            "example": "Hội phí năm 2024 - Công ty ABC"
-          },
-          "paymentCode": {
-            "type": "string",
-            "description": "Mã giao dịch thanh toán",
-            "example": "VCCI-PAY-2024-001"
-          },
-          "amount": {
-            "type": "number",
-            "description": "Số tiền thanh toán",
-            "example": 500000
-          },
-          "paymentDate": {
-            "type": "string",
-            "description": "Ngày thanh toán",
-            "example": "2024-01-15T10:30:00.000Z"
-          },
-          "method": {
-            "type": "string",
-            "description": "Hình thức thanh toán",
-            "enum": [
-              "CASH",
-              "BANK_TRANSFER",
-              "ONLINE"
-            ],
-            "example": "BANK_TRANSFER"
-          },
-          "status": {
-            "type": "string",
-            "description": "Trạng thái thanh toán",
-            "enum": [
-              "PENDING",
-              "PAID",
-              "CANCELLED"
-            ],
-            "example": "PAID"
-          },
-          "note": {
-            "type": "string",
-            "description": "Ghi chú",
-            "example": "Thanh toán hội phí năm 2024"
-          },
-          "attachmentIds": {
-            "description": "Danh sách ID file đính kèm",
-            "example": [
-              "file1",
-              "file2"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "memberId",
-          "paymentYear",
-          "paymentCode",
-          "amount",
-          "paymentDate"
-        ]
-      },
       "PaymentHistoryResponseDto": {
         "type": "object",
         "properties": {
@@ -5327,7 +5296,7 @@
             "example": "Hội phí năm 2024 - Công ty ABC"
           },
           "paymentCode": {
-            "type": "string",
+            "type": "object",
             "description": "Mã giao dịch thanh toán",
             "example": "VCCI-PAY-2024-001"
           },
@@ -5337,8 +5306,7 @@
             "example": 500000
           },
           "paymentDate": {
-            "format": "date-time",
-            "type": "string",
+            "type": "object",
             "description": "Ngày thanh toán",
             "example": "2024-01-15T10:30:00.000Z"
           },
@@ -5399,9 +5367,7 @@
           "id",
           "memberId",
           "paymentYear",
-          "paymentCode",
           "amount",
-          "paymentDate",
           "attachmentIds",
           "createdAt",
           "updatedAt"

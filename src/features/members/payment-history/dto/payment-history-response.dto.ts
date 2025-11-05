@@ -30,8 +30,9 @@ export class PaymentHistoryResponseDto {
   @ApiProperty({
     description: 'Mã giao dịch thanh toán',
     example: 'VCCI-PAY-2024-001',
+    required: false,
   })
-  paymentCode: string;
+  paymentCode: string | null;
 
   @ApiProperty({
     description: 'Số tiền thanh toán',
@@ -42,8 +43,9 @@ export class PaymentHistoryResponseDto {
   @ApiProperty({
     description: 'Ngày thanh toán',
     example: '2024-01-15T10:30:00.000Z',
+    required: false,
   })
-  paymentDate: Date;
+  paymentDate: Date | null;
 
   @ApiProperty({
     description: 'Hình thức thanh toán',
