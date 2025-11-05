@@ -241,7 +241,7 @@ enum FeeStatus {
 /// Hội viên (đã gộp đơn đăng ký & hội viên chính thức)
 model Member {
   id              String          @id @default(cuid())
-  code            String?         @unique // Mã hội viên
+  code            String?         @unique // Mã hội viên memberNo
   applicationCode String?         @unique // Mã đơn đăng ký hội viên
   applicationType ApplicationType
   memberType      MemberType?
@@ -310,8 +310,8 @@ model MemberEnterpriseDetail {
 model MemberAssociationDetail {
   id                     String    @id @default(cuid())
   memberId               String    @unique
-  establishmentLicenseNo String
-  establishmentDate      DateTime?
+  establishmentLicenseNo String //Quyết định thành lập số 
+  establishmentDate      DateTime? //Ngày/tháng/năm ký quyết định
   issuedBy               String?
   totalMembers           Int?
 
@@ -379,9 +379,9 @@ model MemberPaymentHistory {
   memberId      String
   paymentYear   Int // Năm hội phí (VD: 2023, 2024)
   paymentName   String?
-  paymentCode   String // Mã giao dịch: VCCI-PAY-2024-001
-  amount        Decimal        @default(0)
-  paymentDate   DateTime
+  paymentCode   String? // Mã giao dịch: VCCI-PAY-2024-001
+  amount        Decimal?
+  paymentDate   DateTime?
   method        PaymentMethod? // Hình thức thanh toán
   status        PaymentStatus? @default(PAID)
   note          String?

@@ -158,6 +158,40 @@ export class MembersRepository {
     });
   }
 
+  async findByVietnameseNameExact(name: string): Promise<Member | null> {
+    return this.prisma.member.findFirst({
+      where: { vietnameseName: { equals: name, mode: 'insensitive' } },
+      include: {
+        enterpriseDetail: true,
+        associationDetail: true,
+        contacts: true,
+        branchCategory: true,
+        User: {
+          select: { id: true, fullName: true, email: true },
+        },
+        statusHistories: {
+          include: {
+            changedBy: {
+              select: {
+                id: true,
+                fullName: true,
+                email: true,
+              },
+            },
+          },
+          orderBy: {
+            changedAt: 'desc',
+          },
+        },
+        memberBusinessCategories: {
+          include: {
+            businessCategory: true,
+          },
+        },
+      },
+    });
+  }
+
   async findMany(
     query: QueryMemberDto,
   ): Promise<{ data: Member[]; total: number }> {

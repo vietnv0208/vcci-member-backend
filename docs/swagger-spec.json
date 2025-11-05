@@ -1396,6 +1396,50 @@
         ]
       }
     },
+    "/api/members/bulk-upsert": {
+      "post": {
+        "operationId": "MembersController_bulkUpsert",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "Danh sách hội viên cần tạo/cập nhật. Nếu có code sẽ ưu tiên tìm theo code, nếu không có sẽ tìm theo vietnameseName.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UpsertMemberDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Danh sách hội viên đã được tạo/cập nhật",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Tạo hoặc cập nhật nhiều hội viên theo danh sách (bulk upsert)",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
     "/api/public/members/register": {
       "post": {
         "description": "API công khai cho phép doanh nghiệp/hiệp hội tự đăng ký làm hội viên VCCI. Đơn đăng ký sẽ có trạng thái PENDING và chờ xét duyệt.",
@@ -5038,6 +5082,141 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "UpsertMemberDto": {
+        "type": "object",
+        "properties": {
+          "applicationType": {
+            "type": "string",
+            "enum": [
+              "ENTERPRISE",
+              "ASSOCIATION"
+            ],
+            "description": "Loại đơn đăng ký"
+          },
+          "memberType": {
+            "type": "string",
+            "enum": [
+              "LINKED",
+              "OFFICIAL",
+              "HONORARY"
+            ],
+            "description": "Loại hội viên",
+            "default": "LINKED"
+          },
+          "vietnameseName": {
+            "type": "string",
+            "description": "Tên tiếng Việt"
+          },
+          "englishName": {
+            "type": "string",
+            "description": "Tên tiếng Anh"
+          },
+          "abbreviation": {
+            "type": "string",
+            "description": "Tên viết tắt"
+          },
+          "officeAddress": {
+            "type": "string",
+            "description": "Địa chỉ trụ sở chính"
+          },
+          "businessAddress": {
+            "type": "string",
+            "description": "Địa chỉ kinh doanh"
+          },
+          "telephone": {
+            "type": "string",
+            "description": "Số điện thoại"
+          },
+          "email": {
+            "type": "string",
+            "description": "Email"
+          },
+          "website": {
+            "type": "string",
+            "description": "Website"
+          },
+          "taxCode": {
+            "type": "string",
+            "description": "Mã số thuế"
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "NONE",
+              "BASIC",
+              "SPECIAL",
+              "PREMIUM"
+            ],
+            "description": "Phân hạng hội viên"
+          },
+          "expireDate": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Ngày hết hạn"
+          },
+          "remarks": {
+            "type": "string",
+            "description": "Ghi chú"
+          },
+          "branchCategoryId": {
+            "type": "string",
+            "description": "ID chi nhánh VCCI"
+          },
+          "enterpriseDetail": {
+            "description": "Chi tiết doanh nghiệp",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateMemberEnterpriseDetailDto"
+              }
+            ]
+          },
+          "associationDetail": {
+            "description": "Chi tiết hiệp hội",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateMemberAssociationDetailDto"
+              }
+            ]
+          },
+          "contacts": {
+            "description": "Danh sách người liên hệ",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateMemberContactDto"
+            }
+          },
+          "businessCategoryIds": {
+            "description": "Danh mục ngành nghề",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attachmentIds": {
+            "description": "Danh sách file đính kèm",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "code": {
+            "type": "string",
+            "description": "Mã hội viên (dùng làm khóa cập nhật nếu có)"
+          },
+          "paymentYears": {
+            "type": "string",
+            "description": "Chuỗi năm hội phí từ file import. Có thể là nối liền hoặc có ký tự phân tách. Ví dụ: \"2001200320042006|\" hoặc \"2001,2003,2004,2006\""
+          }
+        },
+        "required": [
+          "applicationType",
+          "vietnameseName",
+          "officeAddress",
+          "telephone",
+          "email",
+          "contacts"
         ]
       },
       "CreateBusinessCategoryDto": {

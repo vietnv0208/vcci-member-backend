@@ -13,6 +13,7 @@ import {
   MemberListResponseDto,
   ChangeMemberStatusDto,
   ActivateMemberDto,
+  UpsertMemberDto,
 } from './dto';
 import { CreatePaymentHistoryDto } from './payment-history/dto/create-payment-history.dto';
 import {
@@ -22,6 +23,7 @@ import {
   EntityType,
   UserRole,
   ApplicationType,
+  CategoryType,
 } from '@prisma/client';
 import { FilesService } from '../common/file-management';
 import {
@@ -57,6 +59,108 @@ export class MembersService {
       [ApplicationType.ASSOCIATION]: 'Hiệp hội',
     };
     return typeMap[applicationType] || applicationType;
+  }
+
+  /**
+   * Validate branchCategoryId có tồn tại và đang hoạt động
+   */
+  private async validateBranchCategoryId(branchCategoryId: string): Promise<void> {
+    const branchCategory = await this.prisma.branchCategory.findUnique({
+      where: { id: branchCategoryId },
+    });
+
+    if (!branchCategory) {
+      throw new BadRequestException(
+        `Chi nhánh với ID ${branchCategoryId} không tồn tại`,
+      );
+    }
+
+    if (!branchCategory.isActive) {
+      throw new BadRequestException(
+        `Chi nhánh "${branchCategory.name}" đang không hoạt động`,
+      );
+    }
+  }
+
+  /**
+   * Validate organizationTypes có tồn tại và đang hoạt động
+   */
+  private async validateOrganizationTypes(
+    organizationTypes: string[],
+  ): Promise<void> {
+    if (!organizationTypes || organizationTypes.length === 0) {
+      return;
+    }
+
+    // Loại bỏ các giá trị trùng lặp
+    const uniqueCodes = Array.from(new Set(organizationTypes));
+
+    // Kiểm tra từng code có tồn tại trong Category với type ORGANIZATION_TYPE
+    const categories = await this.prisma.category.findMany({
+      where: {
+        type: CategoryType.ORGANIZATION_TYPE,
+        code: { in: uniqueCodes },
+        deleted: false,
+      },
+    });
+
+    const foundCodes = new Set(categories.map((c) => c.code));
+    const invalidCodes = uniqueCodes.filter((code) => !foundCodes.has(code));
+
+    if (invalidCodes.length > 0) {
+      throw new BadRequestException(
+        `Các loại hình tổ chức sau không hợp lệ: ${invalidCodes.join(', ')}`,
+      );
+    }
+
+    // Kiểm tra các category đang hoạt động
+    const inactiveCategories = categories.filter((c) => !c.isActive);
+    if (inactiveCategories.length > 0) {
+      const inactiveCodes = inactiveCategories.map((c) => c.code).join(', ');
+      throw new BadRequestException(
+        `Các loại hình tổ chức sau đang không hoạt động: ${inactiveCodes}`,
+      );
+    }
+  }
+
+  /**
+   * Validate businessCategoryIds có tồn tại và đang hoạt động
+   */
+  private async validateBusinessCategoryIds(
+    businessCategoryIds: string[],
+  ): Promise<void> {
+    if (!businessCategoryIds || businessCategoryIds.length === 0) {
+      return;
+    }
+
+    // Loại bỏ các giá trị trùng lặp
+    const uniqueIds = Array.from(new Set(businessCategoryIds));
+
+    // Kiểm tra từng ID có tồn tại trong BusinessCategory
+    const businessCategories =
+      await this.prisma.businessCategory.findMany({
+        where: {
+          id: { in: uniqueIds },
+        },
+      });
+
+    const foundIds = new Set(businessCategories.map((c) => c.id));
+    const invalidIds = uniqueIds.filter((id) => !foundIds.has(id));
+
+    if (invalidIds.length > 0) {
+      throw new BadRequestException(
+        `Các danh mục ngành nghề sau không tồn tại: ${invalidIds.join(', ')}`,
+      );
+    }
+
+    // Kiểm tra các category đang hoạt động
+    const inactiveCategories = businessCategories.filter((c) => !c.isActive);
+    if (inactiveCategories.length > 0) {
+      const inactiveIds = inactiveCategories.map((c) => c.id).join(', ');
+      throw new BadRequestException(
+        `Các danh mục ngành nghề sau đang không hoạt động: ${inactiveIds}`,
+      );
+    }
   }
 
   async create(
@@ -113,15 +217,20 @@ export class MembersService {
       },
     };
 
-    // Set branch category if provided
+    // Validate và set branch category if provided
     if (branchCategoryId) {
-      const exists = await this.prisma.branchCategory.findUnique({
-        where: { id: branchCategoryId },
-      });
-      if (!exists) {
-        throw new BadRequestException('Chi nhánh không tồn tại');
-      }
+      await this.validateBranchCategoryId(branchCategoryId);
       createData.branchCategory = { connect: { id: branchCategoryId } } as any;
+    }
+
+    // Validate organizationTypes if provided
+    if (enterpriseDetail?.organizationTypes) {
+      await this.validateOrganizationTypes(enterpriseDetail.organizationTypes);
+    }
+
+    // Validate businessCategoryIds if provided
+    if (businessCategoryIds && businessCategoryIds.length > 0) {
+      await this.validateBusinessCategoryIds(businessCategoryIds);
     }
 
     // Add enterprise detail if exists
@@ -306,6 +415,18 @@ export class MembersService {
     return this.mapToResponseDto(member);
   }
 
+  async findByVietnameseName(name: string): Promise<MemberResponseDto> {
+    const member = await this.membersRepository.findByVietnameseNameExact(name);
+
+    if (!member) {
+      throw new NotFoundException(
+        `Không tìm thấy hội viên với tên tiếng Việt "${name}"`,
+      );
+    }
+
+    return this.mapToResponseDto(member);
+  }
+
   async findByApplicationCode(
     applicationCode: string,
   ): Promise<MemberResponseDto> {
@@ -365,21 +486,26 @@ export class MembersService {
       ...memberData,
     };
 
-    // Update branch category
+    // Validate và update branch category
     if (typeof branchCategoryId !== 'undefined') {
       if (branchCategoryId === null || branchCategoryId === '') {
         updateData.branchCategory = { disconnect: true } as any;
       } else {
-        const exists = await this.prisma.branchCategory.findUnique({
-          where: { id: branchCategoryId },
-        });
-        if (!exists) {
-          throw new BadRequestException('Chi nhánh không tồn tại');
-        }
+        await this.validateBranchCategoryId(branchCategoryId);
         updateData.branchCategory = {
           connect: { id: branchCategoryId },
         } as any;
       }
+    }
+
+    // Validate organizationTypes if provided
+    if (enterpriseDetail?.organizationTypes) {
+      await this.validateOrganizationTypes(enterpriseDetail.organizationTypes);
+    }
+
+    // Validate businessCategoryIds if provided
+    if (businessCategoryIds && businessCategoryIds.length > 0) {
+      await this.validateBusinessCategoryIds(businessCategoryIds);
     }
 
     // Update enterprise detail
@@ -629,6 +755,106 @@ export class MembersService {
 
   async getStatistics() {
     return this.membersRepository.getStatistics();
+  }
+
+  async bulkUpsert(dtos: UpsertMemberDto[], userId?: string): Promise<any> {
+    const details = {
+      created: [] as any[],
+      updated: [] as any[],
+      errors: [] as any[],
+    };
+
+    for (const dtoImport of dtos) {
+      try {
+        let existingId: string | null = null;
+        const { paymentYears, ...dto } = dtoImport;
+        if (dto.code) {
+          const byCode = await this.membersRepository.findByCode(dto.code);
+          if (byCode) existingId = byCode.id;
+        }
+        if (!existingId && dto.vietnameseName) {
+          const byName = await this.membersRepository.findByVietnameseNameExact(
+            dto.vietnameseName,
+          );
+          if (byName) existingId = byName.id;
+        }
+
+        if (existingId) {
+          const updated = await this.update(
+            existingId,
+            dto as unknown as UpdateMemberDto,
+          );
+          await this.upsertPaymentYears(updated.id, paymentYears);
+          details.updated.push({
+            id: updated.id,
+            code: updated.code,
+            applicationCode: updated.applicationCode,
+            vietnameseName: updated.vietnameseName,
+            action: 'updated',
+          });
+        } else {
+          const created = await this.create(dto, userId);
+          await this.upsertPaymentYears(created.id, paymentYears);
+          details.created.push({
+            id: created.id,
+            code: created.code,
+            applicationCode: created.applicationCode,
+            vietnameseName: created.vietnameseName,
+            action: 'created',
+          });
+        }
+      } catch (error: any) {
+        console.log(error);
+        details.errors.push({
+          key: dtoImport.code || dtoImport.vietnameseName,
+          error: error?.message || 'Lỗi không xác định',
+        });
+      }
+    }
+
+    return {
+      summary: {
+        total: dtos.length,
+        created: details.created.length,
+        updated: details.updated.length,
+        errors: details.errors.length,
+      },
+      details,
+    };
+  }
+
+  private extractYearsFromString(input?: string): number[] {
+    if (!input) return [];
+    const matches = input.match(/(?:19|20)\d{2}/g) || [];
+    const years = matches
+      .map((y) => parseInt(y, 10))
+      .filter((y) => y >= 1900 && y <= 2100);
+    return Array.from(new Set(years));
+  }
+
+  private async upsertPaymentYears(
+    memberId: string,
+    paymentYears?: string,
+  ): Promise<void> {
+    const years = this.extractYearsFromString(paymentYears);
+    if (years.length === 0) return;
+
+    for (const year of years) {
+      const exists = await this.prisma.memberPaymentHistory.findFirst({
+        where: { memberId, paymentYear: year },
+        select: { id: true },
+      });
+      if (exists) continue;
+      await this.prisma.memberPaymentHistory.create({
+        data: {
+          memberId,
+          paymentYear: year,
+          paymentName: `Hội phí năm ${year}`,
+          note: `Nhập từ file excel`,
+          attachmentIds: [],
+        },
+      });
+    }
   }
 
   private validateStatusTransition(

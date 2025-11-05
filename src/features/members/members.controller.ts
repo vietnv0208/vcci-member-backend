@@ -20,7 +20,7 @@ import {
   MemberResponseDto,
   MemberListResponseDto,
   ChangeMemberStatusDto,
-  CreateMemberAccountDto, ActivateMemberDto,
+  CreateMemberAccountDto, ActivateMemberDto, UpsertMemberDto,
 } from './dto';
 import { CreatePaymentHistoryDto } from './payment-history/dto/create-payment-history.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -34,6 +34,7 @@ import {
   ApiBearerAuth,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 import { ApplicationType, MemberStatus, MemberType } from '@prisma/client';
 import { MemberClassification } from './dto/classification.enum';
@@ -73,7 +74,8 @@ export class MembersController {
   @ApiQuery({
     name: 'search',
     required: false,
-    description: 'Tìm kiếm theo tên, email, mã số thuế, mã hội viên, mã đơn đăng ký',
+    description:
+      'Tìm kiếm theo tên, email, mã số thuế, mã hội viên, mã đơn đăng ký',
   })
   @ApiQuery({
     name: 'applicationType',
@@ -181,7 +183,9 @@ export class MembersController {
     type: MemberResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Không tìm thấy hội viên' })
-  async findByApplicationCode(@Param('applicationCode') applicationCode: string): Promise<MemberResponseDto> {
+  async findByApplicationCode(
+    @Param('applicationCode') applicationCode: string,
+  ): Promise<MemberResponseDto> {
     return this.membersService.findByApplicationCode(applicationCode);
   }
 
@@ -254,17 +258,51 @@ export class MembersController {
 
   @Post(':id/create-account')
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGEMENT)
-  @ApiOperation({ summary: 'Tạo tài khoản đăng nhập cho hội viên (role MEMBER)' })
+  @ApiOperation({
+    summary: 'Tạo tài khoản đăng nhập cho hội viên (role MEMBER)',
+  })
   @ApiParam({ name: 'id', description: 'ID của hội viên' })
   @ApiResponse({ status: 201, description: 'Tạo tài khoản thành công' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy hội viên' })
-  @ApiResponse({ status: 409, description: 'Email đã tồn tại hoặc hội viên đã có tài khoản' })
+  @ApiResponse({
+    status: 409,
+    description: 'Email đã tồn tại hoặc hội viên đã có tài khoản',
+  })
   async createMemberAccount(
     @Param('id') id: string,
     @Body() body: CreateMemberAccountDto,
     @Request() req,
   ): Promise<any> {
-    return this.membersService.createMemberAccount(id, body.email, body.password, req.user.userId);
+    return this.membersService.createMemberAccount(
+      id,
+      body.email,
+      body.password,
+      req.user.userId,
+    );
+  }
+
+  @Post('bulk-upsert')
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGEMENT)
+  @ApiOperation({
+    summary: 'Tạo hoặc cập nhật nhiều hội viên theo danh sách (bulk upsert)',
+  })
+  @ApiBody({
+    description:
+      'Danh sách hội viên cần tạo/cập nhật. Nếu có code sẽ ưu tiên tìm theo code, nếu không có sẽ tìm theo vietnameseName.',
+    isArray: true,
+    type: UpsertMemberDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Danh sách hội viên đã được tạo/cập nhật',
+    type: MemberListResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Dữ liệu không hợp lệ' })
+  async bulkUpsert(
+    @Body() dtos: UpsertMemberDto[],
+    @Request() req,
+  ): Promise<any> {
+    return this.membersService.bulkUpsert(dtos, req.user.userId);
   }
 
   @Delete(':id')
