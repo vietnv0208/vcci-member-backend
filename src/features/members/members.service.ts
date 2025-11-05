@@ -23,6 +23,7 @@ import {
   EntityType,
   UserRole,
   ApplicationType,
+  CategoryType,
 } from '@prisma/client';
 import { FilesService } from '../common/file-management';
 import {
@@ -58,6 +59,108 @@ export class MembersService {
       [ApplicationType.ASSOCIATION]: 'Hiệp hội',
     };
     return typeMap[applicationType] || applicationType;
+  }
+
+  /**
+   * Validate branchCategoryId có tồn tại và đang hoạt động
+   */
+  private async validateBranchCategoryId(branchCategoryId: string): Promise<void> {
+    const branchCategory = await this.prisma.branchCategory.findUnique({
+      where: { id: branchCategoryId },
+    });
+
+    if (!branchCategory) {
+      throw new BadRequestException(
+        `Chi nhánh với ID ${branchCategoryId} không tồn tại`,
+      );
+    }
+
+    if (!branchCategory.isActive) {
+      throw new BadRequestException(
+        `Chi nhánh "${branchCategory.name}" đang không hoạt động`,
+      );
+    }
+  }
+
+  /**
+   * Validate organizationTypes có tồn tại và đang hoạt động
+   */
+  private async validateOrganizationTypes(
+    organizationTypes: string[],
+  ): Promise<void> {
+    if (!organizationTypes || organizationTypes.length === 0) {
+      return;
+    }
+
+    // Loại bỏ các giá trị trùng lặp
+    const uniqueCodes = Array.from(new Set(organizationTypes));
+
+    // Kiểm tra từng code có tồn tại trong Category với type ORGANIZATION_TYPE
+    const categories = await this.prisma.category.findMany({
+      where: {
+        type: CategoryType.ORGANIZATION_TYPE,
+        code: { in: uniqueCodes },
+        deleted: false,
+      },
+    });
+
+    const foundCodes = new Set(categories.map((c) => c.code));
+    const invalidCodes = uniqueCodes.filter((code) => !foundCodes.has(code));
+
+    if (invalidCodes.length > 0) {
+      throw new BadRequestException(
+        `Các loại hình tổ chức sau không hợp lệ: ${invalidCodes.join(', ')}`,
+      );
+    }
+
+    // Kiểm tra các category đang hoạt động
+    const inactiveCategories = categories.filter((c) => !c.isActive);
+    if (inactiveCategories.length > 0) {
+      const inactiveCodes = inactiveCategories.map((c) => c.code).join(', ');
+      throw new BadRequestException(
+        `Các loại hình tổ chức sau đang không hoạt động: ${inactiveCodes}`,
+      );
+    }
+  }
+
+  /**
+   * Validate businessCategoryIds có tồn tại và đang hoạt động
+   */
+  private async validateBusinessCategoryIds(
+    businessCategoryIds: string[],
+  ): Promise<void> {
+    if (!businessCategoryIds || businessCategoryIds.length === 0) {
+      return;
+    }
+
+    // Loại bỏ các giá trị trùng lặp
+    const uniqueIds = Array.from(new Set(businessCategoryIds));
+
+    // Kiểm tra từng ID có tồn tại trong BusinessCategory
+    const businessCategories =
+      await this.prisma.businessCategory.findMany({
+        where: {
+          id: { in: uniqueIds },
+        },
+      });
+
+    const foundIds = new Set(businessCategories.map((c) => c.id));
+    const invalidIds = uniqueIds.filter((id) => !foundIds.has(id));
+
+    if (invalidIds.length > 0) {
+      throw new BadRequestException(
+        `Các danh mục ngành nghề sau không tồn tại: ${invalidIds.join(', ')}`,
+      );
+    }
+
+    // Kiểm tra các category đang hoạt động
+    const inactiveCategories = businessCategories.filter((c) => !c.isActive);
+    if (inactiveCategories.length > 0) {
+      const inactiveIds = inactiveCategories.map((c) => c.id).join(', ');
+      throw new BadRequestException(
+        `Các danh mục ngành nghề sau đang không hoạt động: ${inactiveIds}`,
+      );
+    }
   }
 
   async create(
@@ -114,15 +217,20 @@ export class MembersService {
       },
     };
 
-    // Set branch category if provided
+    // Validate và set branch category if provided
     if (branchCategoryId) {
-      const exists = await this.prisma.branchCategory.findUnique({
-        where: { id: branchCategoryId },
-      });
-      if (!exists) {
-        throw new BadRequestException('Chi nhánh không tồn tại');
-      }
+      await this.validateBranchCategoryId(branchCategoryId);
       createData.branchCategory = { connect: { id: branchCategoryId } } as any;
+    }
+
+    // Validate organizationTypes if provided
+    if (enterpriseDetail?.organizationTypes) {
+      await this.validateOrganizationTypes(enterpriseDetail.organizationTypes);
+    }
+
+    // Validate businessCategoryIds if provided
+    if (businessCategoryIds && businessCategoryIds.length > 0) {
+      await this.validateBusinessCategoryIds(businessCategoryIds);
     }
 
     // Add enterprise detail if exists
@@ -378,21 +486,26 @@ export class MembersService {
       ...memberData,
     };
 
-    // Update branch category
+    // Validate và update branch category
     if (typeof branchCategoryId !== 'undefined') {
       if (branchCategoryId === null || branchCategoryId === '') {
         updateData.branchCategory = { disconnect: true } as any;
       } else {
-        const exists = await this.prisma.branchCategory.findUnique({
-          where: { id: branchCategoryId },
-        });
-        if (!exists) {
-          throw new BadRequestException('Chi nhánh không tồn tại');
-        }
+        await this.validateBranchCategoryId(branchCategoryId);
         updateData.branchCategory = {
           connect: { id: branchCategoryId },
         } as any;
       }
+    }
+
+    // Validate organizationTypes if provided
+    if (enterpriseDetail?.organizationTypes) {
+      await this.validateOrganizationTypes(enterpriseDetail.organizationTypes);
+    }
+
+    // Validate businessCategoryIds if provided
+    if (businessCategoryIds && businessCategoryIds.length > 0) {
+      await this.validateBusinessCategoryIds(businessCategoryIds);
     }
 
     // Update enterprise detail

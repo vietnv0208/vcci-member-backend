@@ -5200,6 +5200,10 @@
           "code": {
             "type": "string",
             "description": "Mã hội viên (dùng làm khóa cập nhật nếu có)"
+          },
+          "paymentYears": {
+            "type": "string",
+            "description": "Chuỗi năm hội phí từ file import. Có thể là nối liền hoặc có ký tự phân tách. Ví dụ: \"2001200320042006|\" hoặc \"2001,2003,2004,2006\""
           }
         },
         "required": [
