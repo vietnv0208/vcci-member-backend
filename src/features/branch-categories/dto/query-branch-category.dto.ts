@@ -9,10 +9,9 @@ export class QueryBranchCategoryDto {
   search?: string;
 
   @ApiPropertyOptional({ description: 'Lọc theo trạng thái hoạt động' })
-  @IsBooleanString()
   @Type(() => Boolean)
   @IsOptional()
-  isActive?: any;
+  isActive?: boolean;
 
   @ApiPropertyOptional({ description: 'Trang', default: 1 })
   @Type(() => Number)

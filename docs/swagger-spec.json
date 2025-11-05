@@ -3272,7 +3272,7 @@
             "in": "query",
             "description": "Lọc theo trạng thái hoạt động",
             "schema": {
-              "$ref": "#/components/schemas/Object"
+              "type": "boolean"
             }
           },
           {
@@ -5471,7 +5471,7 @@
             "example": "Hội phí năm 2024 - Công ty ABC"
           },
           "paymentCode": {
-            "type": "string",
+            "type": "object",
             "description": "Mã giao dịch thanh toán",
             "example": "VCCI-PAY-2024-001"
           },
@@ -5481,8 +5481,7 @@
             "example": 500000
           },
           "paymentDate": {
-            "format": "date-time",
-            "type": "string",
+            "type": "object",
             "description": "Ngày thanh toán",
             "example": "2024-01-15T10:30:00.000Z"
           },
@@ -5543,9 +5542,7 @@
           "id",
           "memberId",
           "paymentYear",
-          "paymentCode",
           "amount",
-          "paymentDate",
           "attachmentIds",
           "createdAt",
           "updatedAt"
