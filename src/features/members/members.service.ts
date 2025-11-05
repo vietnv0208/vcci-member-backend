@@ -764,10 +764,10 @@ export class MembersService {
       errors: [] as any[],
     };
 
-    for (const dto of dtos) {
+    for (const dtoImport of dtos) {
       try {
         let existingId: string | null = null;
-
+        const { paymentYears, ...dto } = dtoImport;
         if (dto.code) {
           const byCode = await this.membersRepository.findByCode(dto.code);
           if (byCode) existingId = byCode.id;
@@ -784,7 +784,7 @@ export class MembersService {
             existingId,
             dto as unknown as UpdateMemberDto,
           );
-          await this.upsertPaymentYears(updated.id, dto.paymentYears);
+          await this.upsertPaymentYears(updated.id, paymentYears);
           details.updated.push({
             id: updated.id,
             code: updated.code,
@@ -794,7 +794,7 @@ export class MembersService {
           });
         } else {
           const created = await this.create(dto, userId);
-          await this.upsertPaymentYears(created.id, dto.paymentYears);
+          await this.upsertPaymentYears(created.id, paymentYears);
           details.created.push({
             id: created.id,
             code: created.code,
@@ -804,8 +804,9 @@ export class MembersService {
           });
         }
       } catch (error: any) {
+        console.log(error);
         details.errors.push({
-          key: dto.code || dto.vietnameseName,
+          key: dtoImport.code || dtoImport.vietnameseName,
           error: error?.message || 'Lỗi không xác định',
         });
       }
