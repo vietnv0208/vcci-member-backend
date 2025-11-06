@@ -200,6 +200,11 @@ export class CreateMemberDto {
   @IsString()
   remarks?: string;
 
+  @ApiPropertyOptional({ description: 'Lĩnh vực hoạt động chính (text tự do)' })
+  @IsOptional()
+  @IsString()
+  businessCategoriesText?: string;
+
   @ApiPropertyOptional({ description: 'ID chi nhánh VCCI' })
   @IsOptional()
   @IsString()

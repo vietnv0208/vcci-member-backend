@@ -924,6 +924,7 @@ export class MembersService {
       website: member.website,
       taxCode: member.taxCode,
       classification: member.classification,
+      businessCategoriesText: member.businessCategoriesText,
       submittedDate: member.submittedDate,
       approvedDate: member.approvedDate,
       joinDate: member.joinDate,

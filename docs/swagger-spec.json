@@ -4325,6 +4325,10 @@
           "remarks": {
             "type": "string"
           },
+          "businessCategoriesText": {
+            "type": "string",
+            "description": "Lĩnh vực hoạt động chính (text tự do)"
+          },
           "branchCategoryId": {
             "type": "string"
           },
@@ -4762,6 +4766,10 @@
             "type": "string",
             "description": "Ghi chú"
           },
+          "businessCategoriesText": {
+            "type": "string",
+            "description": "Lĩnh vực hoạt động chính (text tự do)"
+          },
           "branchCategoryId": {
             "type": "string",
             "description": "ID chi nhánh VCCI"
@@ -4918,6 +4926,10 @@
           "remarks": {
             "type": "string",
             "description": "Ghi chú"
+          },
+          "businessCategoriesText": {
+            "type": "string",
+            "description": "Lĩnh vực hoạt động chính (text tự do)"
           },
           "branchCategoryId": {
             "type": "string",
@@ -5159,6 +5171,10 @@
           "remarks": {
             "type": "string",
             "description": "Ghi chú"
+          },
+          "businessCategoriesText": {
+            "type": "string",
+            "description": "Lĩnh vực hoạt động chính (text tự do)"
           },
           "branchCategoryId": {
             "type": "string",

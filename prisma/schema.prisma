@@ -274,6 +274,7 @@ model Member {
   enterpriseDetail         MemberEnterpriseDetail?
   associationDetail        MemberAssociationDetail?
   memberBusinessCategories MemberEnterpriseBusinessCategory[] // productsServices Sản phẩm, dịch vụ chính va activityArea
+  businessCategoriesText   String? // Lĩnh vực hoạt động chính (activityArea)
 
   branchCategoryId String?
   branchCategory   BranchCategory? @relation(fields: [branchCategoryId], references: [id], onDelete: SetNull)

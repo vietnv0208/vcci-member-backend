@@ -181,6 +181,9 @@ export class MemberResponseDto {
   @ApiPropertyOptional()
   remarks?: string;
 
+  @ApiPropertyOptional({ description: 'Lĩnh vực hoạt động chính (text tự do)' })
+  businessCategoriesText?: string;
+
   @ApiProperty()
   branchCategoryId?: string;
 
