@@ -825,7 +825,7 @@ export class MembersService {
 
   private extractYearsFromString(input?: string): number[] {
     if (!input) return [];
-    const matches = input.match(/(?:19|20)\d{2}/g) || [];
+    const matches = String(input).match(/(?:19|20)\d{2}/g) || [];
     const years = matches
       .map((y) => parseInt(y, 10))
       .filter((y) => y >= 1900 && y <= 2100);
