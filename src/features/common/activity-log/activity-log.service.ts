@@ -54,46 +54,46 @@ export class ActivityLogService {
         title: 'Cập nhật tài liệu',
         description: 'Cập nhật tài liệu đính kèm: {fileName}',
       },
-      [ActivityActionType.LOGIN]: {
-        title: 'Đăng nhập hệ thống',
-        description: 'Đăng nhập vào hệ thống từ IP {ipAddress}',
-      },
-      [ActivityActionType.LOGOUT]: {
-        title: 'Đăng xuất hệ thống',
-        description: 'Đăng xuất khỏi hệ thống',
-      },
-      [ActivityActionType.CHANGE_PASSWORD]: {
-        title: 'Đổi mật khẩu',
-        description: 'Thay đổi mật khẩu tài khoản',
-      },
-      [ActivityActionType.RESET_PASSWORD]: {
-        title: 'Reset mật khẩu',
-        description: 'Reset mật khẩu cho tài khoản {username}',
-      },
+      // [ActivityActionType.LOGIN]: {
+      //   title: 'Đăng nhập hệ thống',
+      //   description: 'Đăng nhập vào hệ thống từ IP {ipAddress}',
+      // },
+      // [ActivityActionType.LOGOUT]: {
+      //   title: 'Đăng xuất hệ thống',
+      //   description: 'Đăng xuất khỏi hệ thống',
+      // },
+      // [ActivityActionType.CHANGE_PASSWORD]: {
+      //   title: 'Đổi mật khẩu',
+      //   description: 'Thay đổi mật khẩu tài khoản',
+      // },
+      // [ActivityActionType.RESET_PASSWORD]: {
+      //   title: 'Reset mật khẩu',
+      //   description: 'Reset mật khẩu cho tài khoản {username}',
+      // },
       [ActivityActionType.CREATE_USER_FOR_MEMBER]: {
         title: 'Tạo tài khoản',
         description: 'Tạo tài khoản cho hội viên "{memberName}" tên đăng nhập: {email}',
       },
-      [ActivityActionType.CREATE_USER]: {
-        title: 'Tạo tài khoản',
-        description: 'Tạo tài khoản mới: {email} - {role}',
-      },
-      [ActivityActionType.UPDATE_USER]: {
-        title: 'Cập nhật tài khoản',
-        description: 'Cập nhật thông tin tài khoản: {email}',
-      },
-      [ActivityActionType.DELETE_USER]: {
-        title: 'Xóa tài khoản',
-        description: 'Xóa tài khoản: {email}',
-      },
-      [ActivityActionType.UPLOAD_FILE]: {
-        title: 'Tải lên tài liệu',
-        description: 'Tải lên tài liệu: {fileName} ({fileSize})',
-      },
-      [ActivityActionType.DELETE_FILE]: {
-        title: 'Xóa tài liệu',
-        description: 'Xóa tài liệu: {fileName}',
-      },
+      // [ActivityActionType.CREATE_USER]: {
+      //   title: 'Tạo tài khoản',
+      //   description: 'Tạo tài khoản mới: {email} - {role}',
+      // },
+      // [ActivityActionType.UPDATE_USER]: {
+      //   title: 'Cập nhật tài khoản',
+      //   description: 'Cập nhật thông tin tài khoản: {email}',
+      // },
+      // [ActivityActionType.DELETE_USER]: {
+      //   title: 'Xóa tài khoản',
+      //   description: 'Xóa tài khoản: {email}',
+      // },
+      // [ActivityActionType.UPLOAD_FILE]: {
+      //   title: 'Tải lên tài liệu',
+      //   description: 'Tải lên tài liệu: {fileName} ({fileSize})',
+      // },
+      // [ActivityActionType.DELETE_FILE]: {
+      //   title: 'Xóa tài liệu',
+      //   description: 'Xóa tài liệu: {fileName}',
+      // },
     };
 
   constructor(private readonly prisma: PrismaService) {}
