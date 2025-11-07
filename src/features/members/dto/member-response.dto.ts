@@ -87,6 +87,12 @@ export class MemberEnterpriseDetailResponseDto {
 
   @ApiProperty({ type: [String] })
   organizationTypes: string[];
+
+  @ApiPropertyOptional({ 
+    type: [String],
+    description: 'Tên các loại hình tổ chức (từ category codes)',
+  })
+  organizationTypeNames?: string[];
 }
 
 export class MemberAssociationDetailResponseDto {

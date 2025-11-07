@@ -312,7 +312,7 @@ export class MembersService {
         requestData: createMemberDto,
       },
     );
-    return this.mapToResponseDto(member);
+    return await this.mapToResponseDto(member);
   }
 
   async createMemberAccount(
@@ -386,8 +386,28 @@ export class MembersService {
     const limit = query.limit || 10;
     const totalPages = Math.ceil(total / limit);
 
+    // Batch resolve organization type names for all members
+    const allOrganizationTypeCodes = new Set<string>();
+    data.forEach((member: any) => {
+      if (member.enterpriseDetail?.organizationTypes) {
+        member.enterpriseDetail.organizationTypes.forEach((code: string) =>
+          allOrganizationTypeCodes.add(code),
+        );
+      }
+    });
+
+    // Fetch all organization type categories at once
+    const codeToNameMap = await this.getOrganizationTypeCodeToNameMap(
+      Array.from(allOrganizationTypeCodes),
+    );
+
+    // Map members with resolved organization type names (using batch-resolved map)
+    const mappedData = await Promise.all(
+      data.map((member) => this.mapToResponseDto(member, codeToNameMap)),
+    );
+
     return {
-      data: data.map((member) => this.mapToResponseDto(member)),
+      data: mappedData,
       total,
       page,
       limit,
@@ -402,7 +422,7 @@ export class MembersService {
       throw new NotFoundException(`Không tìm thấy hội viên với ID ${id}`);
     }
 
-    return this.mapToResponseDto(member);
+    return await this.mapToResponseDto(member);
   }
 
   async findByCode(code: string): Promise<MemberResponseDto> {
@@ -412,7 +432,7 @@ export class MembersService {
       throw new NotFoundException(`Không tìm thấy hội viên với mã ${code}`);
     }
 
-    return this.mapToResponseDto(member);
+    return await this.mapToResponseDto(member);
   }
 
   async findByVietnameseName(name: string): Promise<MemberResponseDto> {
@@ -424,7 +444,7 @@ export class MembersService {
       );
     }
 
-    return this.mapToResponseDto(member);
+    return await this.mapToResponseDto(member);
   }
 
   async findByApplicationCode(
@@ -439,7 +459,7 @@ export class MembersService {
       );
     }
 
-    return this.mapToResponseDto(member);
+    return await this.mapToResponseDto(member);
   }
 
   async update(
@@ -608,7 +628,7 @@ export class MembersService {
         },
       );
     }
-    return this.mapToResponseDto(member);
+    return await this.mapToResponseDto(member);
   }
 
   async remove(id: string): Promise<void> {
@@ -677,7 +697,7 @@ export class MembersService {
       userId,
     });
 
-    return this.mapToResponseDto(member);
+    return await this.mapToResponseDto(member);
   }
 
   async activateMember(
@@ -750,7 +770,7 @@ export class MembersService {
       },
     );
 
-    return this.mapToResponseDto(member);
+    return await this.mapToResponseDto(member);
   }
 
   async getStatistics() {
@@ -889,7 +909,62 @@ export class MembersService {
     }
   }
 
-  private mapToResponseDto(member: any): MemberResponseDto {
+  /**
+   * Fetch organization type categories and create a code-to-name map
+   * @param codes Array of organization type codes
+   * @returns Map of code to name
+   */
+  private async getOrganizationTypeCodeToNameMap(
+    codes: string[],
+  ): Promise<Map<string, string>> {
+    if (!codes || codes.length === 0) {
+      return new Map();
+    }
+
+    const categories = await this.prisma.category.findMany({
+      where: {
+        type: CategoryType.ORGANIZATION_TYPE,
+        code: { in: codes },
+        deleted: false,
+      },
+      select: {
+        code: true,
+        name: true,
+      },
+    });
+
+    return new Map(categories.map((cat) => [cat.code, cat.name]));
+  }
+
+  /**
+   * Resolve organization type codes to names from Category
+   */
+  private async resolveOrganizationTypeNames(
+    organizationTypes: string[] | undefined | null,
+    codeToNameMap?: Map<string, string>,
+  ): Promise<string[]> {
+    if (!organizationTypes || organizationTypes.length === 0) {
+      return [];
+    }
+
+    // If codeToNameMap is provided, use it (for batch operations)
+    if (codeToNameMap) {
+      return organizationTypes.map(
+        (code) => codeToNameMap.get(code) || code,
+      );
+    }
+
+    // Otherwise, query from database (for single member operations)
+    const map = await this.getOrganizationTypeCodeToNameMap(organizationTypes);
+
+    // Return names in the same order as codes, fallback to code if not found
+    return organizationTypes.map((code) => map.get(code) || code);
+  }
+
+  private async mapToResponseDto(
+    member: any,
+    codeToNameMap?: Map<string, string>,
+  ): Promise<MemberResponseDto> {
     // Map business categories từ memberBusinessCategories relation
     const businessCategories = (member.memberBusinessCategories || []).map(
       (mbc: any) => ({
@@ -905,6 +980,15 @@ export class MembersService {
     const primaryUser =
       Array.isArray(member.User) && member.User.length > 0
         ? member.User[0]
+        : undefined;
+
+    // Resolve organization type names
+    const organizationTypeNames =
+      member.enterpriseDetail?.organizationTypes
+        ? await this.resolveOrganizationTypeNames(
+            member.enterpriseDetail.organizationTypes,
+            codeToNameMap,
+          )
         : undefined;
 
     return {
@@ -938,7 +1022,12 @@ export class MembersService {
             address: member.branchCategory.address,
           }
         : undefined,
-      enterpriseDetail: member.enterpriseDetail,
+      enterpriseDetail: member.enterpriseDetail
+        ? {
+            ...member.enterpriseDetail,
+            organizationTypeNames,
+          }
+        : undefined,
       associationDetail: member.associationDetail,
       contacts: member.contacts || [],
       businessCategories,

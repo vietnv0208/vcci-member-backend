@@ -4098,6 +4098,13 @@
             "items": {
               "type": "string"
             }
+          },
+          "organizationTypeNames": {
+            "description": "Tên các loại hình tổ chức (từ category codes)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
