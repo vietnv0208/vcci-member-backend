@@ -1,0 +1,1 @@
+docker compose -f be-dev.yml up -d --force-recreate --build
