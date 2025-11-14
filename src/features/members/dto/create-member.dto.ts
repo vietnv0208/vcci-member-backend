@@ -47,6 +47,7 @@ export class CreateMemberContactDto {
 
   @ApiPropertyOptional({ description: 'Email' })
   @IsOptional()
+  @IsString()
   // @ValidateIf((o) => o.email !== '')
   // @IsEmail({}, { message: 'Email không hợp lệ' })
   email?: string;
