@@ -47,8 +47,8 @@ export class CreateMemberContactDto {
 
   @ApiPropertyOptional({ description: 'Email' })
   @IsOptional()
-  @ValidateIf((o) => o.email !== '')
-  @IsEmail({}, { message: 'Email không hợp lệ' })
+  // @ValidateIf((o) => o.email !== '')
+  // @IsEmail({}, { message: 'Email không hợp lệ' })
   email?: string;
 
   @ApiPropertyOptional({ description: 'Ghi chú' })
@@ -169,7 +169,7 @@ export class CreateMemberDto {
   telephone: string;
 
   @ApiProperty({ description: 'Email' })
-  @IsEmail({}, { message: 'Email không hợp lệ' })
+  // @IsEmail({}, { message: 'Email không hợp lệ' })
   email: string;
 
   @ApiPropertyOptional({ description: 'Website' })
