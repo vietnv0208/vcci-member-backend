@@ -64,7 +64,9 @@ export class MembersService {
   /**
    * Validate branchCategoryId có tồn tại và đang hoạt động
    */
-  private async validateBranchCategoryId(branchCategoryId: string): Promise<void> {
+  private async validateBranchCategoryId(
+    branchCategoryId: string,
+  ): Promise<void> {
     const branchCategory = await this.prisma.branchCategory.findUnique({
       where: { id: branchCategoryId },
     });
@@ -137,12 +139,11 @@ export class MembersService {
     const uniqueIds = Array.from(new Set(businessCategoryIds));
 
     // Kiểm tra từng ID có tồn tại trong BusinessCategory
-    const businessCategories =
-      await this.prisma.businessCategory.findMany({
-        where: {
-          id: { in: uniqueIds },
-        },
-      });
+    const businessCategories = await this.prisma.businessCategory.findMany({
+      where: {
+        id: { in: uniqueIds },
+      },
+    });
 
     const foundIds = new Set(businessCategories.map((c) => c.id));
     const invalidIds = uniqueIds.filter((id) => !foundIds.has(id));
@@ -166,6 +167,7 @@ export class MembersService {
   async create(
     createMemberDto: CreateMemberDto,
     userId?: string,
+    status?: MemberStatus,
   ): Promise<MemberResponseDto> {
     const {
       enterpriseDetail,
@@ -215,6 +217,7 @@ export class MembersService {
       contacts: {
         create: contacts,
       },
+      ...(status ? { status } : {}),
     };
 
     // Validate và set branch category if provided
@@ -813,7 +816,7 @@ export class MembersService {
             action: 'updated',
           });
         } else {
-          const created = await this.create(dto, userId);
+          const created = await this.create(dto, userId, MemberStatus.ACTIVE);
           await this.upsertPaymentYears(created.id, paymentYears);
           details.created.push({
             id: created.id,
@@ -949,9 +952,7 @@ export class MembersService {
 
     // If codeToNameMap is provided, use it (for batch operations)
     if (codeToNameMap) {
-      return organizationTypes.map(
-        (code) => codeToNameMap.get(code) || code,
-      );
+      return organizationTypes.map((code) => codeToNameMap.get(code) || code);
     }
 
     // Otherwise, query from database (for single member operations)
@@ -983,13 +984,12 @@ export class MembersService {
         : undefined;
 
     // Resolve organization type names
-    const organizationTypeNames =
-      member.enterpriseDetail?.organizationTypes
-        ? await this.resolveOrganizationTypeNames(
-            member.enterpriseDetail.organizationTypes,
-            codeToNameMap,
-          )
-        : undefined;
+    const organizationTypeNames = member.enterpriseDetail?.organizationTypes
+      ? await this.resolveOrganizationTypeNames(
+          member.enterpriseDetail.organizationTypes,
+          codeToNameMap,
+        )
+      : undefined;
 
     return {
       id: member.id,
