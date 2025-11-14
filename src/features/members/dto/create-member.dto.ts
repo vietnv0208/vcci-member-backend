@@ -8,7 +8,7 @@ import {
   ValidateNested,
   IsInt,
   IsNumber,
-  ValidateIf,
+  ValidateIf, IsNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -170,6 +170,8 @@ export class CreateMemberDto {
 
   @ApiProperty({ description: 'Email' })
   // @IsEmail({}, { message: 'Email không hợp lệ' })
+  @IsString()
+  @IsNotEmpty()
   email: string;
 
   @ApiPropertyOptional({ description: 'Website' })
